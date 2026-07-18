@@ -592,6 +592,7 @@
               <tr><td class="mono">entry_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำรายการ</td></tr>
               <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสร้างรายการนี้ เลือกได้เฉพาะ: manual, sales, procurement, inventory, hr, asset</td></tr>
               <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบขายที่ทำให้เกิดรายการนี้</td></tr>
+              <tr><td class="mono">(line) journal_entry_id</td><td class="type">เลขอ้างอิง (FK → journal_entry)</td><td>บรรทัดนี้เป็นของใบบันทึกรายการไหน</td></tr>
               <tr><td class="mono">(line) account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>บรรทัดนี้ลงบัญชีไหน</td></tr>
               <tr><td class="mono">(line) cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>บรรทัดนี้ลงศูนย์ต้นทุนไหน ปล่อยว่างได้ถ้าไม่เจาะจง</td></tr>
               <tr><td class="mono">(line) debit / credit</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนเงินฝั่งเดบิต/เครดิตของบรรทัดนี้ — มีค่าใดค่าหนึ่งเท่านั้น อีกฝั่งเป็น 0</td></tr>

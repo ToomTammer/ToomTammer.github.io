@@ -569,6 +569,7 @@
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → customer)</td><td>ขายให้ลูกค้ารายไหน</td></tr>
               <tr><td class="mono">order_date</td><td class="type">วันที่ (date)</td><td>วันที่ตกลงซื้อขาย</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, confirmed, delivered, invoiced, cancelled</td></tr>
+              <tr><td class="mono">(line) sales_order_id</td><td class="type">เลขอ้างอิง (FK → sales_order)</td><td>บรรทัดนี้เป็นของใบสั่งขายไหน</td></tr>
               <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>ขายสินค้าอะไร</td></tr>
               <tr><td class="mono">(line) grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดที่ตกลงซื้อขาย เช่น A, B, C</td></tr>
               <tr><td class="mono">(line) weight / moisture</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักและความชื้นโดยประมาณที่ใช้ตั้งราคาตอนสั่งขาย</td></tr>

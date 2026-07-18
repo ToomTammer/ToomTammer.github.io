@@ -625,6 +625,7 @@
               <tr><td class="mono">warehouse_id</td><td class="type">เลขอ้างอิง (FK → warehouse)</td><td>ตรวจนับคลังไหน</td></tr>
               <tr><td class="mono">counted_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจนับ</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, completed, adjusted</td></tr>
+              <tr><td class="mono">(line) stock_count_id</td><td class="type">เลขอ้างอิง (FK → stock_count)</td><td>บรรทัดนี้เป็นของรอบตรวจนับไหน</td></tr>
               <tr><td class="mono">(line) stock_lot_id</td><td class="type">เลขอ้างอิง (FK → stock_lot)</td><td>นับล็อตไหน</td></tr>
               <tr><td class="mono">(line) system_quantity / counted_quantity</td><td class="type">ตัวเลข (decimal)</td><td>ยอดในระบบตอนเริ่มนับ เทียบกับยอดที่นับได้จริง</td></tr>
             </tbody>

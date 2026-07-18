@@ -621,6 +621,7 @@
             <tbody>
               <tr><td class="mono">period</td><td class="type">ข้อความ/วันที่</td><td>งวดเงินเดือนนี้ครอบคลุมช่วงไหน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, calculated, approved, paid, posted</td></tr>
+              <tr><td class="mono">(line) payroll_run_id</td><td class="type">เลขอ้างอิง (FK → payroll_run)</td><td>บรรทัดนี้เป็นของรอบเงินเดือนไหน</td></tr>
               <tr><td class="mono">(line) employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>เงินเดือนงวดนี้ของใคร</td></tr>
               <tr><td class="mono">(line) gross_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้รวมก่อนหัก (ฐานค่าจ้าง + OT + piece rate)</td></tr>
               <tr><td class="mono">(line) social_security_deduction / tax_deduction</td><td class="type">ตัวเลข (decimal)</td><td>ยอดหักประกันสังคมและภาษี ณ ที่จ่าย</td></tr>
