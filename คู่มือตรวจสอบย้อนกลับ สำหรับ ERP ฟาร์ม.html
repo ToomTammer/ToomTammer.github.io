@@ -1,0 +1,745 @@
+<title>โมดูลตรวจสอบย้อนกลับ (Traceability) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#trace">การตรวจสอบย้อนกลับและมาตรฐาน (Traceability &amp; Compliance)</a>
+    <span class="sep">/</span>
+    <span class="here">ตรวจสอบย้อนกลับ</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Traceability Module 1/3 · Traceability — Dev-Ready Spec</span>
+    <h1>โมดูลตรวจสอบย้อนกลับ (Traceability)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้คล้าย "รายงานและแดชบอร์ด" ตรงที่ไม่ได้เป็นเจ้าของข้อมูลการผลิต/ขายเอง แต่เป็นชั้นเชื่อมโยงข้อมูลข้ามโมดูลทั้งฝั่งพืชและปศุสัตว์เข้าด้วยกัน ตั้งแต่ต้นทาง (แปลง/สัตว์) จนถึงลูกค้าที่ซื้อสินค้าไป (farm-to-table)</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>สร้างรหัสติดตาม/QR code ต่อ lot สินค้า <span class="en">(Trace Code Generation)</span></li>
+          <li>เชื่อมโยงข้อมูลตลอดห่วงโซ่ตั้งแต่ต้นทางถึงปลายทาง</li>
+          <li>ค้นหาประวัติย้อนกลับจาก lot ที่ขายแล้ว <span class="en">(Backward Trace)</span></li>
+          <li>ค้นหาไปข้างหน้าเพื่อประเมินผลกระทบการเรียกคืน <span class="en">(Forward Trace / Recall)</span></li>
+          <li>สร้างรายงานตรวจสอบย้อนกลับสำหรับผู้ตรวจประเมิน</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (อ่านข้อมูลจากโมดูลอื่น ไม่คำนวณซ้ำ)</h3>
+        <ul>
+          <li>ไม่ได้เป็นเจ้าของข้อมูลการผลิต/ขายเอง — อ่านจาก <span class="en">stock_lot</span> (คลังสินค้า), <span class="en">harvest_record/dispatch_record</span> (พืช/ปศุสัตว์), <span class="en">sales_order/delivery_note</span> (ขาย)</li>
+          <li>ไม่คำนวณต้นทุน/คุณภาพซ้ำ — ใช้ค่าที่โมดูลต้นทางบันทึกไว้แล้ว</li>
+          <li>การขอรับรองมาตรฐาน GAP/GMP จริง — เป็นของ <span class="en">มาตรฐานฟาร์ม</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลต้นทาง</th><th>ข้อมูลที่ดึงมา</th><th>ใช้ทำอะไรใน Traceability</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>คลังสินค้า/สต็อก</td><td>stock_lot ที่สร้างจากการเก็บเกี่ยว/คัดแยก</td><td>จุดเริ่มต้นของ trace code</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว / คัดแยกและส่งขาย</td><td>harvest_record / dispatch_record ที่ทำให้เกิด lot</td><td>เชื่อมโยงย้อนกลับไปยังแปลง/สัตว์ต้นทาง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>แผนการเพาะปลูก / ทะเบียนสัตว์</td><td>planting_plan / animal_group ต้นทาง</td><td>เชื่อมโยงไปยังพันธุ์พืช/สายพันธุ์สัตว์</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การให้น้ำ ปุ๋ย และยา / อาหารสัตว์ / สุขภาพและวัคซีน</td><td>pesticide_application, treatment_record ฯลฯ</td><td>แสดงประวัติสารเคมี/ยาที่ใช้ในรอบนั้น</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ขายและลูกค้า</td><td>sales_order, delivery_note</td><td>เชื่อมโยงไปข้างหน้าถึงลูกค้าที่ซื้อ lot นี้</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการติดตามพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สร้างรหัสติดตามอัตโนมัติทุกครั้งที่มี stock_lot ใหม่</span></li>
+          <li class="func-item"><span class="txt">เชื่อมโยง trace code กับต้นทาง (แปลง/สัตว์, รอบผลิต, พันธุ์/สายพันธุ์)</span></li>
+          <li class="func-item"><span class="txt">เชื่อมโยง trace code กับปัจจัยการผลิตที่ใช้ (ปุ๋ย/สารเคมี/ยา/อาหาร)</span></li>
+          <li class="func-item"><span class="txt">ค้นหาประวัติย้อนกลับจาก lot หรือ trace code หนึ่ง</span></li>
+          <li class="func-item"><span class="txt">ค้นหาไปข้างหน้าว่า lot ต้นทางถูกขายให้ลูกค้าที่ไหนบ้าง</span></li>
+          <li class="func-item"><span class="txt">พิมพ์/แสดง QR code สำหรับติดฉลากสินค้า</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สร้างรายงานตรวจสอบย้อนกลับพร้อมส่งผู้ตรวจประเมิน (export PDF)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนอัตโนมัติเมื่อพบปัญหาที่ต้นทางว่ากระทบ lot ที่ขายไปแล้วบ้าง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เชื่อม blockchain/ระบบภายนอกยืนยันความถูกต้องของข้อมูล</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">พอร์ทัลให้ลูกค้าปลายทางสแกน QR code ดูประวัติสินค้าเอง</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>trace_code <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รหัสติดตาม — รหัส/QR code เฉพาะของแต่ละ lot สินค้า ใช้เป็นจุดเข้าหลักในการค้นหาประวัติย้อนกลับ</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ stock_lot (จากโมดูลคลังสินค้า) แบบหนึ่งต่อหนึ่ง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">stock_lot_ref</td><td class="type">ข้อความ (อ้างอิง stock_lot)</td><td>รหัสนี้เป็นของ lot ไหนในคลังสินค้า</td></tr>
+              <tr><td class="mono">trace_code</td><td class="type">ข้อความ (unique)</td><td>รหัสที่ใช้พิมพ์เป็น QR code บนฉลากสินค้า</td></tr>
+              <tr><td class="mono">generated_date</td><td class="type">วันที่ (date)</td><td>วันที่สร้างรหัสนี้</td></tr>
+              <tr><td class="mono">qr_image_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>ตำแหน่งที่เก็บรูปภาพ QR ที่สร้างไว้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>trace_link <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การเชื่อมโยงย้อนกลับ — บันทึกความสัมพันธ์ระหว่าง trace_code กับเอนทิตีต้นทางในโมดูลอื่นที่เกี่ยวข้อง เช่น harvest_record, animal_group, pesticide_application, sales_order</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ trace_code และอ้างอิงเอนทิตีต้นทางแบบยืดหยุ่น (source_module + source_entity + source_ref_id) เพื่อรองรับได้ทั้งฝั่งพืชและปศุสัตว์</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>เป็นการเชื่อมโยงของรหัสติดตามไหน</td></tr>
+              <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ข้อมูลนี้มาจากโมดูลไหน เลือกได้เฉพาะ: crop, livestock, procurement, sales</td></tr>
+              <tr><td class="mono">source_entity</td><td class="type">ข้อความ (text)</td><td>ชื่อเอนทิตีต้นทาง เช่น "harvest_record", "animal_group", "pesticide_application"</td></tr>
+              <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงของรายการต้นทางนั้น</td></tr>
+              <tr><td class="mono">link_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการเชื่อมโยง เลือกได้เฉพาะ: origin (ต้นทางหลัก), input (ปัจจัยการผลิตที่ใช้), destination (ปลายทางที่ขายไป)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>recall_event <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เหตุการณ์เรียกคืนสินค้า — บันทึกกรณีที่ต้องเรียกคืนสินค้าเนื่องจากพบปัญหาที่ต้นทาง ใช้ค้นหาว่ากระทบลูกค้ารายไหนบ้างผ่าน forward trace</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ trace_code ที่ได้รับผลกระทบ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>เรียกคืน lot ไหน</td></tr>
+              <tr><td class="mono">reason</td><td class="type">ข้อความ (text)</td><td>สาเหตุที่ต้องเรียกคืน</td></tr>
+              <tr><td class="mono">initiated_date</td><td class="type">วันที่ (date)</td><td>วันที่เริ่มดำเนินการเรียกคืน</td></tr>
+              <tr><td class="mono">affected_customer_refs</td><td class="type">ข้อความ (list)</td><td>รายชื่อลูกค้าที่ได้รับผลกระทบ คำนวณจาก forward trace</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: investigating, in_progress, resolved</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>traceability_report <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รายงานตรวจสอบย้อนกลับ — เอกสารสรุปประวัติทั้งหมดของ lot หนึ่ง จัดรูปแบบพร้อมส่งให้ผู้ตรวจประเมินมาตรฐานหรือลูกค้าส่งออก</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ trace_code หนึ่งรายงานต่อหนึ่งรหัส</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>รายงานนี้เป็นของรหัสติดตามไหน</td></tr>
+              <tr><td class="mono">generated_date</td><td class="type">วันที่ (date)</td><td>วันที่สร้างรายงาน</td></tr>
+              <tr><td class="mono">generated_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนสร้างรายงาน</td></tr>
+              <tr><td class="mono">file_ref</td><td class="type">ข้อความ (text)</td><td>ตำแหน่งที่เก็บไฟล์ PDF ที่สร้างขึ้น</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/trace-codes</td><td>ดึงรหัสติดตามทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/traceability/trace-codes</td><td>Internal endpoint สร้างรหัสติดตามใหม่ (เรียกอัตโนมัติเมื่อมี stock_lot ใหม่)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/trace-codes/{code}/qr-image</td><td>ดึงรูปภาพ QR code สำหรับติดฉลาก</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/trace-codes/{code}/backward</td><td>ประวัติย้อนกลับทั้งหมดของ lot นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/trace-codes/{code}/forward</td><td>รายชื่อลูกค้า/คำสั่งขายที่ได้รับสินค้าจาก lot นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/traceability/trace-links</td><td>Internal endpoint ให้โมดูลอื่นเรียกสร้างการเชื่อมโยงอัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/recall-events</td><td>ดึงรายการเรียกคืนสินค้าทั้งหมด</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/traceability/recall-events</td><td>เริ่มกระบวนการเรียกคืนสินค้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/traceability/recall-events/{id}/affected-customers</td><td>รายชื่อลูกค้าที่ได้รับผลกระทบจากการเรียกคืน</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/traceability/trace-codes/{code}/report</td><td>สร้างรายงานตรวจสอบย้อนกลับเป็น PDF</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">ดูประวัติย้อนกลับทั้งหมด สั่งเรียกคืนสินค้า</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/แปลง/โรงเรือน</div>
+        <div class="role-scope">ดูประวัติย้อนกลับของ lot ที่เกี่ยวข้องกับพื้นที่ตน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่ควบคุมคุณภาพ/มาตรฐาน</div>
+        <div class="role-scope">สร้างรายงานตรวจสอบย้อนกลับให้ผู้ตรวจประเมิน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานขาย</div>
+        <div class="role-scope">ดูรหัสติดตามเพื่อติดฉลากสินค้าตอนขาย ไม่มีสิทธิ์สั่งเรียกคืน</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการพื้นที่</th><th class="center">เจ้าหน้าที่ควบคุมคุณภาพ</th><th class="center">พนักงานขาย</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ดูประวัติย้อนกลับ (backward trace)</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ดูประวัติไปข้างหน้า (forward trace)</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>สั่งเรียกคืนสินค้า</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>สร้างรายงานตรวจสอบย้อนกลับ</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>พิมพ์/ดาวน์โหลด QR code</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>สร้างรหัสติดตามอัตโนมัติ (Trace Code Generation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทำงานทันทีที่มี stock_lot ใหม่เกิดขึ้นไม่ว่าจากพืชหรือปศุสัตว์</p>
+        <pre class="formula">trace_code =
+  [FARM_CODE] - [YYYYMMDD] - [STOCK_LOT_ID]
+
+สร้างอัตโนมัติทุกครั้งที่มี stock_lot ใหม่
+  (ไม่ว่าจะมาจาก harvest_record หรือ dispatch_record)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>สร้างการเชื่อมโยงอัตโนมัติจากเหตุการณ์โมดูลอื่น</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>กฎที่ทำให้ข้อมูลเชื่อมกันเองโดยไม่ต้องให้ผู้ใช้คีย์ย้อนหลัง</p>
+        <pre class="formula">harvest_record/dispatch_record สร้าง stock_lot ใหม่
+  -&gt; สร้าง trace_link (link_type = origin)
+     ไปยัง planting_plan / animal_group ต้นทาง
+
+pesticide_application/treatment_record เกิดขึ้น
+  ในช่วงเวลาของ planting_plan/animal_group เดียวกัน
+  -&gt; สร้าง trace_link (link_type = input)
+
+sales_order/delivery_note อ้างอิง stock_lot นี้
+  -&gt; สร้าง trace_link (link_type = destination)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ค้นหาย้อนกลับแบบไล่ลำดับ (Recursive Backward Trace)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>แสดงเป็นลำดับเวลาตั้งแต่ต้นทางจนถึงการเก็บเกี่ยว/คัดแยก</p>
+        <pre class="formula">backward_trace(trace_code) =
+  ไล่ trace_link ทุกแถวที่
+  link_type IN (origin, input) ของ trace_code นี้
+  เรียงตามเวลาเป็น timeline เดียว</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ประเมินผลกระทบไปข้างหน้า (Forward Impact Assessment)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ตอนต้องเรียกคืนสินค้า เพื่อรู้ว่ากระทบลูกค้ารายไหนบ้าง</p>
+        <pre class="formula">forward_trace(trace_code) =
+  ไล่ trace_link ที่ link_type = destination
+  หา sales_order/delivery_note/ลูกค้าทั้งหมด
+
+ถ้าสร้าง recall_event:
+  affected_customer_refs = ผลลัพธ์จาก forward_trace ทั้งหมด</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบความสมบูรณ์ของห่วงโซ่ (Trace Chain Completeness)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ป้องกันไม่ให้ขายสินค้าที่ตรวจสอบย้อนกลับไม่ได้เข้าโมเดิร์นเทรด/ส่งออก</p>
+        <pre class="formula">is_trace_complete(trace_code) =
+  มี trace_link (link_type = origin) อย่างน้อย 1 รายการ
+  AND มีข้อมูล input ตามที่กำหนดสำหรับชนิดสินค้านั้น
+      (พืช: ต้องมี planting_plan link
+       ปศุสัตว์: ต้องมี animal_group link)
+
+ถ้าไม่ครบ -&gt; flag เตือนว่าข้อมูลย้อนกลับไม่สมบูรณ์
+  ก่อนอนุมัติขายเข้าโมเดิร์นเทรด/ส่งออก</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "ตรวจสอบย้อนกลับ" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

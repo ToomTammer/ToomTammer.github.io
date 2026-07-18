@@ -1,0 +1,770 @@
+<title>โมดูลมาตรฐานฟาร์ม (Farm Standards) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#trace">การตรวจสอบย้อนกลับและมาตรฐาน (Traceability &amp; Compliance)</a>
+    <span class="sep">/</span>
+    <span class="here">มาตรฐานฟาร์ม</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Traceability Module 2/3 · Farm Standards — Dev-Ready Spec</span>
+    <h1>โมดูลมาตรฐานฟาร์ม (Farm Standards)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้ดูแลการขอ/ต่ออายุ/รักษามาตรฐานฟาร์ม (GAP, GMP, HACCP, ปศุสัตว์ OK, Organic ฯลฯ) ตั้งแต่เช็กลิสต์ข้อกำหนด การตรวจประเมิน จนถึงติดตามใบรับรองและการแก้ไขข้อบกพร่อง โดยดึงหลักฐานจากโมดูลอื่นแทนการบันทึกซ้ำ</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>กำหนดมาตรฐาน/เช็กลิสต์ข้อกำหนดที่ฟาร์มต้องปฏิบัติตาม</li>
+          <li>วางแผน/บันทึกผลการตรวจประเมิน (audit) ทั้งภายในและภายนอก</li>
+          <li>ติดตามข้อบกพร่องและการแก้ไข <span class="en">(Corrective Action)</span></li>
+          <li>ติดตามอายุใบรับรองและแจ้งเตือนก่อนหมดอายุ</li>
+          <li>รวบรวมหลักฐานพร้อมส่งผู้ตรวจประเมิน</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (อ่านข้อมูลจากโมดูลอื่น ไม่คำนวณซ้ำ)</h3>
+        <ul>
+          <li>ไม่ได้เป็นเจ้าของข้อมูลการผลิตเอง — ดึงหลักฐานจาก <span class="en">ตรวจสอบย้อนกลับ (trace_code/trace_link)</span>, <span class="en">การให้น้ำ ปุ๋ย และยา</span>, <span class="en">สุขภาพและวัคซีน</span></li>
+          <li>ไม่ตรวจสอบ PHI/withdrawal period ซ้ำ — ใช้ผลจากโมดูลต้นทางที่คำนวณไว้แล้ว</li>
+          <li>การส่งรายงานให้หน่วยงานรัฐจริง — เป็นของ <span class="en">รายงานหน่วยงานรัฐ</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลต้นทาง</th><th>ข้อมูลที่ดึงมา</th><th>ใช้ทำอะไรใน Farm Standards</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ตรวจสอบย้อนกลับ</td><td>trace_code, trace_link ของรอบผลิต/lot ที่ตรวจ</td><td>เป็นหลักฐานประกอบเช็กลิสต์ (evidence pack)</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>การให้น้ำ ปุ๋ย และยา</td><td>pesticide_application, ผล PHI check</td><td>หลักฐานการใช้สารเคมีตามเกณฑ์ GAP</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>สุขภาพและวัคซีน</td><td>vaccination_record, treatment_record, ผล withdrawal check</td><td>หลักฐานตามเกณฑ์ปศุสัตว์ OK/GMP</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>ผังแปลงและที่ดิน / ทะเบียนสัตว์</td><td>field, animal_group ที่อยู่ในขอบเขตการรับรอง</td><td>ระบุขอบเขตพื้นที่/กลุ่มสัตว์ที่ใบรับรองครอบคลุม</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>รายงานและแดชบอร์ด</td><td>สถานะใบรับรอง, ผล audit</td><td>แสดงในแดชบอร์ดภาพรวม</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการรักษามาตรฐานพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กำหนดมาตรฐาน/เวอร์ชันเช็กลิสต์ที่ฟาร์มต้องปฏิบัติตาม</span></li>
+          <li class="func-item"><span class="txt">บันทึกแผนและผลการตรวจประเมิน (audit) ต่อมาตรฐาน</span></li>
+          <li class="func-item"><span class="txt">บันทึกผลรายข้อของเช็กลิสต์ (ผ่าน/ไม่ผ่าน/ไม่เกี่ยวข้อง)</span></li>
+          <li class="func-item"><span class="txt">เปิดและติดตามข้อบกพร่อง/การแก้ไขจนปิดงาน</span></li>
+          <li class="func-item"><span class="txt">บันทึกใบรับรอง วันออก วันหมดอายุ และแจ้งเตือนล่วงหน้า</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ดึงหลักฐานอัตโนมัติจากตรวจสอบย้อนกลับ/โมดูลอื่นมาแปะในเช็กลิสต์</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์แนวโน้มผลตรวจประเมินย้อนหลัง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">พอร์ทัลให้ผู้ตรวจประเมินภายนอกเข้าดู/คอมเมนต์เอง</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">เซ็นเอกสารรับรองด้วยลายเซ็นดิจิทัล</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>certification_standard <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มาตรฐานรับรอง — นิยามของมาตรฐานที่ฟาร์มต้องการขอ/รักษา เช่น GAP, GMP, HACCP, ปศุสัตว์ OK, Organic</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> เป็นต้นทางของ standard_checklist_item, audit_record, certificate</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">standard_name</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ชื่อมาตรฐาน เลือกได้เฉพาะ: GAP, GMP, HACCP, ปศุสัตว์_OK, Organic, อื่นๆ</td></tr>
+              <tr><td class="mono">version</td><td class="type">ข้อความ (text)</td><td>เวอร์ชัน/ปีของเกณฑ์มาตรฐานที่ใช้อ้างอิง</td></tr>
+              <tr><td class="mono">issuing_body</td><td class="type">ข้อความ (text)</td><td>หน่วยงานที่ออกใบรับรอง เช่น กรมวิชาการเกษตร กรมปศุสัตว์</td></tr>
+              <tr><td class="mono">scope_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใช้กับพืชหรือปศุสัตว์ เลือกได้เฉพาะ: crop, livestock, both</td></tr>
+              <tr><td class="mono">audit_cycle_months</td><td class="type">ตัวเลข (int)</td><td>รอบระยะเวลาที่ต้องตรวจประเมินซ้ำ หน่วยเดือน</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>standard_checklist_item <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ข้อกำหนดในเช็กลิสต์ — รายการข้อกำหนดย่อยของมาตรฐานหนึ่งที่ต้องตรวจสอบทุกครั้งที่มี audit</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ certification_standard หนึ่งรายการมีได้หลายข้อกำหนด</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>ข้อกำหนดนี้เป็นของมาตรฐานไหน</td></tr>
+              <tr><td class="mono">item_code</td><td class="type">ข้อความ (text)</td><td>รหัสข้อกำหนดตามเอกสารมาตรฐาน เช่น "GAP-4.2"</td></tr>
+              <tr><td class="mono">requirement_text</td><td class="type">ข้อความ (text)</td><td>รายละเอียดสิ่งที่ต้องปฏิบัติตาม</td></tr>
+              <tr><td class="mono">evidence_type_required</td><td class="type">ข้อความ (text, ว่างได้)</td><td>ประเภทหลักฐานที่ต้องแนบ เช่น "บันทึกการใช้สารเคมี"</td></tr>
+              <tr><td class="mono">is_critical</td><td class="type">ค่าจริง/เท็จ (boolean)</td><td>เป็นข้อกำหนดวิกฤต ถ้าไม่ผ่านให้ audit ล้มเหลวทันทีหรือไม่</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>audit_record <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รอบการตรวจประเมิน — บันทึกการตรวจประเมินหนึ่งครั้งของมาตรฐานหนึ่ง ไม่ว่าจะเป็นการตรวจภายในเองหรือผู้ตรวจภายนอก</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ certification_standard และมี audit_finding ย่อยหลายรายการ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>รอบตรวจนี้เป็นของมาตรฐานไหน</td></tr>
+              <tr><td class="mono">audit_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจประเมิน</td></tr>
+              <tr><td class="mono">audit_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: internal (ตรวจเอง), external (ผู้ตรวจภายนอก)</td></tr>
+              <tr><td class="mono">auditor_name</td><td class="type">ข้อความ (text)</td><td>ชื่อผู้ตรวจ/หน่วยงานผู้ตรวจ</td></tr>
+              <tr><td class="mono">overall_result</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ผลรวม เลือกได้เฉพาะ: pass, conditional, fail — คำนวณจาก audit_finding</td></tr>
+              <tr><td class="mono">next_audit_due_date</td><td class="type">วันที่ (date)</td><td>วันครบกำหนดตรวจครั้งถัดไป</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>audit_finding <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ผลตรวจรายข้อ — ผลการตรวจของแต่ละข้อกำหนดในเช็กลิสต์ ณ รอบ audit หนึ่ง พร้อมการแก้ไขถ้าพบข้อบกพร่อง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ audit_record และ standard_checklist_item</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">audit_record_id</td><td class="type">เลขอ้างอิง (FK → audit_record)</td><td>ผลนี้เป็นของรอบตรวจไหน</td></tr>
+              <tr><td class="mono">checklist_item_id</td><td class="type">เลขอ้างอิง (FK → standard_checklist_item)</td><td>ผลนี้เป็นของข้อกำหนดไหน</td></tr>
+              <tr><td class="mono">result</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: comply, non_comply, not_applicable</td></tr>
+              <tr><td class="mono">evidence_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>อ้างอิงหลักฐาน เช่น trace_code หรือไฟล์แนบ</td></tr>
+              <tr><td class="mono">corrective_action</td><td class="type">ข้อความ (text, ว่างได้)</td><td>สิ่งที่ต้องแก้ไข ถ้าผลเป็น non_comply</td></tr>
+              <tr><td class="mono">corrective_deadline</td><td class="type">วันที่ (date, ว่างได้)</td><td>กำหนดเวลาต้องแก้ไขให้เสร็จ</td></tr>
+              <tr><td class="mono">corrective_status</td><td class="type">ตัวเลือกคงที่ (enum, ว่างได้)</td><td>เลือกได้เฉพาะ: open, in_progress, closed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>certificate <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบรับรอง — เอกสารใบรับรองที่ออกจริงหลังผ่านการตรวจประเมิน พร้อมวันหมดอายุที่ต้องเฝ้าติดตาม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ certification_standard และอาจอ้างอิง audit_record ที่ทำให้ได้ใบรับรองนี้</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>ใบรับรองนี้เป็นของมาตรฐานไหน</td></tr>
+              <tr><td class="mono">audit_record_id</td><td class="type">เลขอ้างอิง (FK → audit_record, ว่างได้)</td><td>ออกจากผลตรวจรอบไหน</td></tr>
+              <tr><td class="mono">certificate_number</td><td class="type">ข้อความ (unique)</td><td>เลขที่ใบรับรองตามที่หน่วยงานออกให้</td></tr>
+              <tr><td class="mono">issued_date</td><td class="type">วันที่ (date)</td><td>วันที่ออกใบรับรอง</td></tr>
+              <tr><td class="mono">expiry_date</td><td class="type">วันที่ (date)</td><td>วันหมดอายุใบรับรอง</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: active, expiring_soon, expired, revoked</td></tr>
+              <tr><td class="mono">file_ref</td><td class="type">ข้อความ (text)</td><td>ตำแหน่งที่เก็บไฟล์สแกนใบรับรอง</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/standards/certification-standards</td><td>ดึงมาตรฐานทั้งหมดที่ฟาร์มใช้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/certification-standards</td><td>เพิ่มมาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/checklist-items</td><td>เพิ่มข้อกำหนดในเช็กลิสต์ของมาตรฐาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records</td><td>สร้างรอบตรวจประเมินใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/findings</td><td>ดึงผลตรวจรายข้อของรอบ audit นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records/{id}/findings</td><td>บันทึกผลตรวจรายข้อ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/standards/audit-findings/{id}</td><td>อัปเดตสถานะการแก้ไขข้อบกพร่อง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/certificates/expiring</td><td>ดึงใบรับรองที่ใกล้หมดอายุ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/certificates</td><td>บันทึกใบรับรองที่ได้รับ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/evidence-pack</td><td>รวบรวมหลักฐานจากตรวจสอบย้อนกลับ/โมดูลอื่นอัตโนมัติ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">ดูภาพรวมสถานะมาตรฐานและใบรับรองทั้งหมด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่ควบคุมคุณภาพ/มาตรฐาน</div>
+        <div class="role-scope">เจ้าของหลักของโมดูล — ตั้งเช็กลิสต์ บันทึกผล audit ติดตามการแก้ไข</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/แปลง/โรงเรือน</div>
+        <div class="role-scope">รับทราบข้อบกพร่องที่เกี่ยวกับพื้นที่ตนและดำเนินการแก้ไข</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้ตรวจประเมินภายนอก</div>
+        <div class="role-scope">ดูเช็กลิสต์และหลักฐาน บันทึกผลตรวจในรอบที่ได้รับมอบหมายเท่านั้น</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">เจ้าหน้าที่มาตรฐาน</th><th class="center">ผู้จัดการพื้นที่</th><th class="center">ผู้ตรวจภายนอก</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>กำหนดมาตรฐาน/เช็กลิสต์</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>สร้างรอบตรวจ/บันทึกผลตรวจ</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓ (เฉพาะรอบที่ได้รับมอบหมาย)</td></tr>
+          <tr><td>ปิดข้อบกพร่อง/การแก้ไข</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✗</td></tr>
+          <tr><td>บันทึก/แก้ไขใบรับรอง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานสถานะมาตรฐานทั้งหมด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตัดสินผลรวมของ Audit (Overall Result Determination)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>คำนวณจากสัดส่วนข้อกำหนดที่ผ่าน เมื่อบันทึก audit_finding ครบทุกข้อ</p>
+        <pre class="formula">compliance_pct =
+  จำนวนข้อที่ result = comply
+  / จำนวนข้อทั้งหมดที่ result != not_applicable
+  &#215; 100
+
+ถ้ามีข้อ critical ใดข้อหนึ่ง result = non_comply
+  -&gt; overall_result = fail
+ถ้า compliance_pct &gt;= 95%
+  -&gt; overall_result = pass
+ถ้า 80% &lt;= compliance_pct &lt; 95%
+  -&gt; overall_result = conditional (ต้องมี corrective_action)
+ถ้า compliance_pct &lt; 80%
+  -&gt; overall_result = fail</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>กำหนดวันตรวจครั้งถัดไป (Next Audit Due Date)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ตั้งอัตโนมัติทันทีที่บันทึกผล audit เสร็จ ใช้แจ้งเตือนล่วงหน้า</p>
+        <pre class="formula">next_audit_due_date =
+  audit_date + standard.audit_cycle_months (เดือน)
+
+ถ้า overall_result = fail
+  -&gt; next_audit_due_date = audit_date + 1 เดือน (ตรวจซ้ำเร็วขึ้น)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>แจ้งเตือนใบรับรองใกล้หมดอายุ (Certificate Expiry Alert)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>รันเป็น scheduled job ตรวจทุกวัน เทียบกับวันที่ปัจจุบัน</p>
+        <pre class="formula">days_remaining = expiry_date - today
+
+ถ้า days_remaining &lt;= 0
+  -&gt; status = expired
+ถ้า 0 &lt; days_remaining &lt;= 60
+  -&gt; status = expiring_soon -&gt; แจ้งเตือนผู้รับผิดชอบ
+ถ้า days_remaining &gt; 60
+  -&gt; status = active</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ทวงติดตามการแก้ไข (Corrective Action Escalation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ป้องกันข้อบกพร่องค้างเกินกำหนดโดยไม่มีใครติดตาม</p>
+        <pre class="formula">ถ้า corrective_status != closed
+  AND today &gt; corrective_deadline
+  -&gt; แจ้งเตือนผู้จัดการพื้นที่และเจ้าหน้าที่มาตรฐานทันที
+     (escalate เป็นรายวันจนกว่าจะปิดงาน)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ดึงหลักฐานอัตโนมัติจากตรวจสอบย้อนกลับ (Evidence Auto-Pull)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ลดงานคีย์ซ้ำโดยดึง evidence_ref จากข้อมูลที่มีอยู่แล้วในระบบ</p>
+        <pre class="formula">เมื่อสร้าง audit_finding ที่ evidence_type_required ตรงกับ
+  ประเภทข้อมูลใน trace_link (source_module = crop/livestock)
+  ของช่วงเวลาเดียวกัน
+  -&gt; เสนอ evidence_ref อัตโนมัติให้ผู้ตรวจเลือกยืนยัน</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "มาตรฐานฟาร์ม" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

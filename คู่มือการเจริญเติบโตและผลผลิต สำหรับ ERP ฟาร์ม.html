@@ -1,0 +1,731 @@
+<title>โมดูลการเจริญเติบโตและผลผลิต (Growth &amp; Yield) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#livestock">โมดูลเฉพาะฟาร์มปศุสัตว์ (Livestock Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">การเจริญเติบโตและผลผลิต</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Livestock Module 5/7 · Growth &amp; Yield — Dev-Ready Spec</span>
+    <h1>โมดูลการเจริญเติบโตและผลผลิต (Growth &amp; Yield)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้ครอบคลุมสัตว์สองแบบ: สัตว์ที่เลี้ยงเพื่อน้ำหนัก/เนื้อ (ติดตามน้ำหนัก+ADG) และสัตว์ที่ให้ผลผลิตต่อเนื่อง เช่น วัวนม ไก่ไข่ (ติดตามผลผลิตรายวัน) เป็นแหล่งข้อมูลน้ำหนักหลักที่โมดูลอาหารสัตว์ใช้คำนวณ FCR</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>บันทึกน้ำหนักตัว <span class="en">(Weight Record)</span></li>
+          <li>คำนวณอัตราการเติบโตต่อวัน <span class="en">(ADG)</span></li>
+          <li>บันทึกผลผลิตรายวัน <span class="en">(Daily Yield)</span> — นม ไข่ หรือเนื้อ</li>
+          <li>เป้าหมายน้ำหนัก/ผลผลิตตามมาตรฐาน</li>
+          <li>แจ้งเตือนเมื่อสัตว์/ฝูงถึงเกณฑ์พร้อมขาย</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>ทะเบียนสัตว์/ฝูง — รับจาก <span class="en">ทะเบียนสัตว์</span></li>
+          <li>น้ำหนักแรกเกิดตั้งต้น — รับจาก <span class="en">ผสมพันธุ์และตั้งท้อง</span></li>
+          <li>น้ำหนักที่เพิ่มขึ้นสำหรับคำนวณ FCR — ส่งต่อให้ <span class="en">อาหารสัตว์</span></li>
+          <li>การคัดแยกและขายจริงเมื่อถึงเกณฑ์ — ส่งต่อให้ <span class="en">คัดแยกและส่งขาย</span></li>
+          <li>ผลผลิตนม/ไข่ที่พร้อมขาย — ส่งต่อให้ <span class="en">คลังสินค้า/สต็อก</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่การเจริญเติบโตฯ ต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ทะเบียนสัตว์</td><td>มีสัตว์/ฝูงพร้อมติดตาม</td><td>อ้างอิง animal_id/animal_group_id</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ผสมพันธุ์และตั้งท้อง</td><td>มีน้ำหนักแรกเกิดตั้งต้น</td><td>ใช้เป็นจุดเริ่มต้นคำนวณ ADG</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเจริญเติบโตฯ (ตัวเอง) → อาหารสัตว์</td><td>มีน้ำหนักที่เพิ่มขึ้นล่าสุด</td><td>ให้ total_weight_gain ไปคำนวณ FCR</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเจริญเติบโตฯ (ตัวเอง) → คัดแยกและส่งขาย</td><td>สัตว์/ฝูงถึงเกณฑ์น้ำหนักพร้อมขาย</td><td>แจ้งเตือนความพร้อม</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเจริญเติบโตฯ (ตัวเอง) → คลังสินค้า/สต็อก</td><td>บันทึกผลผลิตนม/ไข่รายวัน</td><td>สร้างสต็อกสินค้าสำเร็จรูป</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการติดตามพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">บันทึกน้ำหนักตัวเป็นระยะ</span></li>
+          <li class="func-item"><span class="txt">คำนวณอัตราการเติบโตต่อวัน (ADG) อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">บันทึกผลผลิตรายวัน (นม/ไข่/เนื้อ) ต่อตัว/ฝูง</span></li>
+          <li class="func-item"><span class="txt">ตั้งเป้าหมายน้ำหนัก/ผลผลิตตามมาตรฐานต่อช่วงอายุ</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนเมื่อสัตว์/ฝูงถึงเกณฑ์น้ำหนักพร้อมขาย</span></li>
+          <li class="func-item"><span class="txt">ดูกราฟการเติบโตเทียบเป้าหมายมาตรฐาน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เปรียบเทียบอัตราการเติบโต/ผลผลิตระหว่างฝูง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เชื่อมเครื่องชั่งอัตโนมัติ/เซนเซอร์บันทึกน้ำหนักโดยตรง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์วันที่จะถึงน้ำหนักเป้าหมายจากแนวโน้มที่ผ่านมา</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ปัจจัยที่กระทบการเติบโต (อาหาร/สุขภาพ/สภาพแวดล้อม)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์ผลผลิตล่วงหน้าทั้งฝูงจากข้อมูลย้อนหลัง</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>weight_record <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกน้ำหนัก — บันทึกน้ำหนักตัวสัตว์ที่ชั่งได้เป็นระยะ ใช้คำนวณอัตราการเติบโตและเป็นข้อมูลหลักที่โมดูลอาหารสัตว์ดึงไปใช้คำนวณ FCR</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal/animal_group จากโมดูลทะเบียนสัตว์</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ชั่งน้ำหนักสัตว์ตัวไหนหรือฝูงไหน</td></tr>
+              <tr><td class="mono">weigh_date</td><td class="type">วันที่ (date)</td><td>วันที่ชั่งน้ำหนัก</td></tr>
+              <tr><td class="mono">weight_value</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักที่ชั่งได้ (เฉลี่ยต่อตัว ถ้าเป็นการชั่งแทนทั้งฝูง)</td></tr>
+              <tr><td class="mono">sample_size</td><td class="type">ตัวเลข (integer, ว่างได้)</td><td>จำนวนตัวที่สุ่มชั่ง ถ้าเป็นการชั่งแทนทั้งฝูงแทนการชั่งทุกตัว</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>daily_yield_record <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกผลผลิตรายวัน — บันทึกผลผลิตที่เก็บได้รายวัน เช่น ปริมาณนม จำนวนไข่ ใช้กับสัตว์ที่ให้ผลผลิตต่อเนื่อง ไม่ใช่แค่ชั่งน้ำหนักครั้งเดียวตอนขาย</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal/animal_group เป็นต้นทางสร้างสต็อกสินค้าสำเร็จรูปในโมดูลคลังสินค้า</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ผลผลิตนี้มาจากสัตว์ตัวไหนหรือฝูงไหน</td></tr>
+              <tr><td class="mono">record_date</td><td class="type">วันที่ (date)</td><td>วันที่เก็บผลผลิต</td></tr>
+              <tr><td class="mono">yield_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทผลผลิต เลือกได้เฉพาะ: milk, egg, meat</td></tr>
+              <tr><td class="mono">quantity</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่เก็บได้จริงในวันนั้น</td></tr>
+              <tr><td class="mono">unit</td><td class="type">ข้อความ (text)</td><td>หน่วยนับ เช่น ลิตร, ฟอง, กก.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>growth_target_standard <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เป้าหมายมาตรฐาน — กำหนดน้ำหนัก/ผลผลิตที่ควรได้ตามช่วงอายุของสัตว์แต่ละชนิด ใช้เทียบกับผลจริงเพื่อดูว่าฝูงโตตามเกณฑ์หรือไม่</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ species (จากโมดูลทะเบียนสัตว์)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เป้าหมายนี้ใช้กับสัตว์ชนิดไหน</td></tr>
+              <tr><td class="mono">age_days</td><td class="type">ตัวเลข (integer)</td><td>อายุเป็นวันที่เป้าหมายนี้ใช้อ้างอิง</td></tr>
+              <tr><td class="mono">target_weight</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>น้ำหนักเป้าหมาย ณ อายุนั้น</td></tr>
+              <tr><td class="mono">target_daily_yield</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ผลผลิตรายวันเป้าหมาย ณ อายุนั้น สำหรับสัตว์ให้ผลผลิตต่อเนื่อง</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>market_readiness_alert <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การแจ้งเตือนพร้อมขาย — แจ้งเตือนเมื่อสัตว์/ฝูงถึงเกณฑ์น้ำหนักที่กำหนดว่าพร้อมส่งขาย</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal/animal_group ใช้ส่งต่อให้โมดูลคัดแยกและส่งขายตัดสินใจ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>แจ้งเตือนนี้เกี่ยวกับสัตว์ตัวไหนหรือฝูงไหน</td></tr>
+              <tr><td class="mono">triggered_date</td><td class="type">วันที่ (date)</td><td>วันที่ระบบตรวจพบว่าถึงเกณฑ์</td></tr>
+              <tr><td class="mono">current_weight / target_weight</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักปัจจุบันเทียบกับเป้าหมายที่กำหนดว่าพร้อมขาย</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: pending, acknowledged, sold</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/weight-records</td><td>ดึงประวัติการชั่งน้ำหนัก</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/weight-records</td><td>บันทึกน้ำหนักที่ชั่งได้จริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/adg</td><td>คำนวณอัตราการเติบโตต่อวันของฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/daily-yield-records</td><td>ดึงประวัติผลผลิตรายวัน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/daily-yield-records</td><td>บันทึกผลผลิตรายวันจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/growth-target-standards</td><td>ดึงเป้าหมายมาตรฐานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/growth-target-standards</td><td>ตั้งเป้าหมายมาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/growth-vs-target</td><td>เทียบน้ำหนัก/ผลผลิตจริงกับเป้าหมาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/market-readiness-alerts</td><td>ดึงรายการแจ้งเตือนพร้อมขาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/market-readiness-alerts/{id}/acknowledge</td><td>รับทราบการแจ้งเตือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/yield-summary</td><td>สรุปผลผลิตรวมต่อฝูง/ช่วงเวลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">ตั้งเป้าหมายมาตรฐาน ดูรายงานการเติบโต/ผลผลิตทั้งหมด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/โรงเรือน</div>
+        <div class="role-scope">ดูความคืบหน้าเทียบเป้าหมาย ตัดสินใจเรื่องเวลาขาย</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่ปศุสัตว์/พนักงานภาคสนาม</div>
+        <div class="role-scope">บันทึกน้ำหนัก/ผลผลิตประจำวันจริง</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานขาย</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อดูความพร้อมขายของแต่ละฝูง</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการโรงเรือน</th><th class="center">เจ้าหน้าที่ปศุสัตว์</th><th class="center">พนักงานขาย</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>บันทึกน้ำหนัก</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกผลผลิตรายวัน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ตั้ง/แก้ไขเป้าหมายมาตรฐาน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานเทียบเป้าหมาย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>รับทราบการแจ้งเตือนพร้อมขาย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>คำนวณอัตราการเติบโตต่อวัน (ADG)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>คำนวณระหว่างการชั่งสองครั้งล่าสุด</p>
+        <pre class="formula">ADG =
+  (current_weight - previous_weight)
+  / (current_weigh_date - previous_weigh_date)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เทียบน้ำหนัก/ผลผลิตจริงกับเป้าหมาย</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ดูว่าฝูงโตตามแผนหรือช้า/เร็วกว่าที่ควร</p>
+        <pre class="formula">weight_variance_pct =
+  (actual_weight - target_weight) / target_weight &#215; 100</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>แจ้งเตือนพร้อมขาย (Market Readiness Trigger)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทำงานอัตโนมัติทุกครั้งที่มีการบันทึกน้ำหนักใหม่</p>
+        <pre class="formula">ถ้า current_weight &gt;= target_weight
+   (ของช่วงอายุที่กำหนดว่าพร้อมขาย)
+
+-&gt; สร้าง market_readiness_alert (status = pending)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ผลผลิตสะสมต่อรอบ (Cumulative Yield per Cycle)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้สรุปผลผลิตรวมของฝูงในแต่ละรอบ/ช่วงเวลา</p>
+        <pre class="formula">total_yield(animal_group, period) =
+  SUM(daily_yield_record.quantity)
+  ในช่วงเวลาที่กำหนด</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>พยากรณ์วันที่จะถึงน้ำหนักเป้าหมาย</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ช่วยวางแผนวันขายล่วงหน้าจากแนวโน้มการเติบโตจริง</p>
+        <pre class="formula">days_to_target =
+  (target_weight - current_weight) / recent_adg
+
+recent_adg = ADG เฉลี่ยจากการชั่ง 2-3 ครั้งล่าสุด</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "การเจริญเติบโตและผลผลิต" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>
