@@ -1,0 +1,751 @@
+<title>โมดูลผังแปลงและที่ดิน (Field &amp; Land Mapping) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#crop">โมดูลเฉพาะพืชไร่/พืชสวน (Crop Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">ผังแปลงและที่ดิน</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Crop Module 1/6 · Field &amp; Land Mapping — Dev-Ready Spec</span>
+    <h1>โมดูลผังแปลงและที่ดิน (Field &amp; Land Mapping)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้เป็นรากฐานของโมดูลพืชไร่/พืชสวนทั้งหมด — กำหนด "แปลง" และ "โซน" ที่ทุกโมดูลปลูกพืชอื่นต้องอ้างอิงตาม field_id/zone_id เดียวกัน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ทะเบียนแปลง/ที่ดิน <span class="en">(Field Registry)</span> พร้อมขนาดพื้นที่และขอบเขต GPS/GIS</li>
+          <li>การแบ่งโซน/แปลงย่อยภายในแปลงใหญ่</li>
+          <li>ประวัติการใช้ที่ดินย้อนหลัง</li>
+          <li>ข้อมูลดิน (ประเภทดิน, pH, ความอุดมสมบูรณ์)</li>
+          <li>เอกสารสิทธิ์ที่ดินอ้างอิง</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>แผนการเพาะปลูกจริงต่อรอบ — ส่งต่อให้ <span class="en">แผนการเพาะปลูก</span> ใช้ field_id/zone_id อ้างอิง</li>
+          <li>การสร้างศูนย์ต้นทุนต่อแปลง — ส่งต่อให้ <span class="en">บัญชีและการเงิน</span> สร้าง cost_center</li>
+          <li>การให้น้ำ/ปุ๋ย/สารเคมีต่อแปลง — โมดูล <span class="en">การให้น้ำ ปุ๋ย และยา</span> อ้างอิง field_id นี้</li>
+          <li>พยากรณ์อากาศเฉพาะจุด — รับจาก <span class="en">สภาพอากาศ</span> โดยใช้พิกัด GPS ของแปลง</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่ผังแปลงต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ผังแปลง (ตัวเอง) → บัญชีและการเงิน</td><td>สร้างแปลง/โซนใหม่</td><td>เสนอให้สร้าง cost_center ผูกกับแปลงนั้น</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>แผนการเพาะปลูก</td><td>วางแผนปลูกพืชในแปลง/โซนหนึ่ง</td><td>ให้ field_id/zone_id อ้างอิงสำหรับผูกแผนปลูก</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การให้น้ำ ปุ๋ย และยา</td><td>บันทึกการให้น้ำ/ปุ๋ย/สารเคมีต่อแปลง</td><td>ให้พื้นที่ (ไร่) ของแปลงไว้คำนวณปริมาณที่ต้องใช้</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว</td><td>บันทึกผลผลิตต่อแปลงเมื่อจบรอบ</td><td>อัปเดตประวัติการใช้ที่ดินหลังเก็บเกี่ยว</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>สภาพอากาศ</td><td>ต้องการพิกัด GPS ของแปลงเพื่อสอบถามพยากรณ์เฉพาะจุด</td><td>ให้พิกัดขอบเขตแปลง</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการอ้างอิงแปลงพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการทะเบียนแปลง/ที่ดิน พร้อมขนาดพื้นที่และพิกัด GPS</span></li>
+          <li class="func-item"><span class="txt">วาดขอบเขตแปลงบนแผนที่ (GIS polygon) อย่างง่าย</span></li>
+          <li class="func-item"><span class="txt">แบ่งย่อยแปลงเป็นโซน/แปลงย่อย</span></li>
+          <li class="func-item"><span class="txt">บันทึกประวัติการใช้ที่ดินย้อนหลัง</span></li>
+          <li class="func-item"><span class="txt">เชื่อมกับบัญชีเพื่อสร้างศูนย์ต้นทุนต่อแปลง/โซน</span></li>
+          <li class="func-item"><span class="txt">ดูสรุปพื้นที่ทั้งหมดแยกตามสถานะการใช้งาน (ว่าง/กำลังปลูก/พักดิน)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">บันทึกข้อมูลดิน (ประเภทดิน, pH, ความอุดมสมบูรณ์)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เชื่อมพิกัด GPS ไปสอบถามพยากรณ์อากาศเฉพาะจุด</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แนบเอกสารสิทธิ์ที่ดิน (เลขโฉนด, ไฟล์สแกน)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แผนที่ภาพรวมฟาร์มแบบ interactive (ซูม/คลิกดูรายละเอียดแปลง)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ประวัติการปลูกเพื่อแนะนำการหมุนเวียนพืช</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">เชื่อมภาพถ่ายดาวเทียม/โดรนติดตามสภาพแปลง (NDVI)</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>field <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>แปลง/ที่ดิน — ทะเบียนแปลงที่ดินหลักของฟาร์ม แต่ละแปลงคือพื้นที่ทางกายภาพต่อเนื่องหนึ่งผืน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field_zone (แปลงย่อย), land_use_history และเชื่อมกับ cost_center ในโมดูลบัญชี</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_code</td><td class="type">ข้อความ (text)</td><td>รหัสแปลงที่ใช้อ้างอิงภายในระบบ</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อแปลง เช่น "แปลงหลังบ้านริมคลอง"</td></tr>
+              <tr><td class="mono">area_rai</td><td class="type">ตัวเลข (decimal)</td><td>ขนาดพื้นที่เป็นไร่</td></tr>
+              <tr><td class="mono">gps_boundary</td><td class="type">ข้อความ (GeoJSON/polygon)</td><td>พิกัดขอบเขตแปลงบนแผนที่ สำหรับวาด/คำนวณพื้นที่</td></tr>
+              <tr><td class="mono">land_title_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่เอกสารสิทธิ์ที่ดินอ้างอิง เช่น เลขโฉนด</td></tr>
+              <tr><td class="mono">default_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนหลักที่ผูกกับแปลงนี้</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: active, fallow (พักดิน), inactive</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>field_zone <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>โซน/แปลงย่อย — การแบ่งพื้นที่ย่อยภายในแปลงใหญ่ ใช้เมื่อปลูกพืชต่างชนิดหรือต่างรอบในแปลงเดียวกัน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field (แปลงแม่) และอาจมี cost_center ของตัวเองถ้าต้องแยกต้นทุนละเอียดกว่าระดับแปลง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id</td><td class="type">เลขอ้างอิง (FK → field)</td><td>โซนนี้อยู่ในแปลงไหน</td></tr>
+              <tr><td class="mono">zone_code</td><td class="type">ข้อความ (text)</td><td>รหัสโซนภายในแปลง เช่น "A1", "A2"</td></tr>
+              <tr><td class="mono">area_rai</td><td class="type">ตัวเลข (decimal)</td><td>ขนาดพื้นที่ของโซนนี้เป็นไร่</td></tr>
+              <tr><td class="mono">gps_boundary</td><td class="type">ข้อความ (GeoJSON, ว่างได้)</td><td>พิกัดขอบเขตโซนย่อย ถ้าต้องการแยกจากแปลงแม่</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center, ว่างได้)</td><td>ศูนย์ต้นทุนของโซนนี้โดยเฉพาะ ถ้าไม่ระบุใช้ของแปลงแม่ร่วมกัน</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>soil_data <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ข้อมูลดิน — คุณสมบัติดินของแปลง/โซน ใช้ประกอบการวางแผนปลูกและใส่ปุ๋ยให้เหมาะสม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field หรือ field_zone</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ข้อมูลดินนี้เป็นของแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">soil_type</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ประเภทดิน เช่น ดินร่วน ดินเหนียว ดินทราย</td></tr>
+              <tr><td class="mono">ph_level</td><td class="type">ตัวเลข (decimal)</td><td>ค่าความเป็นกรด-ด่างของดิน</td></tr>
+              <tr><td class="mono">organic_matter_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ร้อยละอินทรียวัตถุในดิน</td></tr>
+              <tr><td class="mono">test_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจวัดค่าดินนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>land_use_history <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ประวัติการใช้ที่ดิน — บันทึกว่าที่ผ่านมาแปลง/โซนนี้ปลูกพืชอะไรในช่วงไหนบ้าง ใช้วางแผนหมุนเวียนพืชและวิเคราะห์ผลผลิตย้อนหลัง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field/field_zone และอ้างอิง cost_center (batch) ของรอบปลูกจริงจากโมดูลแผนการเพาะปลูก</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ประวัตินี้เป็นของแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">crop_type</td><td class="type">ข้อความ (text)</td><td>ชนิดพืชที่ปลูกในรอบนั้น</td></tr>
+              <tr><td class="mono">planting_start_date / harvest_end_date</td><td class="type">วันที่ (date, ว่างได้)</td><td>ช่วงเวลาปลูกจนถึงเก็บเกี่ยวเสร็จ (ว่างถ้ายังไม่จบรอบ)</td></tr>
+              <tr><td class="mono">ref_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุน (batch) ของรอบปลูกนี้ในโมดูลบัญชี</td></tr>
+              <tr><td class="mono">yield_result</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ผลผลิตที่ได้จริง ถ้ามีบันทึกไว้จากโมดูลเก็บเกี่ยว</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields</td><td>ดึงรายการแปลงทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fields</td><td>สร้างแปลงใหม่พร้อมขอบเขต GPS</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/fields/{id}</td><td>แก้ไขข้อมูล/ขอบเขตแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/zones</td><td>ดึงโซนย่อยของแปลงหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fields/{id}/zones</td><td>สร้างโซนย่อยใหม่ในแปลงนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/zones/{id}</td><td>แก้ไขข้อมูลโซนย่อย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/land-use-history</td><td>ประวัติการใช้ที่ดินของแปลงหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/land-use-history</td><td>บันทึกประวัติการใช้ที่ดินใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/land-utilization</td><td>สรุปพื้นที่ทั้งหมดแยกตามสถานะการใช้งาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/gps-boundary</td><td>ดึงพิกัดขอบเขตสำหรับแสดงผลบนแผนที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/soil-data</td><td>ดึงข้อมูลดินของแปลง/โซน</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/soil-data</td><td>บันทึกผลตรวจดินใหม่</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">จัดการทะเบียนแปลงทั้งหมด แก้ไขขอบเขต GPS และเอกสารสิทธิ์ที่ดิน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการแปลง/หัวหน้างานเกษตร</div>
+        <div class="role-scope">แบ่งโซนปลูก บันทึกประวัติการใช้ที่ดินและข้อมูลดินของพื้นที่ตนดูแล</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่เกษตร/ผู้ช่วยภาคสนาม</div>
+        <div class="role-scope">อัปเดตสถานะแปลงพื้นฐานหน้างาน ไม่มีสิทธิ์แก้ขอบเขต GPS หรือเอกสารสิทธิ์</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานบัญชี</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อผูกศูนย์ต้นทุนกับแปลง/โซน</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการแปลง</th><th class="center">เจ้าหน้าที่เกษตร</th><th class="center">พนักงานบัญชี</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>สร้าง/แก้ไขทะเบียนแปลงและขอบเขต GPS</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>แบ่งโซน/แปลงย่อย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกประวัติการใช้ที่ดิน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✗</td></tr>
+          <tr><td>บันทึก/แก้ไขข้อมูลดิน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>แนบเอกสารสิทธิ์ที่ดิน</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานการใช้พื้นที่</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>คำนวณพื้นที่จากขอบเขต GPS</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ตรวจสอบว่าพื้นที่ที่วาดบนแผนที่ตรงกับที่กรอกไว้หรือไม่</p>
+        <pre class="formula">area_sq_meters =
+  geodesic_area(gps_boundary polygon)
+  (คำนวณจากพิกัดขอบเขตด้วยสูตรพื้นที่ทรงกลม/shoelace)
+
+area_rai = area_sq_meters / 1600
+  (1 ไร่ = 1,600 ตารางเมตร)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบพื้นที่โซนย่อยไม่เกินแปลงแม่</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ป้องกันข้อมูลผิดพลาดตอนแบ่งโซนย่อยเกินพื้นที่จริง</p>
+        <pre class="formula">SUM(field_zone.area_rai WHERE field_id = X)
+  &lt;= field.area_rai (ของแปลง X)
+
+ถ้าเกิน -&gt; reject การบันทึกโซนใหม่/แก้ไข</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>สถานะการใช้ที่ดิน ณ ปัจจุบัน (Current Land Utilization)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้สรุปว่าฟาร์มมีพื้นที่ว่างเหลือเท่าไหร่ ณ ตอนนี้</p>
+        <pre class="formula">is_in_use(field/zone) =
+  มี land_use_history ที่
+  planting_start_date &lt;= today
+  AND (harvest_end_date &gt;= today OR harvest_end_date ว่าง)
+
+utilization_rate =
+  SUM(area_rai ที่ is_in_use = true)
+  / SUM(area_rai ทั้งหมด)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เตือนแปลงที่พักดินนานเกินกำหนด (Fallow Period Alert)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>พักดินนานเกินไปอาจเสียโอกาสในการผลิตโดยไม่จำเป็น</p>
+        <pre class="formula">fallow_days = today - last_harvest_end_date
+  (ของ land_use_history ล่าสุดที่จบรอบแล้ว)
+
+fallow_days &gt; max_fallow_days
+  -&gt; flag เตือนให้พิจารณาวางแผนปลูกรอบใหม่</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เตือนความเสี่ยงปลูกพืชตระกูลเดียวกันซ้ำ</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ปลูกพืชตระกูลเดียวกันซ้ำในแปลงเดิมต่อเนื่องเพิ่มความเสี่ยงโรค/ศัตรูพืชสะสมในดิน</p>
+        <pre class="formula">last_crop_family(field) =
+  crop_family ของ land_use_history ล่าสุดของแปลงนั้น
+
+new_crop_family == last_crop_family
+  -&gt; flag เตือนความเสี่ยง แนะนำให้หมุนเวียนพืชต่างตระกูล</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> เป็นการเตือนเบื้องต้นเท่านั้น การวางแผนหมุนเวียนพืชแบบเต็มรูปแบบอยู่ในโมดูล "แผนการเพาะปลูก"</p>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "ผังแปลงและที่ดิน" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

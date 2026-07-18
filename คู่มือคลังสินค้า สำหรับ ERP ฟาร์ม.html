@@ -1,0 +1,805 @@
+<title>โมดูลคลังสินค้า/สต็อก (Inventory &amp; Warehouse) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#core">โมดูลหลัก (Core Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">คลังสินค้า/สต็อก</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Core Module 3/7 · Inventory &amp; Warehouse — Dev-Ready Spec</span>
+    <h1>โมดูลคลังสินค้า/สต็อก (Inventory &amp; Warehouse)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้เป็นศูนย์กลางของทุกการเข้า-ออกของสินค้าในฟาร์ม รับข้อมูลเข้าจากจัดซื้อ ส่งข้อมูลออกให้ขายและบัญชี ไม่ควรมีใครแก้ตัวเลขสต็อกตรง ๆ นอกจากผ่านการเคลื่อนไหวที่บันทึกไว้</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ทะเบียนสินค้า/วัตถุดิบ <span class="en">(Item Master)</span></li>
+          <li>รับเข้า-เบิกจ่ายสินค้า และ lot/batch tracking</li>
+          <li>ยอดคงเหลือสต็อกแบบเรียลไทม์ และมูลค่าสต็อก</li>
+          <li>แจ้งเตือนวันหมดอายุและจุดสั่งซื้อซ้ำ</li>
+          <li>ตรวจนับสต็อกจริงและโอนย้ายระหว่างคลัง</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>การสั่งซื้อสินค้าเข้าคลัง — มาจาก <span class="en">จัดซื้อ</span> ผ่านใบรับสินค้า</li>
+          <li>การตัดสต็อกตอนขาย — มาจาก <span class="en">ขายและลูกค้า</span></li>
+          <li>การบันทึกต้นทุนขาย (COGS) เข้าบัญชี — ส่งให้ <span class="en">บัญชีและการเงิน</span></li>
+          <li>ปริมาณอาหารสัตว์ที่ใช้ตามสูตรอาหาร — มาจาก <span class="en">ปศุสัตว์</span></li>
+          <li>ปริมาณปุ๋ย/สารเคมีที่ใช้ตามแผนปลูก — มาจาก <span class="en">พืชไร่/พืชสวน</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่คลังต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>จัดซื้อ</td><td>บันทึกรับสินค้า (goods receipt) ผ่านการตรวจสอบ</td><td>เพิ่ม stock เข้าคลังเป็น lot ใหม่</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ขายและลูกค้า</td><td>ปิดคำสั่งขาย/ออกใบส่งของ</td><td>ตัดสต็อกตาม FIFO และส่งต้นทุนขายให้บัญชี</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ปศุสัตว์</td><td>บันทึกการให้อาหารประจำวัน</td><td>ตัดสต็อกอาหารสัตว์ตามสูตรที่ใช้จริง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>พืชไร่/พืชสวน</td><td>บันทึกการให้ปุ๋ย/ฉีดพ่นสารเคมี</td><td>ตัดสต็อกปุ๋ย/สารเคมีตามพื้นที่ที่ใช้จริง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>บัญชีและการเงิน</td><td>ต้องการมูลค่าต้นทุนขายรายวัน</td><td>ส่งมูลค่าสต็อกที่ตัดออกให้ลงบัญชีอัตโนมัติ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>จัดซื้อ</td><td>ต้องการทราบว่าสินค้าไหนใกล้หมด</td><td>แจ้งเตือนสต็อกถึงจุดสั่งซื้อซ้ำ</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการควบคุมสต็อกพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการทะเบียนสินค้า/วัตถุดิบ (สร้าง/แก้ไข/ปิดใช้งาน)</span></li>
+          <li class="func-item"><span class="txt">รับสินค้าเข้าคลังพร้อมระบุ lot/batch และวันหมดอายุ</span></li>
+          <li class="func-item"><span class="txt">เบิกจ่าย/ตัดสต็อกออกจากคลังตามลำดับ FIFO</span></li>
+          <li class="func-item"><span class="txt">ดูยอดคงเหลือสต็อกแบบเรียลไทม์ต่อสินค้า/คลัง/lot</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนสินค้าใกล้หมดอายุ</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนสต็อกต่ำกว่าระดับขั้นต่ำ (reorder point)</span></li>
+          <li class="func-item"><span class="txt">รายงานมูลค่าสต็อกคงเหลือสำหรับส่งบัญชี</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตรวจนับสต็อกจริง (physical count) พร้อมปรับยอด</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">คลังหลายแห่ง/หลายจุดเก็บ พร้อมโอนย้ายสินค้าระหว่างคลัง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เสนอสร้างใบขอซื้ออัตโนมัติเมื่อถึงจุดสั่งซื้อซ้ำ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ตั้งค่าวิธีคิดต้นทุนแบบถัวเฉลี่ยถ่วงน้ำหนัก (นอกจาก FIFO)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์ความต้องการสต็อกล่วงหน้าจากแผนการผลิต</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">ตรวจสอบย้อนกลับถึง lot ต้นทางเมื่อสินค้ามีปัญหา (recall)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์อัตราหมุนเวียนสต็อก (inventory turnover)</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>item <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการสินค้า/วัตถุดิบ — ทะเบียนสินค้าทุกชนิดที่เก็บในคลัง เช่น อาหารสัตว์ เมล็ดพันธุ์ ปุ๋ย ยา อุปกรณ์</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ stock_lot และ stock_movement ถูกอ้างอิงจาก purchase_order_line (จัดซื้อ) และคำสั่งขาย</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">item_code</td><td class="type">ข้อความ (text)</td><td>รหัสสินค้าที่ใช้อ้างอิงภายในระบบ</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อสินค้า เช่น "อาหารไก่ไข่สูตรเข้มข้น"</td></tr>
+              <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินค้า เลือกได้เฉพาะ: feed, seed, fertilizer, medicine, equipment, other</td></tr>
+              <tr><td class="mono">unit</td><td class="type">ข้อความ (text)</td><td>หน่วยนับ เช่น กก., ลิตร, ถุง, ชิ้น</td></tr>
+              <tr><td class="mono">reorder_point</td><td class="type">ตัวเลข (decimal)</td><td>ระดับสต็อกขั้นต่ำ ถ้าต่ำกว่านี้ต้องสั่งซื้อเพิ่ม</td></tr>
+              <tr><td class="mono">max_stock_level</td><td class="type">ตัวเลข (decimal)</td><td>ระดับสต็อกสูงสุดที่ต้องการสำรองไว้</td></tr>
+              <tr><td class="mono">shelf_life_days</td><td class="type">ตัวเลข (integer, ว่างได้)</td><td>อายุการเก็บรักษาเป็นวัน ใช้คำนวณวันหมดอายุอัตโนมัติตอนรับเข้า</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>warehouse <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คลัง/จุดเก็บ — สถานที่จัดเก็บสินค้าจริง เช่น โกดังกลาง โรงเก็บอาหารสัตว์ประจำโรงเรือน โรงเก็บปุ๋ย</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ stock_lot ว่าล็อตไหนอยู่คลังไหน และอาจผูกกับ cost_center (โมดูลบัญชี) ถ้าเป็นคลังประจำพื้นที่เฉพาะ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">warehouse_code</td><td class="type">ข้อความ (text)</td><td>รหัสคลัง</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อคลัง เช่น "โกดังกลาง" หรือ "โรงเก็บอาหาร โรงเรือน 2"</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center, ว่างได้)</td><td>ถ้าคลังนี้ผูกกับพื้นที่เฉพาะ ให้ชี้ไปยังศูนย์ต้นทุนนั้น</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>stock_lot <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ล็อต/รุ่นสินค้าคงคลัง — สินค้าล็อตหนึ่งที่รับเข้ามาพร้อมกัน มีวันหมดอายุและต้นทุนของตัวเอง ใช้ทำ FIFO และตรวจสอบย้อนกลับ</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ item, warehouse และอ้างอิง goods_receipt จากโมดูลจัดซื้อที่ทำให้เกิดล็อตนี้</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">lot_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ล็อต สร้างอัตโนมัติตอนรับเข้า</td></tr>
+              <tr><td class="mono">item_id / warehouse_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ล็อตนี้เป็นสินค้าอะไร เก็บอยู่คลังไหน</td></tr>
+              <tr><td class="mono">goods_receipt_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบรับสินค้าต้นทางจากโมดูลจัดซื้อ</td></tr>
+              <tr><td class="mono">received_date</td><td class="type">วันที่ (date)</td><td>วันที่รับล็อตนี้เข้าคลัง</td></tr>
+              <tr><td class="mono">expiry_date</td><td class="type">วันที่ (date, ว่างได้)</td><td>วันหมดอายุของล็อตนี้ (คำนวณจาก received_date + shelf_life_days หรือระบุเอง)</td></tr>
+              <tr><td class="mono">unit_cost</td><td class="type">ตัวเลข (decimal)</td><td>ต้นทุนต่อหน่วยของล็อตนี้ ณ วันที่รับเข้า</td></tr>
+              <tr><td class="mono">quantity_remaining</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณคงเหลือในล็อตนี้ ณ ตอนนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>stock_movement <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การเคลื่อนไหวสต็อก — บันทึกทุกครั้งที่มีสินค้าเข้า-ออกคลัง ไม่ว่าจะรับเข้า เบิกใช้ ขาย โอนย้าย หรือปรับยอด เป็นประวัติที่แก้ไขย้อนหลังไม่ได้</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ stock_lot และอ้างอิงเอกสารต้นทางจากโมดูลอื่น เช่น คำสั่งขาย บันทึกการให้อาหาร</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">movement_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการเคลื่อนไหว เลือกได้เฉพาะ: receipt, issue, sale, transfer, adjustment</td></tr>
+              <tr><td class="mono">stock_lot_id</td><td class="type">เลขอ้างอิง (FK → stock_lot)</td><td>เคลื่อนไหวกับล็อตไหน</td></tr>
+              <tr><td class="mono">quantity</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่เคลื่อนไหว ค่าบวก=เข้าคลัง ค่าลบ=ออกจากคลัง</td></tr>
+              <tr><td class="mono">movement_date</td><td class="type">วันที่ (date)</td><td>วันที่เกิดการเคลื่อนไหวจริง</td></tr>
+              <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสั่งให้เกิดรายการนี้ เลือกได้เฉพาะ: procurement, sales, livestock, crop, manual</td></tr>
+              <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบส่งของที่ทำให้ตัดสต็อก</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>stock_count + stock_count_line <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>การตรวจนับสต็อก — บันทึกผลตรวจนับจริงเทียบกับยอดในระบบ เพื่อปรับยอดให้ตรงกับความเป็นจริง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ warehouse และสร้าง stock_movement ประเภท adjustment เมื่อพบส่วนต่าง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">count_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจนับ</td></tr>
+              <tr><td class="mono">warehouse_id</td><td class="type">เลขอ้างอิง (FK → warehouse)</td><td>ตรวจนับคลังไหน</td></tr>
+              <tr><td class="mono">counted_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจนับ</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, completed, adjusted</td></tr>
+              <tr><td class="mono">(line) stock_lot_id</td><td class="type">เลขอ้างอิง (FK → stock_lot)</td><td>นับล็อตไหน</td></tr>
+              <tr><td class="mono">(line) system_quantity / counted_quantity</td><td class="type">ตัวเลข (decimal)</td><td>ยอดในระบบตอนเริ่มนับ เทียบกับยอดที่นับได้จริง</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>stock_transfer <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>การโอนย้ายสินค้าระหว่างคลัง — เช่น ย้ายอาหารสัตว์จากโกดังกลางไปโรงเก็บประจำโรงเรือน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ warehouse ต้นทาง-ปลายทาง และสร้าง stock_movement ประเภท transfer สองรายการ (ออกจากต้นทาง เข้าปลายทาง)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">from_warehouse_id / to_warehouse_id</td><td class="type">เลขอ้างอิง (FK → warehouse)</td><td>โอนจากคลังไหนไปคลังไหน</td></tr>
+              <tr><td class="mono">transfer_date</td><td class="type">วันที่ (date)</td><td>วันที่โอนย้าย</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, in_transit, completed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2-3</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/items</td><td>ดึงรายการสินค้าทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/items</td><td>สร้างรายการสินค้าใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/inventory/items/{id}</td><td>แก้ไข/ปิดใช้งานสินค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/warehouses</td><td>ดึงรายชื่อคลังทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/warehouses</td><td>สร้างคลังใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/stock-lots</td><td>ดึงล็อตสินค้า (filter: item_id, warehouse_id, expiry_before)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/stock-levels</td><td>ยอดคงเหลือสรุปต่อสินค้า/คลัง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-movements</td><td>บันทึกเบิกจ่าย/รับเข้าแบบ manual</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-movements/from-source</td><td>Internal endpoint ให้โมดูลอื่น (ขาย/ปศุสัตว์/พืช) เรียกตัดสต็อกอัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/reports/expiring-soon</td><td>รายงานสินค้าใกล้หมดอายุ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/reports/below-reorder-point</td><td>รายงานสินค้าที่ต่ำกว่าจุดสั่งซื้อซ้ำ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/reports/stock-valuation</td><td>มูลค่าสต็อกคงเหลือ ส่งให้บัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/inventory/stock-counts</td><td>ดึงรายการตรวจนับสต็อก</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-counts</td><td>เริ่มรอบตรวจนับสต็อกใหม่</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-counts/{id}/apply-adjustment</td><td>ปรับยอดสต็อกตามผลตรวจนับ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-transfers</td><td>สร้างรายการโอนย้ายสินค้าระหว่างคลัง</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">เห็นทุกคลัง อนุมัติการปรับยอดสต็อกที่มีส่วนต่างเกินกำหนด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานคลังสินค้า</div>
+        <div class="role-scope">รับเข้า/เบิกจ่ายสินค้า ตรวจนับสต็อก โอนย้ายระหว่างคลัง</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่จัดซื้อ</div>
+        <div class="role-scope">ดูระดับสต็อก/จุดสั่งซื้อซ้ำอย่างเดียว เพื่อวางแผนสั่งซื้อ ไม่มีสิทธิ์แก้ไขสต็อก</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานฟาร์ม/โรงเรือน</div>
+        <div class="role-scope">เบิกอาหารสัตว์/ปุ๋ยใช้งานประจำวัน เฉพาะคลังของพื้นที่ตนเท่านั้น</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">พนักงานคลังสินค้า</th><th class="center">เจ้าหน้าที่จัดซื้อ</th><th class="center">พนักงานฟาร์ม/โรงเรือน</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>จัดการทะเบียนสินค้า (item master)</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>รับสินค้าเข้าคลัง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>เบิกจ่ายสินค้าออกจากคลัง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">เฉพาะคลังของตน</td></tr>
+          <tr><td>ตรวจนับสต็อกและบันทึกผล</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>อนุมัติการปรับยอดที่ส่วนต่างเกินกำหนด</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>โอนย้ายสินค้าระหว่างคลัง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานมูลค่าสต็อก/จุดสั่งซื้อซ้ำ</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>การตัดสต็อกแบบ FIFO</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>เข้าก่อนออกก่อน — ใช้ทุกครั้งที่มีการเบิกจ่ายหรือขายสินค้าออกจากคลัง</p>
+        <pre class="formula">ORDER BY stock_lot.received_date ASC
+  (lot ที่รับเข้าเก่าสุดถูกตัดออกก่อน)
+
+ตัดจาก lot ที่ quantity_remaining &gt; 0 ไปเรื่อย ๆ
+  จนครบ quantity_needed
+
+cost_of_issue = SUM( qty_ตัดจากแต่ละ_lot &#215; lot.unit_cost )</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>มูลค่าสต็อกคงเหลือ (Stock Valuation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้สรุปส่งให้โมดูลบัญชีบันทึกมูลค่าสินทรัพย์คงเหลือ</p>
+        <pre class="formula">stock_value(item, warehouse) =
+  SUM( stock_lot.quantity_remaining &#215; stock_lot.unit_cost )
+  ต่อทุก lot ของ item/warehouse นั้น</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>แจ้งเตือนวันหมดอายุ (Expiry Alert)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ตั้ง threshold ล่วงหน้าได้ต่อ item หรือทั้งหมวดหมู่สินค้า</p>
+        <pre class="formula">days_to_expiry = stock_lot.expiry_date - today
+
+flag เตือนถ้า days_to_expiry &lt;= alert_threshold_days
+  (ค่าเริ่มต้นแนะนำ: 7-14 วัน แล้วแต่ประเภทสินค้า)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>จุดสั่งซื้อซ้ำ (Reorder Point Trigger)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>รวมยอดคงเหลือทุกล็อตทุกคลังของสินค้าเดียวกัน แล้วเทียบกับระดับขั้นต่ำ</p>
+        <pre class="formula">current_stock(item) = SUM(quantity_remaining)
+  ต่อทุก lot ทุกคลังของ item นั้น
+
+trigger: current_stock &lt;= item.reorder_point
+
+suggested_order_qty = item.max_stock_level - current_stock</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ส่วนต่างจากการตรวจนับ (Stock Count Variance)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ใช้สร้างรายการปรับยอดหลังตรวจนับสต็อกจริง</p>
+        <pre class="formula">variance = counted_quantity - system_quantity
+
+variance != 0
+  -&gt; สร้าง stock_movement (movement_type = adjustment)
+
+|variance| &gt; threshold_pct &#215; system_quantity
+  -&gt; ต้องมีผู้อนุมัติก่อนปรับยอดจริง
+     (threshold_pct แนะนำเริ่มที่ 5%)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ต้นทุนถัวเฉลี่ยถ่วงน้ำหนัก (Weighted Average Cost)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ทางเลือกแทน FIFO สำหรับฟาร์มที่ต้องการต้นทุนคงที่ต่อรอบมากกว่าติดตามราคาต่อล็อต</p>
+        <pre class="formula">weighted_avg_cost(item, warehouse) =
+  SUM( quantity_remaining &#215; unit_cost )
+  / SUM( quantity_remaining )
+  ต่อทุก lot ของ item/warehouse นั้น</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> เลือกวิธีคิดต้นทุนได้ต่อสินค้าหรือทั้งระบบ แต่ควรคงที่ตลอดรอบบัญชี ไม่สลับไปมา เพื่อไม่ให้ต้นทุนขายเพี้ยน</p>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "คลังสินค้า/สต็อก" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

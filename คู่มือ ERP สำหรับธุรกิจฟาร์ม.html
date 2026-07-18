@@ -1,0 +1,574 @@
+<title>ระบบ ERP สำหรับธุรกิจฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+
+  .heading-font{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    letter-spacing:0.01em;
+  }
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,4.2vw,40px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:62ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:68ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+  }
+  .card h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .card-link{
+    display:inline-block;
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px dashed var(--line);
+    font-size:13px;
+    font-weight:600;
+    color:var(--moss-strong);
+    text-decoration:none;
+  }
+  .card-link:hover{text-decoration:underline;}
+
+  table.phases{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  table.phases th, table.phases td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.phases th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+  table.phases td.num{
+    font-variant-numeric:tabular-nums;
+    color:var(--wheat);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .table-wrap{overflow-x:auto;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+  .note b{color:var(--ink);}
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <span class="eyebrow">Farm Business · ERP Requirements</span>
+    <h1>ระบบ ERP สำหรับธุรกิจฟาร์ม (Farm ERP System)</h1>
+    <p class="sub">รายการโมดูลและฟีเจอร์ที่ควรมี ครอบคลุมทั้งฟาร์มปศุสัตว์ พืชไร่/พืชสวน และฟาร์มผสมผสาน — เลือกเฉพาะส่วนที่ตรงกับธุรกิจจริง แล้วตัดส่วนที่ไม่เกี่ยวข้องออก</p>
+    <div class="meta">
+      <span>เอกสารประกอบการวางแผนระบบ</span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#core">โมดูลหลัก (Core Modules)</a>
+    <a href="#livestock">ปศุสัตว์ (Livestock)</a>
+    <a href="#crop">พืชไร่/พืชสวน (Crop)</a>
+    <a href="#trace">ตรวจสอบย้อนกลับ (Traceability)</a>
+    <a href="#tech">โครงสร้างพื้นฐาน (Infrastructure)</a>
+    <a href="#rollout">ลำดับการทำ (Rollout Plan)</a>
+  </nav>
+
+  <section class="block" id="core">
+    <div class="block-head">
+      <span class="eyebrow">Core Modules · ทุกฟาร์มต้องมี</span>
+      <h2>1. โมดูลหลักของ ERP (Core ERP Modules)</h2>
+      <p class="lede">ส่วนพื้นฐานที่ธุรกิจฟาร์มทุกประเภทต้องมี ไม่ต่างจาก ERP ทั่วไป แต่ต้องปรับหน่วยนับให้เหมาะกับฟาร์ม เช่น ต้นทุนต่อตัว ต่อไร่ หรือต่อรอบผลิต</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>บัญชีและการเงิน (Accounting &amp; Finance)</h3>
+        <ul>
+          <li>บัญชีแยกประเภท / งบการเงิน</li>
+          <li>ต้นทุนต่อหน่วยผลผลิต <span class="en">(cost per head / per rai / per batch)</span></li>
+          <li>กระแสเงินสดตามฤดูกาลผลิต</li>
+          <li>ภาษี ใบกำกับภาษี เอกสารบัญชี</li>
+        </ul>
+        <a class="card-link" href="คู่มือบัญชีและการเงิน สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>จัดซื้อ (Procurement)</h3>
+        <ul>
+          <li>ใบสั่งซื้อ (PO) และการอนุมัติ</li>
+          <li>ฐานข้อมูลผู้ขาย / เปรียบเทียบราคา</li>
+          <li>สัญญาซื้อวัตถุดิบล่วงหน้า</li>
+        </ul>
+        <a class="card-link" href="คู่มือจัดซื้อ สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>คลังสินค้า / สต็อก (Inventory &amp; Warehouse)</h3>
+        <ul>
+          <li>สต็อกอาหารสัตว์ เมล็ดพันธุ์ ปุ๋ย ยา</li>
+          <li>ระบบ FIFO และ lot / batch tracking</li>
+          <li>แจ้งเตือนวันหมดอายุและสต็อกใกล้หมด</li>
+        </ul>
+        <a class="card-link" href="คู่มือคลังสินค้า สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>ขายและลูกค้า (Sales &amp; CRM)</h3>
+        <ul>
+          <li>ใบสั่งขาย ใบส่งของ</li>
+          <li>ราคาตามเกรด/น้ำหนัก/ความชื้น</li>
+          <li>ประวัติลูกค้า พ่อค้าคนกลาง คู่ค้าส่งออก</li>
+        </ul>
+        <a class="card-link" href="คู่มือขายและลูกค้า สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>บุคลากรและแรงงาน (HR &amp; Labor)</h3>
+        <ul>
+          <li>แรงงานประจำและรายวัน ตารางกะ</li>
+          <li>ค่าแรงตามผลงาน <span class="en">(piece rate)</span></li>
+          <li>ลา โอที ประกันสังคม</li>
+        </ul>
+        <a class="card-link" href="คู่มือบุคลากรและแรงงาน สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>สินทรัพย์และเครื่องจักร (Assets &amp; Equipment)</h3>
+        <ul>
+          <li>ทะเบียนรถไถ รถบรรทุก โรงเรือน อุปกรณ์</li>
+          <li>ตารางซ่อมบำรุงเชิงป้องกัน <span class="en">(PM)</span></li>
+          <li>ค่าเสื่อมราคา</li>
+        </ul>
+        <a class="card-link" href="คู่มือสินทรัพย์และเครื่องจักร สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>รายงานและแดชบอร์ด (Reports &amp; Dashboard)</h3>
+        <ul>
+          <li>ต้นทุน-กำไรต่อฟาร์ม ต่อแปลง ต่อโรงเรือน</li>
+          <li>เปรียบเทียบรอบผลิตปัจจุบันกับย้อนหลัง</li>
+          <li>KPI สำหรับผู้บริหาร</li>
+        </ul>
+        <a class="card-link" href="คู่มือรายงานและแดชบอร์ด สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="livestock">
+    <div class="block-head">
+      <span class="eyebrow">Livestock Add-on · ฟาร์มปศุสัตว์</span>
+      <h2>2. โมดูลเฉพาะฟาร์มปศุสัตว์ (Livestock Modules)</h2>
+      <p class="lede">สำหรับฟาร์มหมู ไก่ วัว หรือสัตว์เศรษฐกิจอื่น ๆ เพิ่มจากโมดูลหลัก</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>ทะเบียนสัตว์ (Animal Registry)</h3>
+        <ul>
+          <li>ทะเบียนรายตัว/รายฝูง เบอร์หู <span class="en">(ear tag)</span> ไมโครชิป</li>
+          <li>สายพันธุ์ วันเกิด แหล่งที่มา</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>ผสมพันธุ์และตั้งท้อง (Breeding &amp; Gestation)</h3>
+        <ul>
+          <li>ปฏิทินผสมพันธุ์ / ตั้งท้อง / คลอด</li>
+          <li>ประวัติสายพันธุ์ <span class="en">(pedigree)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>สุขภาพและวัคซีน (Health &amp; Vaccination)</h3>
+        <ul>
+          <li>ประวัติการรักษา วัคซีน โรค</li>
+          <li>ระยะหยุดยาก่อนส่งขาย <span class="en">(withdrawal period)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อาหารสัตว์ (Feed Management)</h3>
+        <ul>
+          <li>สูตรอาหารตามช่วงอายุ</li>
+          <li>อัตราแลกเนื้อ <span class="en">(FCR)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การเจริญเติบโตและผลผลิต (Growth &amp; Yield)</h3>
+        <ul>
+          <li>น้ำหนัก / อัตราการเติบโตต่อวัน <span class="en">(ADG)</span></li>
+          <li>ผลผลิตนม ไข่ หรือเนื้อรายวัน</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>คัดแยกและส่งขาย (Sorting &amp; Sales)</h3>
+        <ul>
+          <li>คัดเกรดก่อนส่งโรงชำแหละ/ตลาด</li>
+          <li>ติดตามอัตราการสูญเสีย <span class="en">(mortality)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>สภาพแวดล้อมโรงเรือน (Housing Environment)</h3>
+        <ul>
+          <li>อุณหภูมิ ความชื้น การระบายอากาศ</li>
+          <li>ความหนาแน่นต่อพื้นที่</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="crop">
+    <div class="block-head">
+      <span class="eyebrow">Crop Add-on · ฟาร์มพืชไร่/พืชสวน</span>
+      <h2>3. โมดูลเฉพาะพืชไร่/พืชสวน (Crop Modules)</h2>
+      <p class="lede">สำหรับฟาร์มปลูกพืช ทั้งพืชไร่ พืชสวน หรือพืชผัก เพิ่มจากโมดูลหลัก</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>ผังแปลงและที่ดิน (Field &amp; Land Mapping)</h3>
+        <ul>
+          <li>ผังแปลง ขนาดพื้นที่ ตำแหน่ง GPS/GIS</li>
+          <li>ประวัติการใช้ที่ดินย้อนหลัง</li>
+        </ul>
+        <a class="card-link" href="คู่มือผังแปลงและที่ดิน สำหรับ ERP ฟาร์ม.html">ดูรายละเอียดโมดูลนี้ →</a>
+      </article>
+      <article class="card">
+        <h3>แผนการเพาะปลูก (Planting Plan)</h3>
+        <ul>
+          <li>ปฏิทินฤดูกาล การหมุนเวียนพืช</li>
+          <li>แผนพันธุ์พืชต่อแปลงต่อรอบ</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การให้น้ำ ปุ๋ย และยา (Irrigation, Fertilizer &amp; Pesticide)</h3>
+        <ul>
+          <li>บันทึกการให้น้ำ/ปุ๋ย/สารเคมีต่อแปลง</li>
+          <li>คำนวณปริมาณตามพื้นที่</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การเก็บเกี่ยว (Harvest)</h3>
+        <ul>
+          <li>บันทึกวันเก็บเกี่ยวและปริมาณผลผลิต</li>
+          <li>ผลผลิตต่อไร่ เทียบแต่ละรอบ</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>คุณภาพผลผลิต (Produce Quality)</h3>
+        <ul>
+          <li>คัดเกรดตามขนาด ความหวาน ความชื้น</li>
+          <li>เชื่อมราคารับซื้อกับเกรด</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>สภาพอากาศ (Weather)</h3>
+        <ul>
+          <li>เชื่อมข้อมูลพยากรณ์อากาศ/ปริมาณฝน</li>
+          <li>แจ้งเตือนความเสี่ยงภัยแล้ง/น้ำท่วม</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="trace">
+    <div class="block-head">
+      <span class="eyebrow">Traceability & Compliance</span>
+      <h2>4. การตรวจสอบย้อนกลับและมาตรฐาน (Traceability &amp; Compliance)</h2>
+      <p class="lede">สำคัญมากขึ้นเรื่อย ๆ สำหรับฟาร์มที่ขายเข้าโมเดิร์นเทรดหรือส่งออก</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>ตรวจสอบย้อนกลับ (Traceability)</h3>
+        <ul>
+          <li>เชื่อมโยงข้อมูลตั้งแต่วัตถุดิบถึงสินค้าสำเร็จ <span class="en">(farm-to-table)</span></li>
+          <li>QR code / lot number ต่อรุ่นผลผลิต</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>มาตรฐานฟาร์ม (Farm Standards)</h3>
+        <ul>
+          <li>เอกสารรองรับ GAP / GMP / HACCP / ปศุสัตว์ OK</li>
+          <li>บันทึกที่พร้อมให้ผู้ตรวจประเมิน</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>รายงานหน่วยงานรัฐ (Government Reporting)</h3>
+        <ul>
+          <li>ฟอร์มรายงานตามที่กรมปศุสัตว์/เกษตรกำหนด</li>
+          <li>เอกสารประกอบการส่งออก</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="tech">
+    <div class="block-head">
+      <span class="eyebrow">Technical Requirements</span>
+      <h2>5. ข้อกำหนดด้านเทคนิคและโครงสร้างพื้นฐาน (Technical &amp; Infrastructure Requirements)</h2>
+      <p class="lede">ข้อกำหนดที่มักถูกมองข้าม แต่กระทบการใช้งานจริงในฟาร์ม</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>การติดตั้ง (Deployment)</h3>
+        <ul>
+          <li>รองรับติดตั้งแบบ On-Premise / Self-hosted ได้ ไม่ผูกกับ cloud อย่างเดียว</li>
+          <li>ทำงานได้แม้อินเทอร์เน็ตในพื้นที่ไม่เสถียร</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การใช้งานภาคสนาม (Field Operations)</h3>
+        <ul>
+          <li>แอปมือถือแบบ offline-first แล้วซิงค์ภายหลัง</li>
+          <li>บันทึกข้อมูลหน้างานโดยพนักงานฟาร์ม</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>สิทธิ์และความปลอดภัย (Access &amp; Security)</h3>
+        <ul>
+          <li>กำหนดสิทธิ์ตามบทบาท <span class="en">(role-based access)</span></li>
+          <li>สำรองข้อมูลและแผนกู้คืน</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การเชื่อมต่อภายนอก (External Integration)</h3>
+        <ul>
+          <li>API เชื่อมธนาคาร ระบบบัญชี ตลาดกลาง</li>
+          <li>เซนเซอร์ IoT สำหรับโรงเรือน/แปลง (ถ้าต้องการ)</li>
+        </ul>
+      </article>
+    </div>
+    <p class="note"><b>หมายเหตุ</b> เนื่องจากระบบ IT ของบริษัทเป็น on-premise ควรกำหนดเป็นเงื่อนไขคัดเลือกซอฟต์แวร์/ผู้พัฒนาตั้งแต่ต้น เพื่อไม่ให้ติดปัญหาระบบผูกกับ cloud ของผู้ให้บริการรายเดียวภายหลัง</p>
+  </section>
+
+  <section class="block" id="rollout">
+    <div class="block-head">
+      <span class="eyebrow">Suggested Rollout</span>
+      <h2>6. ลำดับการพัฒนา/ติดตั้งที่แนะนำ (Suggested Rollout Plan)</h2>
+      <p class="lede">ทำทีละเฟส เริ่มจากส่วนที่กระทบเงินสดและสต็อกก่อน แล้วค่อยต่อยอด</p>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>เฟส (Phase)</th><th>เนื้อหา (Scope)</th><th>ระยะเวลาโดยประมาณ (Est. Duration)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num">1</td>
+            <td>บัญชี-การเงิน, สต็อก, ขาย, HR พื้นฐาน</td>
+            <td>2–3 เดือน</td>
+          </tr>
+          <tr>
+            <td class="num">2</td>
+            <td>โมดูลเฉพาะฟาร์มตามประเภทจริง (ปศุสัตว์/พืช)</td>
+            <td>2–4 เดือน</td>
+          </tr>
+          <tr>
+            <td class="num">3</td>
+            <td>ตรวจสอบย้อนกลับ, มาตรฐาน, รายงานเชิงลึก</td>
+            <td>1–2 เดือน</td>
+          </tr>
+          <tr>
+            <td class="num">4</td>
+            <td>IoT, แอปมือถือ offline, การแจ้งเตือนอัตโนมัติ</td>
+            <td>ต่อเนื่อง</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    เอกสารนี้เป็นรายการเริ่มต้นสำหรับวางแผนระบบ ควรปรับตามขนาดฟาร์มและงบประมาณจริงก่อนเริ่มพัฒนาหรือจัดซื้อ
+  </footer>
+
+</div>

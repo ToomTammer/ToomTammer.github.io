@@ -1,0 +1,810 @@
+<title>โมดูลจัดซื้อ (Procurement) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#core">โมดูลหลัก (Core Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">จัดซื้อ</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Core Module 2/7 · Procurement — Dev-Ready Spec</span>
+    <h1>โมดูลจัดซื้อ (Procurement)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้ครอบคลุมตั้งแต่ขอซื้อจนถึงรับสินค้าเข้าฟาร์ม ส่วนการตัดสต็อกและบันทึกบัญชีให้โมดูลปลายทางทำต่อ ไม่ต้องคีย์ซ้ำ</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ฐานข้อมูลผู้ขาย/ผู้จำหน่าย <span class="en">(Vendor Master)</span></li>
+          <li>ใบขอซื้อและใบสั่งซื้อ <span class="en">(Purchase Requisition, Purchase Order)</span></li>
+          <li>การอนุมัติตามวงเงิน <span class="en">(Approval Workflow)</span></li>
+          <li>การรับสินค้าและตรวจสอบเบื้องต้น <span class="en">(Goods Receipt)</span></li>
+          <li>การเปรียบเทียบใบเสนอราคา และสัญญาซื้อล่วงหน้า</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>การตัดสต็อกจริงเมื่อรับสินค้า — ส่งต่อให้ <span class="en">คลังสินค้า/สต็อก</span></li>
+          <li>การสร้างใบแจ้งหนี้เจ้าหนี้และบันทึกบัญชี — ส่งต่อให้ <span class="en">บัญชีและการเงิน</span></li>
+          <li>จุดสั่งซื้อซ้ำ/ระดับสต็อกขั้นต่ำ — รับจาก <span class="en">คลังสินค้า/สต็อก</span></li>
+          <li>ปริมาณวัตถุดิบที่ต้องใช้ตามแผนเลี้ยง/ปลูก — รับจาก <span class="en">ปศุสัตว์ / พืชไร่-พืชสวน</span></li>
+          <li>วงเงินงบประมาณที่อนุมัติ — รับจาก <span class="en">บัญชีและการเงิน</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่จัดซื้อต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ผู้ขาย</td><td>ส่งสินค้ามาถึงฟาร์มตาม PO</td><td>บันทึกรับสินค้า (goods receipt)</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คลังสินค้า/สต็อก</td><td>รับสินค้าและตรวจสอบผ่านแล้ว</td><td>แจ้งเพิ่ม stock เข้าคลังอัตโนมัติ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>บัญชีและการเงิน</td><td>ปิด PO / ได้รับใบกำกับภาษีซื้อ</td><td>ส่งข้อมูลให้สร้าง AP invoice</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คลังสินค้า/สต็อก</td><td>สต็อกถึงจุดสั่งซื้อซ้ำ (reorder point)</td><td>เสนอสร้างใบขอซื้อ/PO อัตโนมัติ</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>ปศุสัตว์ / พืชไร่-พืชสวน</td><td>คำนวณความต้องการวัตถุดิบจากสูตรอาหาร/แผนปลูก</td><td>แปลงเป็นใบขอซื้อ (PR)</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>บัญชีและการเงิน</td><td>ตั้งงบประมาณต่อศูนย์ต้นทุน</td><td>ตรวจสอบวงเงินก่อนอนุมัติ PO</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการสั่งซื้อพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการฐานข้อมูลผู้ขาย (สร้าง/แก้ไข/ปิดใช้งาน)</span></li>
+          <li class="func-item"><span class="txt">สร้าง/แก้ไขใบสั่งซื้อ (PO) พร้อมรายการสินค้าและราคา</span></li>
+          <li class="func-item"><span class="txt">อนุมัติ PO ตามลำดับขั้นพื้นฐาน (1 ระดับวงเงิน)</span></li>
+          <li class="func-item"><span class="txt">บันทึกรับสินค้า (Goods Receipt) ผูกกับ PO และแจ้งคลังสินค้า</span></li>
+          <li class="func-item"><span class="txt">ติดตามสถานะ PO ตลอดวงจร (draft ถึง closed)</span></li>
+          <li class="func-item"><span class="txt">ยกเลิก PO ที่ยังไม่ได้รับสินค้า</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือน PO ที่เลยกำหนดส่งมอบแล้วยังไม่มาส่ง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ใบขอซื้อ (PR) พร้อม workflow อนุมัติหลายระดับ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">รับคำแนะนำสั่งซื้ออัตโนมัติจากจุดสั่งซื้อซ้ำของคลังสินค้า</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เปรียบเทียบใบเสนอราคาหลายผู้ขาย (RFQ)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ตรวจสอบวงเงินงบประมาณก่อนอนุมัติ PO</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">รับความต้องการวัตถุดิบจากแผนการเลี้ยง/ปลูกล่วงหน้า</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">สัญญาซื้อวัตถุดิบล่วงหน้า (forward contract) พร้อมล็อคราคา</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">ระบบให้คะแนนผู้ขาย (ตรงเวลา/คุณภาพ/ราคา)</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>vendor <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ผู้ขาย/ผู้จำหน่าย — ฐานข้อมูลร้านค้าที่ฟาร์มซื้อวัตถุดิบและอุปกรณ์ด้วย เช่น ร้านอาหารสัตว์ ร้านปุ๋ย บริษัทพันธุ์พืช ร้านยา</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ purchase_order ที่สร้างขึ้น และกับ ap_invoice ในโมดูลบัญชีและการเงิน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">vendor_code</td><td class="type">ข้อความ (text)</td><td>รหัสผู้ขายที่ใช้อ้างอิงภายในระบบ</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อผู้ขาย/บริษัท</td></tr>
+              <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินค้าหลักที่ขาย เลือกได้เฉพาะ: feed, fertilizer, seed, medicine, equipment, other</td></tr>
+              <tr><td class="mono">contact_phone / contact_address</td><td class="type">ข้อความ (text)</td><td>ช่องทางติดต่อผู้ขาย</td></tr>
+              <tr><td class="mono">payment_terms_days</td><td class="type">ตัวเลข (integer)</td><td>จำนวนวันเครดิตที่ตกลงกัน เช่น 30 = ต้องจ่ายภายใน 30 วันหลังรับของ</td></tr>
+              <tr><td class="mono">is_active</td><td class="type">จริง/เท็จ (boolean)</td><td>ยังติดต่อซื้อขายกันอยู่ไหม</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>purchase_requisition <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ใบขอซื้อ — คำขอซื้อภายในก่อนออกเป็น PO จริง ใช้เมื่อผู้จัดการฟาร์ม/แปลงต้องขออนุมัติจากเจ้าของฟาร์มก่อน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ cost_center จากโมดูลบัญชี และแปลงเป็น purchase_order เมื่อได้รับอนุมัติ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">pr_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบขอซื้อ</td></tr>
+              <tr><td class="mono">requested_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนขอซื้อ</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ขอซื้อให้พื้นที่/รอบผลิตไหน</td></tr>
+              <tr><td class="mono">needed_by_date</td><td class="type">วันที่ (date)</td><td>วันที่ต้องการใช้ของ</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, pending_approval, approved, rejected, converted_to_po</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>purchase_order + purchase_order_line <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบสั่งซื้อ — เอกสารที่ส่งให้ผู้ขายจริง ระบุสินค้า จำนวน ราคา และเงื่อนไขการส่งมอบ purchase_order_line คือแต่ละบรรทัดสินค้าภายในใบนั้น</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ vendor, อาจอ้างอิงจาก purchase_requisition, และเป็นต้นทางให้ goods_receipt กับ ap_invoice ในโมดูลบัญชี</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">po_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้อ</td></tr>
+              <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>สั่งซื้อจากผู้ขายรายไหน</td></tr>
+              <tr><td class="mono">pr_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบขอซื้อต้นทาง ถ้ามาจาก PR</td></tr>
+              <tr><td class="mono">order_date / expected_delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่สั่งซื้อ และวันที่คาดว่าจะได้รับของ</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: draft, pending_approval, approved, partially_received, received, closed, cancelled</td></tr>
+              <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>สั่งซื้อสินค้าอะไร</td></tr>
+              <tr><td class="mono">(line) quantity_ordered / quantity_received</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่สั่ง และจำนวนที่ได้รับแล้วสะสม</td></tr>
+              <tr><td class="mono">(line) unit_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ตกลงซื้อ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>goods_receipt + goods_receipt_line <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบรับสินค้า — บันทึกตอนสินค้าจริงมาส่งถึงฟาร์ม ใช้ตรวจนับจำนวนและคุณภาพก่อนรับเข้าคลัง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ purchase_order และ purchase_order_line ส่งข้อมูลไปเพิ่ม stock ที่โมดูลคลังสินค้า</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">gr_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบรับสินค้า</td></tr>
+              <tr><td class="mono">purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>รับสินค้าตาม PO ใบไหน</td></tr>
+              <tr><td class="mono">received_date</td><td class="type">วันที่ (date)</td><td>วันที่รับสินค้าจริง</td></tr>
+              <tr><td class="mono">received_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจรับ</td></tr>
+              <tr><td class="mono">(line) po_line_id</td><td class="type">เลขอ้างอิง (FK → purchase_order_line)</td><td>รับสินค้าบรรทัดไหนของ PO</td></tr>
+              <tr><td class="mono">(line) quantity_received / quantity_rejected</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่รับผ่าน และจำนวนที่ตีกลับ</td></tr>
+              <tr><td class="mono">(line) reject_reason</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เหตุผลที่ตีกลับ เช่น ของเสีย น้ำหนักไม่ครบ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>price_quotation <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ใบเสนอราคา — ราคาที่ผู้ขายแต่ละรายเสนอสำหรับสินค้าหนึ่งรายการ ใช้เปรียบเทียบก่อนตัดสินใจออก PO จริง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ vendor และรายการสินค้าในคลัง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>ใบเสนอราคาจากผู้ขายรายไหน</td></tr>
+              <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้า)</td><td>เสนอราคาสินค้าตัวไหน</td></tr>
+              <tr><td class="mono">quoted_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่เสนอ</td></tr>
+              <tr><td class="mono">quote_date / valid_until</td><td class="type">วันที่ (date)</td><td>วันที่เสนอราคา และวันหมดอายุของราคานี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>forward_contract <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>สัญญาซื้อล่วงหน้า — ข้อตกลงล็อคราคาซื้อวัตถุดิบกับผู้ขายไว้ล่วงหน้า ป้องกันความเสี่ยงราคาผันผวน เช่น ล็อคราคาข้าวโพดเลี้ยงสัตว์ก่อนเข้าฤดูกาล</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ vendor และรายการสินค้า ใช้ตรวจสอบตอนออก PO ว่าเข้าเงื่อนไขสัญญาที่ล็อคไว้หรือไม่</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">vendor_id / item_id</td><td class="type">เลขอ้างอิง (FK)</td><td>สัญญานี้ทำกับผู้ขายรายไหน สินค้าตัวไหน</td></tr>
+              <tr><td class="mono">locked_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ล็อคไว้ตลอดอายุสัญญา</td></tr>
+              <tr><td class="mono">quantity_committed</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่ตกลงซื้อขั้นต่ำตามสัญญา</td></tr>
+              <tr><td class="mono">contract_start / contract_end</td><td class="type">วันที่ (date)</td><td>ช่วงเวลาที่สัญญามีผล</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2-3</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/vendors</td><td>ดึงรายชื่อผู้ขายทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/vendors</td><td>สร้างผู้ขายใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/procurement/vendors/{id}</td><td>แก้ไข/ปิดใช้งานผู้ขาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders</td><td>ดึงใบสั่งซื้อ (filter: status, vendor_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders</td><td>สร้างใบสั่งซื้อใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders/{id}</td><td>ดูรายละเอียด PO ใบเดียว</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/approve</td><td>อนุมัติ PO</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/cancel</td><td>ยกเลิก PO ที่ยังไม่ได้รับสินค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/goods-receipts</td><td>ดึงประวัติการรับสินค้าทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/reports/pending-deliveries</td><td>รายงาน PO ที่ยังไม่ได้รับสินค้าหรือเลยกำหนดส่งมอบ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/requisitions</td><td>ดึงใบขอซื้อทั้งหมด</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions</td><td>สร้างใบขอซื้อ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions/{id}/approve</td><td>อนุมัติใบขอซื้อ แล้วแปลงเป็น PO</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/from-reorder-point</td><td>Internal endpoint ให้โมดูลคลังสินค้าเรียกเสนอสร้าง PO อัตโนมัติ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/price-quotations</td><td>บันทึกใบเสนอราคาจากผู้ขาย</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/reports/vendor-price-comparison</td><td>เปรียบเทียบราคาผู้ขายต่อสินค้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/forward-contracts</td><td>สร้างสัญญาซื้อวัตถุดิบล่วงหน้า</td><td><span class="phase-tag phase-3">3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">อนุมัติ PO ได้ทุกวงเงินและทุกพื้นที่ เห็นรายงานทั้งหมด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่จัดซื้อ</div>
+        <div class="role-scope">สร้าง PO/PR จัดการฐานข้อมูลผู้ขาย เปรียบเทียบราคา ไม่มีสิทธิ์อนุมัติ PO ที่ตัวเองสร้าง</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/แปลง</div>
+        <div class="role-scope">สร้างใบขอซื้อ (PR) และอนุมัติ PO วงเงินต่ำได้เฉพาะพื้นที่ตนดูแล</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานคลังสินค้า</div>
+        <div class="role-scope">บันทึกรับสินค้า (goods receipt) เท่านั้น ไม่เห็นราคาซื้อ/ไม่มีสิทธิ์สร้างหรืออนุมัติ PO</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">เจ้าหน้าที่จัดซื้อ</th><th class="center">ผู้จัดการฟาร์ม/แปลง</th><th class="center">พนักงานคลังสินค้า</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>สร้าง/แก้ไขใบขอซื้อ (PR)</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>สร้าง/แก้ไขใบสั่งซื้อ (PO)</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>อนุมัติ PO วงเงินต่ำ (เฉพาะพื้นที่ตน)</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>อนุมัติ PO วงเงินสูง/ทุกพื้นที่</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>จัดการฐานข้อมูลผู้ขาย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกรับสินค้า (goods receipt)</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✓</td></tr>
+          <tr><td>ยกเลิก PO</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานเปรียบเทียบราคาผู้ขาย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ยอดรวมใบสั่งซื้อ (PO Total)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>คำนวณยอดรวมทุกครั้งที่มีการเพิ่ม/แก้ไขรายการสินค้าใน PO</p>
+        <pre class="formula">po_line.line_total = quantity_ordered &#215; unit_price
+po.total_amount    = SUM(po_line.line_total)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อัปเดตสถานะ PO ตามการรับสินค้า</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>คำนวณใหม่ทุกครั้งที่มี goods_receipt เข้ามาผูกกับ PO ใบนั้น</p>
+        <pre class="formula">received_ratio = SUM(quantity_received)
+                 / SUM(quantity_ordered)
+                 ต่อทุก line ใน PO เดียวกัน
+
+received_ratio == 0        -&gt; status = "approved"
+0 &lt; received_ratio &lt; 1     -&gt; status = "partially_received"
+received_ratio &gt;= 1        -&gt; status = "received" (ปิด PO ได้)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>จุดสั่งซื้อซ้ำ (Reorder Point)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>รับค่าจากโมดูลคลังสินค้า ใช้เสนอสร้างใบขอซื้อ/PO อัตโนมัติ</p>
+        <pre class="formula">trigger: current_stock &lt;= reorder_point
+
+suggested_order_qty = max_stock_level - current_stock</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>วงเงินอนุมัติตามลำดับขั้น (Approval Threshold)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>กำหนดว่า PO มูลค่าเท่าไหร่ต้องผ่านใครอนุมัติ</p>
+        <pre class="formula">po.total_amount &lt;= level1_limit
+  -&gt; ผู้จัดการฟาร์ม/แปลงอนุมัติเองได้ (เฉพาะพื้นที่ตน)
+
+po.total_amount &lt;= level2_limit
+  -&gt; ต้องผ่านเจ้าหน้าที่จัดซื้อ + เจ้าของฟาร์ม
+
+po.total_amount &gt; level2_limit
+  -&gt; เจ้าของฟาร์มอนุมัติโดยตรง
+     พร้อมแนบใบเสนอราคาเปรียบเทียบ</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> level1_limit / level2_limit ควรตั้งเป็นค่าปรับได้ ไม่ hardcode เพราะแต่ละฟาร์มมีขนาดต่างกัน</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เลือกผู้ขายที่ราคาดีที่สุด (Best Price Selection)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ใช้ตอนมีใบเสนอราคาหลายเจ้าสำหรับสินค้าตัวเดียวกัน</p>
+        <pre class="formula">best_vendor(item) = vendor
+  WHERE quoted_price = MIN(quoted_price)
+    AND valid_until &gt;= today</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบวงเงินงบประมาณก่อนอนุมัติ (Budget Check)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>เชื่อมกับ budget_line ในโมดูลบัญชีและการเงิน ก่อนอนุมัติ PO</p>
+        <pre class="formula">available_budget = budget_line.planned_amount
+  - SUM(po.total_amount WHERE status != cancelled
+        AND cost_center_id = X AND period ตรงกัน)
+  - SUM(actual_spent)
+
+po.total_amount &gt; available_budget
+  -&gt; flag เตือนเกินงบ (ไม่บล็อกอัตโนมัติ
+     เว้นแต่ policy ฟาร์มกำหนดให้บล็อก)</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "จัดซื้อ" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

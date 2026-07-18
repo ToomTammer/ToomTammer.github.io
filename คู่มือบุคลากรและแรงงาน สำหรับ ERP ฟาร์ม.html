@@ -1,0 +1,776 @@
+<title>โมดูลบุคลากรและแรงงาน (HR &amp; Labor) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#core">โมดูลหลัก (Core Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">บุคลากรและแรงงาน</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Core Module 5/7 · HR &amp; Labor — Dev-Ready Spec</span>
+    <h1>โมดูลบุคลากรและแรงงาน (HR &amp; Labor)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">จุดเด่นของฟาร์มคือค่าแรงมักผูกกับผลงานจริง (จับสัตว์ได้กี่ตัว เก็บผลผลิตได้กี่กก.) ไม่ใช่แค่เวลาเข้า-ออกงาน โมดูลนี้ต้องรับข้อมูลผลงานจากหน้างานมาคำนวณเงินเดือนให้ถูกต้อง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ทะเบียนพนักงาน <span class="en">(Employee Master)</span> ทั้งประจำและรายวัน</li>
+          <li>บันทึกเวลาเข้า-ออกงาน <span class="en">(Attendance)</span> และ OT</li>
+          <li>ค่าแรงตามผลงาน <span class="en">(Piece Rate)</span></li>
+          <li>ใบลาและวันลาคงเหลือ</li>
+          <li>คำนวณเงินเดือนและปิดรอบจ่าย <span class="en">(Payroll Run)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>ปริมาณผลงานที่ทำได้จริง (จับสัตว์/เก็บเกี่ยว) — รับจาก <span class="en">ปศุสัตว์ / พืชไร่-พืชสวน</span></li>
+          <li>การบันทึกค่าแรงเป็นรายการบัญชี — ส่งต่อให้ <span class="en">บัญชีและการเงิน</span></li>
+          <li>งบประมาณค่าแรงต่อศูนย์ต้นทุน — รับจาก <span class="en">บัญชีและการเงิน</span></li>
+          <li>การยื่นประกันสังคม/ภาษีหัก ณ ที่จ่ายต่อหน่วยงานรัฐ — เป็นเอกสารส่งออก ไม่ใช่ระบบยื่นอัตโนมัติ</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่ HR ต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ปศุสัตว์ / พืชไร่-พืชสวน</td><td>บันทึกผลงานที่ทำจริงต่อคน (จับสัตว์/เก็บเกี่ยว)</td><td>ดึงมาคำนวณค่าแรงตามผลงาน (piece rate)</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>HR (ตัวเอง) → บัญชีและการเงิน</td><td>ปิดรอบเงินเดือน</td><td>ส่งข้อมูลโพสต์ journal entry ค่าแรงเข้าศูนย์ต้นทุน</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>บัญชีและการเงิน</td><td>ตั้งงบประมาณค่าแรงต่อศูนย์ต้นทุน</td><td>เทียบค่าแรงจริงกับงบที่ตั้งไว้</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>หน่วยงานรัฐ (ภายนอก)</td><td>ถึงกำหนดยื่นประกันสังคม/ภาษีหัก ณ ที่จ่ายรายเดือน</td><td>สร้างรายงาน/แบบยื่นให้พร้อมส่ง</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการจ่ายเงินเดือนพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการทะเบียนพนักงาน แยกประเภทประจำ/รายวัน</span></li>
+          <li class="func-item"><span class="txt">บันทึกเวลาเข้า-ออกงานรายวัน</span></li>
+          <li class="func-item"><span class="txt">บันทึกผลงานรายบุคคลสำหรับค่าแรงตามผลงาน (piece rate)</span></li>
+          <li class="func-item"><span class="txt">คำนวณค่าแรงตามประเภทการจ้าง (รายเดือน/รายวัน/ตามผลงาน)</span></li>
+          <li class="func-item"><span class="txt">บันทึกวันลาและคำนวณวันลาคงเหลือ</span></li>
+          <li class="func-item"><span class="txt">คำนวณค่าล่วงเวลา (OT) ตามชั่วโมงที่ทำเกิน</span></li>
+          <li class="func-item"><span class="txt">ปิดรอบเงินเดือนและส่งข้อมูลเข้าบัญชี</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดตารางกะทำงานล่วงหน้า (shift scheduling)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">คำนวณประกันสังคม/ภาษีหัก ณ ที่จ่ายอัตโนมัติ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เทียบค่าแรงจริงกับงบประมาณต่อศูนย์ต้นทุน</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แอปมือถือให้พนักงานเช็คอิน/ดูสลิปเงินเดือนของตัวเอง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ประสิทธิภาพแรงงาน (ผลงานต่อคน/ต่อชั่วโมง)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์ความต้องการแรงงานตามฤดูกาล/รอบผลิต</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>employee <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>พนักงาน — ทะเบียนคนทำงานทุกคนของฟาร์ม ทั้งพนักงานประจำและแรงงานรายวัน/ตามฤดูกาล</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ attendance, piece_work_record, leave_request และ payroll_run_line</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">employee_code</td><td class="type">ข้อความ (text)</td><td>รหัสพนักงานที่ใช้อ้างอิงภายในระบบ</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อ-นามสกุลพนักงาน</td></tr>
+              <tr><td class="mono">employment_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการจ้าง เลือกได้เฉพาะ: permanent, daily, seasonal</td></tr>
+              <tr><td class="mono">wage_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีคิดค่าแรง เลือกได้เฉพาะ: monthly, daily_rate, piece_rate</td></tr>
+              <tr><td class="mono">base_wage</td><td class="type">ตัวเลข (decimal)</td><td>อัตราค่าจ้างพื้นฐาน หน่วยขึ้นกับ wage_type (ต่อเดือน/ต่อวัน/ต่อหน่วยผลงาน)</td></tr>
+              <tr><td class="mono">default_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>พื้นที่/โรงเรือนที่ทำงานประจำ</td></tr>
+              <tr><td class="mono">social_security_no</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ผู้ประกันตน</td></tr>
+              <tr><td class="mono">is_active</td><td class="type">จริง/เท็จ (boolean)</td><td>ยังทำงานอยู่ไหม</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>attendance <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกเวลาเข้า-ออกงาน — เวลาทำงานจริงของพนักงานแต่ละวัน ใช้คำนวณค่าแรงรายวันและค่าล่วงเวลา</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ employee และ cost_center (ทำงานที่ไหนวันนั้น อาจต่างจาก default_cost_center_id)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครมาทำงาน</td></tr>
+              <tr><td class="mono">work_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำงาน</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ทำงานที่พื้นที่ไหนในวันนั้น</td></tr>
+              <tr><td class="mono">clock_in / clock_out</td><td class="type">เวลา (datetime)</td><td>เวลาที่เข้างานและออกงานจริง</td></tr>
+              <tr><td class="mono">hours_worked</td><td class="type">ตัวเลข (decimal)</td><td>ชั่วโมงทำงานที่คำนวณได้จาก clock_in/clock_out</td></tr>
+              <tr><td class="mono">overtime_hours</td><td class="type">ตัวเลข (decimal)</td><td>ชั่วโมงที่ทำเกินเวลามาตรฐานในวันนั้น</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>piece_work_record <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกผลงานตามชิ้น/หน่วย — ปริมาณงานที่ทำได้จริงต่อคนต่อวัน สำหรับพนักงานที่จ้างแบบค่าแรงตามผลงาน เช่น จับไก่ได้กี่ตัว เก็บผลไม้ได้กี่กิโลกรัม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ employee และ cost_center (batch) ที่รับข้อมูลผลงานมาจากโมดูลปศุสัตว์/พืช</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครเป็นคนทำงานนี้</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ทำผลงานให้รุ่นเลี้ยง/รอบปลูกไหน</td></tr>
+              <tr><td class="mono">work_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำผลงานนี้</td></tr>
+              <tr><td class="mono">task_type</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ประเภทงาน เช่น catching (จับสัตว์), harvesting (เก็บเกี่ยว), sorting (คัดแยก)</td></tr>
+              <tr><td class="mono">quantity_completed</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณงานที่ทำได้จริง เช่น จำนวนตัว หรือน้ำหนักกิโลกรัม</td></tr>
+              <tr><td class="mono">rate_per_unit</td><td class="type">ตัวเลข (decimal)</td><td>อัตราค่าแรงต่อหน่วยผลงาน ณ วันนั้น</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>leave_request <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบลา — คำขอลาของพนักงาน ใช้คำนวณวันลาคงเหลือและตัดเงินเดือนกรณีลาไม่มีสิทธิ์</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ employee และผู้อนุมัติ (user)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครขอลา</td></tr>
+              <tr><td class="mono">leave_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการลา เลือกได้เฉพาะ: sick, personal, vacation, unpaid</td></tr>
+              <tr><td class="mono">start_date / end_date</td><td class="type">วันที่ (date)</td><td>ช่วงวันที่ลา</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: pending, approved, rejected</td></tr>
+              <tr><td class="mono">approved_by</td><td class="type">เลขอ้างอิง (FK → user, ว่างได้)</td><td>ใครเป็นคนอนุมัติ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>payroll_run + payroll_run_line <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รอบเงินเดือน — payroll_run คือการปิดรอบจ่ายเงินหนึ่งรอบ (เช่น รายเดือนหรือรายปักษ์สำหรับแรงงานรายวัน) payroll_run_line คือยอดเงินได้-หักของพนักงานแต่ละคนในรอบนั้น</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ employee และเมื่อ post แล้วจะส่งข้อมูลไปสร้าง journal entry ค่าแรงที่โมดูลบัญชี</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">period</td><td class="type">ข้อความ/วันที่</td><td>งวดเงินเดือนนี้ครอบคลุมช่วงไหน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, calculated, approved, paid, posted</td></tr>
+              <tr><td class="mono">(line) employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>เงินเดือนงวดนี้ของใคร</td></tr>
+              <tr><td class="mono">(line) gross_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้รวมก่อนหัก (ฐานค่าจ้าง + OT + piece rate)</td></tr>
+              <tr><td class="mono">(line) social_security_deduction / tax_deduction</td><td class="type">ตัวเลข (decimal)</td><td>ยอดหักประกันสังคมและภาษี ณ ที่จ่าย</td></tr>
+              <tr><td class="mono">(line) net_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้สุทธิที่จ่ายจริงให้พนักงาน</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/employees</td><td>สร้างพนักงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/hr/employees/{id}</td><td>แก้ไข/ปิดใช้งานพนักงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/piece-work-records</td><td>บันทึกผลงานตามชิ้น/หน่วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/piece-work-records</td><td>ดึงประวัติผลงานตามชิ้น/หน่วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/reports/leave-balance</td><td>วันลาคงเหลือต่อพนักงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs</td><td>เริ่มรอบเงินเดือนใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/calculate</td><td>คำนวณเงินเดือนทุกคนในรอบนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/approve</td><td>อนุมัติรอบเงินเดือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/post</td><td>ปิดรอบและส่งข้อมูลเข้าบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/reports/labor-cost-by-cost-center</td><td>ต้นทุนแรงงานแยกตามศูนย์ต้นทุน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/shift-schedules</td><td>จัดตารางกะทำงานล่วงหน้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">อนุมัติรอบเงินเดือน เห็นรายงานต้นทุนแรงงานทุกพื้นที่</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่ HR/ธุรการ</div>
+        <div class="role-scope">จัดการทะเบียนพนักงาน คำนวณเงินเดือน อนุมัติใบลา</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">หัวหน้างาน/ผู้จัดการฟาร์ม-แปลง</div>
+        <div class="role-scope">บันทึกเวลาเข้า-ออกงานและผลงานของลูกทีมตนเอง อนุมัติใบลาเบื้องต้น</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานทั่วไป</div>
+        <div class="role-scope">ดูสลิปเงินเดือนและวันลาคงเหลือของตัวเอง ยื่นใบลา</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">เจ้าหน้าที่ HR</th><th class="center">หัวหน้างาน</th><th class="center">พนักงานทั่วไป</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>จัดการทะเบียนพนักงาน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกเวลาเข้า-ออกงาน/ผลงาน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะทีมตน)</td><td class="center">✗</td></tr>
+          <tr><td>อนุมัติใบลา</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เบื้องต้น)</td><td class="center">✗</td></tr>
+          <tr><td>คำนวณ/อนุมัติรอบเงินเดือน</td><td class="center">✓</td><td class="center">✓ (คำนวณ)</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานต้นทุนแรงงานทุกพื้นที่</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูสลิปเงินเดือน/วันลาคงเหลือของตัวเอง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ค่าแรงตามผลงาน (Piece Rate Pay)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>รวมทุกบันทึกผลงานของพนักงานในรอบเงินเดือนนั้น</p>
+        <pre class="formula">piece_pay(employee, period) =
+  SUM( quantity_completed &#215; rate_per_unit )
+  ต่อทุก piece_work_record ของพนักงานในรอบนั้น</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ค่าล่วงเวลา (Overtime Pay)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>อัตราต่อชั่วโมงคำนวณจากฐานค่าจ้างตามประเภทการจ้าง</p>
+        <pre class="formula">hourly_rate =
+  monthly: base_wage / standard_hours_per_month
+  daily_rate: base_wage / 8
+
+overtime_pay = overtime_hours &#215; hourly_rate &#215; ot_multiplier
+  (ot_multiplier ตัวอย่าง: 1.5 วันทำงานปกติ, 3.0 วันหยุด)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เงินได้รวม (Gross Pay)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>รวมทุกองค์ประกอบเงินได้ก่อนหักภาษี/ประกันสังคม</p>
+        <pre class="formula">gross_pay = base_wage_for_period
+          + overtime_pay
+          + piece_pay
+          - unpaid_leave_deduction</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>หักวันลาไม่มีสิทธิ์ (Unpaid Leave Deduction)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้กับพนักงานรายเดือนที่ลาเกินสิทธิ์หรือลาแบบไม่รับค่าจ้าง</p>
+        <pre class="formula">daily_rate_equiv = base_wage / working_days_in_period
+
+unpaid_leave_deduction =
+  unpaid_leave_days &#215; daily_rate_equiv</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>หักประกันสังคม (Social Security Deduction)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>คำนวณจากฐานเงินได้ที่ไม่เกินเพดานตามกฎหมาย</p>
+        <pre class="formula">social_security_deduction =
+  MIN(gross_pay, ceiling_wage) &#215; ss_rate</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> ceiling_wage และ ss_rate เปลี่ยนแปลงได้ตามประกาศสำนักงานประกันสังคม ต้องตั้งเป็นค่าปรับได้ในระบบ ไม่ hardcode และควรตรวจสอบอัตราปัจจุบันกับฝ่ายบุคคล/สำนักงานบัญชีก่อนใช้งานจริง</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เงินได้สุทธิ (Net Pay)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ยอดที่จ่ายจริงให้พนักงานหลังหักทุกรายการ</p>
+        <pre class="formula">net_pay = gross_pay
+        - social_security_deduction
+        - tax_deduction</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "บุคลากรและแรงงาน" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

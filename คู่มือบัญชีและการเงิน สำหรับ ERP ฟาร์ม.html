@@ -1,0 +1,898 @@
+<title>โมดูลบัญชีและการเงิน (Accounting &amp; Finance) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#core">โมดูลหลัก (Core Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">บัญชีและการเงิน</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Core Module 1/7 · Accounting &amp; Finance — Dev-Ready Spec</span>
+    <h1>โมดูลบัญชีและการเงิน (Accounting &amp; Finance)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี และสิทธิ์การเข้าถึงตามบทบาท</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้เป็นปลายทางที่รับรายการจากโมดูลอื่นมาบันทึกเป็นบัญชีอัตโนมัติ ไม่ควรให้ผู้ใช้คีย์ข้อมูลซ้ำในสองระบบ</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ผังบัญชีและบัญชีแยกประเภท <span class="en">(Chart of Accounts, GL)</span></li>
+          <li>ลูกหนี้-เจ้าหนี้การค้าและการรับ-จ่ายชำระ</li>
+          <li>การจัดสรรต้นทุนสู่ศูนย์ต้นทุน/รอบผลิต</li>
+          <li>งบการเงิน งบประมาณ พยากรณ์กระแสเงินสด</li>
+          <li>เอกสารภาษีและการประเมินมูลค่าสินทรัพย์ชีวภาพ</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับข้อมูลจากโมดูลอื่น)</h3>
+        <ul>
+          <li>ใบสั่งซื้อ/ใบสั่งขาย และราคาต่อเกรด — จาก <span class="en">จัดซื้อ / ขายและลูกค้า</span></li>
+          <li>การตัดสต็อกและต้นทุนวัตถุดิบ — จาก <span class="en">คลังสินค้า/สต็อก</span></li>
+          <li>ค่าแรงและค่าจ้าง — จาก <span class="en">บุคลากรและแรงงาน</span></li>
+          <li>ค่าเสื่อมราคาเครื่องจักร — จาก <span class="en">สินทรัพย์และเครื่องจักร</span></li>
+          <li>น้ำหนัก/พื้นที่/อายุต่อรุ่น — จาก <span class="en">ปศุสัตว์ / พืชไร่-พืชสวน</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลต้นทาง</th><th>เหตุการณ์ที่ทำให้เกิดข้อมูล</th><th>สิ่งที่บัญชีต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ขายและลูกค้า</td><td>ออกใบส่งของ/ปิดคำสั่งขาย</td><td>สร้าง AR invoice + journal entry อัตโนมัติ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>จัดซื้อ</td><td>รับสินค้าตาม PO / ได้รับใบกำกับภาษีซื้อ</td><td>สร้าง AP invoice + journal entry อัตโนมัติ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คลังสินค้า/สต็อก</td><td>ตัดสต็อกอาหารสัตว์/ปุ๋ย/ยา</td><td>โพสต์ journal entry ต้นทุนขาย (COGS)</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>บุคลากรและแรงงาน</td><td>ปิดรอบเงินเดือน</td><td>โพสต์ journal entry ค่าแรง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ธนาคาร (statement)</td><td>นำเข้ารายการเดินบัญชี</td><td>กระทบยอดเงินสด <span class="en">(reconciliation)</span></td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>สินทรัพย์และเครื่องจักร</td><td>คำนวณค่าเสื่อมประจำเดือน</td><td>โพสต์ journal entry ค่าเสื่อมราคา</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>ปศุสัตว์ / พืชไร่-พืชสวน</td><td>บันทึกน้ำหนัก/พื้นที่ต่อ batch</td><td>ใช้จัดสรรต้นทุนต่อหน่วยผลผลิต</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>กรมสรรพากร (e-Tax)</td><td>ถึงกำหนดยื่นแบบ</td><td>สร้าง/ส่ง tax_document</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+          <tr><td>ปศุสัตว์ / พืชไร่-พืชสวน</td><td>อัปเดตน้ำหนัก/อายุ ณ วันประเมิน</td><td>คำนวณมูลค่าสินทรัพย์ชีวภาพ</td><td><span class="phase-tag phase-3">Phase 3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการใช้งานพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการผังบัญชี (สร้าง/แก้ไข/ปิดใช้งานบัญชี)</span></li>
+          <li class="func-item"><span class="txt">บันทึกรายการบัญชีรายวัน ทั้งแบบ manual และอัตโนมัติจากโมดูลอื่น</span></li>
+          <li class="func-item"><span class="txt">ออกใบแจ้งหนี้ขาย (AR invoice) ผูกกับคำสั่งขาย</span></li>
+          <li class="func-item"><span class="txt">บันทึกใบแจ้งหนี้ซื้อ (AP invoice) ผูกกับคำสั่งซื้อ</span></li>
+          <li class="func-item"><span class="txt">บันทึกรับชำระ/จ่ายชำระเงิน ผูกกับใบแจ้งหนี้</span></li>
+          <li class="func-item"><span class="txt">ดูงบกำไรขาดทุนอย่างง่าย แยกตามศูนย์ต้นทุน</span></li>
+          <li class="func-item"><span class="txt">ดูรายงานอายุลูกหนี้/เจ้าหนี้ (AR/AP Aging)</span></li>
+          <li class="func-item"><span class="txt">ปิดงวดบัญชีรายเดือนพื้นฐาน (period close)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดสรรต้นทุนต่อหน่วยผลผลิต/ต่อรอบผลิต (batch costing)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์กระแสเงินสดตามฤดูกาลผลิต</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">กระทบยอดธนาคารอัตโนมัติจาก statement</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">จัดทำเอกสารภาษี/เชื่อมต่อ e-Tax invoice</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">รับค่าเสื่อมราคาสินทรัพย์จากโมดูล Asset</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ประเมินมูลค่าสินทรัพย์ชีวภาพ (fair value)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">งบประมาณเทียบผลจริง (budget vs actual)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">งบการเงินรวมหลายฟาร์ม/นิติบุคคล</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ต้นทุนจริงเทียบมาตรฐาน (cost variance)</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล — พร้อมคำอธิบายว่าเอนทิตีนั้นแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>chart_of_accounts <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ผังบัญชี — รายชื่อบัญชีทั้งหมดที่ใช้บันทึกรายการทางการเงิน เปรียบเหมือนสารบัญหมวดหมู่เงินเข้า-เงินออกของฟาร์ม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> อ้างอิงตัวเอง (self-reference) เพื่อทำบัญชีแม่-ลูก เช่น "เงินสด" เป็นบัญชีย่อยของ "สินทรัพย์หมุนเวียน"</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">account_code</td><td class="type">ข้อความ (text)</td><td>เลขที่บัญชีที่มนุษย์อ่านได้ เช่น "1100" ใช้อ้างอิงในเอกสารบัญชีจริง</td></tr>
+              <tr><td class="mono">account_name_th / account_name_en</td><td class="type">ข้อความ (text)</td><td>ชื่อบัญชีภาษาไทย/อังกฤษ เช่น "เงินสด" / "Cash"</td></tr>
+              <tr><td class="mono">account_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>หมวดบัญชี เลือกได้เฉพาะ: asset, liability, equity, revenue, expense, biological_asset</td></tr>
+              <tr><td class="mono">parent_account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>ถ้าเป็นบัญชีย่อย ชี้ไปยังบัญชีแม่ ปล่อยว่างได้ถ้าเป็นบัญชีระดับบนสุด</td></tr>
+              <tr><td class="mono">is_active</td><td class="type">จริง/เท็จ (boolean)</td><td>บัญชีนี้ยังเปิดใช้งานอยู่ไหม ปิดแล้วจะเลือกใช้ในรายการใหม่ไม่ได้ แต่ประวัติเก่ายังอยู่</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>cost_center <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ศูนย์ต้นทุน — ตัวแทนของ "พื้นที่/หน่วยงาน" ที่ต้องการแยกต้นทุนและรายได้ออกจากกัน เช่น ทั้งฟาร์ม แปลง โรงเรือน หรือรอบผลิตหนึ่งรุ่น</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> อ้างอิงตัวเอง (แม่-ลูก) และผูกกับรุ่นเลี้ยง/รอบปลูกจริงในโมดูลปศุสัตว์-พืชผ่าน ref_batch_id</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">code</td><td class="type">ข้อความ (text)</td><td>รหัสย่อของศูนย์ต้นทุน เช่น "FARM-A-HOUSE-2"</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อเต็มที่คนอ่านเข้าใจ เช่น "โรงเรือนไก่ไข่ เบอร์ 2"</td></tr>
+              <tr><td class="mono">type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับของศูนย์ต้นทุนนี้ เลือกได้เฉพาะ: farm, plot, house, batch</td></tr>
+              <tr><td class="mono">parent_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนแม่ เช่น โรงเรือนนี้อยู่ใต้ฟาร์มไหน</td></tr>
+              <tr><td class="mono">ref_batch_id</td><td class="type">เลขอ้างอิง (FK → โมดูลปศุสัตว์/พืช)</td><td>ถ้า type = batch ให้ชี้ไปยังรุ่นเลี้ยง/รอบปลูกจริง ปล่อยว่างได้ถ้าไม่ใช่ระดับ batch</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>journal_entry + journal_entry_line <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการบัญชีรายวัน — journal_entry คือ "ใบบันทึกรายการ" หนึ่งใบ (เช่น 1 การขาย = 1 entry) ส่วน journal_entry_line คือรายละเอียดว่าเงินไหลเข้า-ออกบัญชีไหนบ้างภายในใบนั้น</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> 1 journal_entry มีได้หลาย journal_entry_line และผลรวม debit ต้องเท่ากับผลรวม credit เสมอ ไม่งั้นบันทึกไม่ผ่าน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">entry_no</td><td class="type">ข้อความ (text)</td><td>เลขที่เอกสารอ้างอิง สร้างอัตโนมัติ</td></tr>
+              <tr><td class="mono">entry_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำรายการ</td></tr>
+              <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสร้างรายการนี้ เลือกได้เฉพาะ: manual, sales, procurement, inventory, hr, asset</td></tr>
+              <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบขายที่ทำให้เกิดรายการนี้</td></tr>
+              <tr><td class="mono">(line) account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>บรรทัดนี้ลงบัญชีไหน</td></tr>
+              <tr><td class="mono">(line) cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>บรรทัดนี้ลงศูนย์ต้นทุนไหน ปล่อยว่างได้ถ้าไม่เจาะจง</td></tr>
+              <tr><td class="mono">(line) debit / credit</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนเงินฝั่งเดบิต/เครดิตของบรรทัดนี้ — มีค่าใดค่าหนึ่งเท่านั้น อีกฝั่งเป็น 0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> journal_entry ที่ status = posted ห้ามแก้ไข/ลบตรง ๆ ต้องออกรายการกลับรายการ (reversal entry) เท่านั้น เพื่อรักษา audit trail — ควร enforce ที่ระดับ database/API ไม่ใช่แค่ UI</p>
+      </article>
+
+      <article class="card entity-card">
+        <h3>ar_invoice <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบแจ้งหนี้ลูกหนี้ — ใบเรียกเก็บเงินที่ฟาร์มออกให้ลูกค้า เช่น พ่อค้าคนกลาง โมเดิร์นเทรด หรือผู้ส่งออก หลังขายผลผลิต</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับลูกค้าและคำสั่งขายที่มาจากโมดูลขาย</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้</td></tr>
+              <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → ลูกค้า)</td><td>ลูกค้ารายไหนเป็นหนี้</td></tr>
+              <tr><td class="mono">sales_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่คำสั่งขายอ้างอิงจากโมดูลขาย</td></tr>
+              <tr><td class="mono">grade / weight / moisture</td><td class="type">ข้อความ/ตัวเลข</td><td>เกรด น้ำหนัก ความชื้นของสินค้า ที่ใช้คำนวณราคาขาย ณ วันนั้น</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องเรียกเก็บ</td></tr>
+              <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดชำระเงิน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะใบแจ้งหนี้ เลือกได้เฉพาะ: draft, issued, partially_paid, paid, overdue</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>ap_invoice <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบแจ้งหนี้เจ้าหนี้ — ใบเรียกเก็บเงินที่ผู้ขาย (อาหารสัตว์ ปุ๋ย พันธุ์พืช) ส่งมาเรียกเก็บจากฟาร์ม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับผู้ขายและใบสั่งซื้อที่มาจากโมดูลจัดซื้อ</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้จากผู้ขาย</td></tr>
+              <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → ผู้ขาย)</td><td>เป็นหนี้ผู้ขายรายไหน</td></tr>
+              <tr><td class="mono">purchase_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้ออ้างอิงจากโมดูลจัดซื้อ</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องจ่าย</td></tr>
+              <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดจ่ายเงิน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะเดียวกับ ar_invoice (draft, issued, partially_paid, paid, overdue)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>payment <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การรับ-จ่ายเงินจริง — บันทึกทุกครั้งที่มีเงินเข้าบัญชี (รับจากลูกค้า) หรือเงินออก (จ่ายผู้ขาย) ผูกกับใบแจ้งหนี้ใบใดใบหนึ่ง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ar_invoice หรือ ap_invoice รายการใดรายการหนึ่งเท่านั้น</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>รับเงินหรือจ่ายเงิน เลือกได้เฉพาะ: receipt, payment</td></tr>
+              <tr><td class="mono">ref_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice/ap_invoice)</td><td>ชำระใบแจ้งหนี้ใบไหน</td></tr>
+              <tr><td class="mono">amount</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนเงินที่รับ/จ่ายจริง</td></tr>
+              <tr><td class="mono">paid_date</td><td class="type">วันที่ (date)</td><td>วันที่รับ/จ่ายเงินจริง</td></tr>
+              <tr><td class="mono">method</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีชำระ เลือกได้เฉพาะ: cash, bank_transfer, cheque</td></tr>
+              <tr><td class="mono">bank_txn_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขอ้างอิงธุรกรรมธนาคาร ใช้ตอนกระทบยอดกับ statement</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>tax_document <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เอกสารภาษี — เอกสารที่ต้องจัดทำ/ยื่นให้กรมสรรพากร ผูกกับใบแจ้งหนี้ที่เกี่ยวข้องกับงวดภาษีนั้น</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ar_invoice หรือ ap_invoice ที่เกี่ยวข้อง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">doc_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทแบบภาษี เลือกได้เฉพาะ: ภ.ง.ด., ภ.พ.30</td></tr>
+              <tr><td class="mono">period</td><td class="type">วันที่/ข้อความ</td><td>งวดภาษีที่เอกสารนี้เกี่ยวข้อง เช่น เดือน-ปี</td></tr>
+              <tr><td class="mono">related_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice/ap_invoice)</td><td>ใบแจ้งหนี้ที่เอกสารภาษีนี้อ้างอิงถึง</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะการยื่น เช่น ร่าง/ยื่นแล้ว</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>biological_asset_valuation <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>การประเมินมูลค่าสินทรัพย์ชีวภาพ — บันทึกมูลค่าสัตว์/พืชที่ยังไม่ขายในแต่ละรอบประเมิน ตามมาตรฐานบัญชีเกษตร</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ cost_center ที่ type = batch รับน้ำหนัก/อายุจากโมดูลปศุสัตว์-พืช</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">valuation_date</td><td class="type">วันที่ (date)</td><td>วันที่ประเมินมูลค่า</td></tr>
+              <tr><td class="mono">weight_or_age</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักหรืออายุ ณ วันประเมิน รับมาจากโมดูลปศุสัตว์/พืช</td></tr>
+              <tr><td class="mono">market_price_ref</td><td class="type">ตัวเลข (decimal)</td><td>ราคาตลาดอ้างอิง ณ วันประเมิน</td></tr>
+              <tr><td class="mono">fair_value</td><td class="type">ตัวเลข (decimal)</td><td>มูลค่ายุติธรรมที่คำนวณได้จากน้ำหนัก/อายุ × ราคาตลาด</td></tr>
+              <tr><td class="mono">cost_to_sell</td><td class="type">ตัวเลข (decimal)</td><td>ต้นทุนที่คาดว่าจะเกิดขึ้นตอนขายจริง เช่น ค่าขนส่ง ค่านายหน้า</td></tr>
+              <tr><td class="mono">net_value</td><td class="type">ตัวเลข (decimal)</td><td>มูลค่าสุทธิ = fair_value ลบ cost_to_sell</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>budget_line <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>รายการงบประมาณ — แผนงบประมาณที่วางไว้ล่วงหน้า แยกตามบัญชีและศูนย์ต้นทุน เพื่อเทียบกับผลจริงภายหลัง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ chart_of_accounts และ cost_center</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">period</td><td class="type">วันที่/ข้อความ</td><td>งวดงบประมาณ เช่น ปีงบประมาณหรือรอบผลิต</td></tr>
+              <tr><td class="mono">account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>ตั้งงบให้บัญชีไหน</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ตั้งงบให้ศูนย์ต้นทุนไหน</td></tr>
+              <tr><td class="mono">planned_amount</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนเงินที่ตั้งงบไว้ล่วงหน้า (ผลจริงคำนวณจาก journal_entry ภายหลัง ไม่ต้องเก็บซ้ำ)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2-3</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/chart-of-accounts</td><td>ดึงผังบัญชีทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/chart-of-accounts</td><td>สร้างบัญชีใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/accounting/chart-of-accounts/{id}</td><td>แก้ไข/ปิดใช้งานบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/cost-centers</td><td>ดึงศูนย์ต้นทุนทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/cost-centers</td><td>สร้างศูนย์ต้นทุน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/journal-entries</td><td>ดึงรายการบัญชี (filter: date_from, date_to, cost_center_id, source_module)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/journal-entries</td><td>บันทึกรายการบัญชีแบบ manual</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/journal-entries/from-source</td><td>Internal endpoint ให้โมดูลอื่นยิงเข้ามาโพสต์อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/ar-invoices</td><td>ดึงใบแจ้งหนี้ลูกหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices</td><td>ออกใบแจ้งหนี้ลูกหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices/{id}/payments</td><td>บันทึกรับชำระ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/ap-invoices</td><td>ดึงใบแจ้งหนี้เจ้าหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices</td><td>บันทึกใบแจ้งหนี้เจ้าหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices/{id}/payments</td><td>บันทึกจ่ายชำระ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/profit-loss</td><td>งบกำไรขาดทุน (filter: cost_center_id, period)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/ar-aging</td><td>รายงานอายุลูกหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/ap-aging</td><td>รายงานอายุเจ้าหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/periods/{period}/close</td><td>ปิดงวดบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/cash-flow-forecast</td><td>พยากรณ์กระแสเงินสด</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/bank-statements/import</td><td>นำเข้า statement เพื่อกระทบยอด</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/tax-documents</td><td>สร้างเอกสารภาษี/ส่ง e-Tax</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/biological-assets/valuations</td><td>บันทึกการประเมินมูลค่าสินทรัพย์ชีวภาพ</td><td><span class="phase-tag phase-3">3</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/budget-vs-actual</td><td>งบประมาณเทียบผลจริง</td><td><span class="phase-tag phase-3">3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">เห็นและอนุมัติได้ทุกอย่างในทุกฟาร์ม/ศูนย์ต้นทุน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานบัญชี</div>
+        <div class="role-scope">บันทึกรายการ ออกเอกสาร กระทบยอด จัดทำรายงาน ไม่มีสิทธิ์อนุมัติรายจ่ายวงเงินสูง</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/แปลง</div>
+        <div class="role-scope">เห็นเฉพาะรายงานต้นทุน-รายได้ในศูนย์ต้นทุนที่ตนดูแล อ่านอย่างเดียว</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้สอบบัญชีภายนอก</div>
+        <div class="role-scope">อ่านอย่างเดียวทุกรายงาน พร้อมส่งออกข้อมูล ไม่มีสิทธิ์แก้ไขรายการ</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">พนักงานบัญชี</th><th class="center">ผู้จัดการฟาร์ม/แปลง</th><th class="center">ผู้สอบบัญชี</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>สร้าง/แก้ไขผังบัญชีและศูนย์ต้นทุน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกรายการบัญชี / ออกใบแจ้งหนี้</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกรับ-จ่ายชำระเงิน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>อนุมัติรายจ่ายเกินวงเงินที่กำหนด</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูงบการเงินรวมทุกฟาร์ม</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td></tr>
+          <tr><td>ดูรายงานต้นทุนเฉพาะศูนย์ต้นทุนของตน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+          <tr><td>แก้ไข/ลบรายการบัญชีที่ปิดงวดแล้ว</td><td class="center">reversal เท่านั้น</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ส่งออกข้อมูลเพื่อตรวจสอบ</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน — เป็นสูตรมาตรฐานทั่วไป ควรให้ผู้สอบบัญชียืนยันก่อนใช้งานจริง โดยเฉพาะส่วนสินทรัพย์ชีวภาพ</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>กฎ Debit/Credit ตามประเภทบัญชี</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทุก journal_entry ต้อง validate ว่าผลรวม debit เท่ากับผลรวม credit ก่อนบันทึก ไม่งั้น API ต้อง reject</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>account_type</th><th>Debit ทำให้ยอด</th><th>Credit ทำให้ยอด</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">asset / biological_asset</td><td>เพิ่ม</td><td>ลด</td></tr>
+              <tr><td class="mono">expense</td><td>เพิ่ม</td><td>ลด</td></tr>
+              <tr><td class="mono">liability</td><td>ลด</td><td>เพิ่ม</td></tr>
+              <tr><td class="mono">equity</td><td>ลด</td><td>เพิ่ม</td></tr>
+              <tr><td class="mono">revenue</td><td>ลด</td><td>เพิ่ม</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre class="formula">validate: SUM(line.debit) == SUM(line.credit)
+          WHERE line.journal_entry_id = X
+-&gt; ถ้าไม่เท่ากัน reject การบันทึก</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ต้นทุนต่อหน่วยผลผลิต (Cost per Unit)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ต้นทุนทางตรง (ระบุ cost_center ตรงอยู่แล้ว) ลงตรง ๆ ส่วนต้นทุนร่วม/ทางอ้อมต้องจัดสรรตามเกณฑ์ที่เลือก (พื้นที่ / จำนวนตัว / สัดส่วนรายได้)</p>
+        <pre class="formula">allocated_cost(X) = shared_cost_total
+    &#215; ( base(X) / SUM(base(all cost centers)) )
+
+cost_per_unit(X) = ( direct_cost(X) + allocated_cost(X) )
+    / output_quantity(X)</pre>
+        <p class="formula-example"><b>ตัวอย่าง:</b> ค่าน้ำ-ไฟส่วนกลาง 10,000 บาท จัดสรรตามจำนวนตัวสัตว์ โรงเรือน A มี 500 ตัว จากทั้งหมด 2,000 ตัว → ได้รับจัดสรร 10,000 × (500/2000) = 2,500 บาท</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อายุลูกหนี้/เจ้าหนี้ (AR/AP Aging Buckets)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้คำนวณรายงานอายุหนี้ — จำนวนวันที่เลยกำหนดชำระของแต่ละใบแจ้งหนี้ที่ยังไม่จ่ายครบ</p>
+        <pre class="formula">days_overdue = today - due_date
+(ค่า &lt;= 0 หมายถึงยังไม่ครบกำหนด)</pre>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>Bucket</th><th>เงื่อนไข</th></tr></thead>
+            <tbody>
+              <tr><td>ยังไม่ครบกำหนด (Current)</td><td class="mono">days_overdue &lt;= 0</td></tr>
+              <tr><td>1-30 วัน</td><td class="mono">1 &lt;= days_overdue &lt;= 30</td></tr>
+              <tr><td>31-60 วัน</td><td class="mono">31 &lt;= days_overdue &lt;= 60</td></tr>
+              <tr><td>61-90 วัน</td><td class="mono">61 &lt;= days_overdue &lt;= 90</td></tr>
+              <tr><td>เกิน 90 วัน</td><td class="mono">days_overdue &gt; 90</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>มูลค่ายุติธรรมสินทรัพย์ชีวภาพ (Biological Asset Fair Value)</h3><span class="phase-tag phase-3">Phase 3</span></div>
+        <p>คำนวณใหม่ทุกรอบประเมิน แล้วรับรู้ผลต่างเป็นกำไร/ขาดทุนเข้า journal_entry อัตโนมัติ</p>
+        <pre class="formula">fair_value = weight_or_age &#215; market_price_ref
+net_value  = fair_value - cost_to_sell
+
+period_gain_loss = net_value(รอบนี้) - net_value(รอบก่อน)
+-&gt; กำไร: Debit biological_asset / Credit รายได้จากการเปลี่ยนแปลงมูลค่า
+-&gt; ขาดทุน: กลับด้าน</pre>
+        <p class="note" style="margin-top:10px;"><b>หมายเหตุ</b> รอบเวลาประเมินและแหล่งอ้างอิงราคาตลาดที่เหมาะสม ควรปรึกษาผู้สอบบัญชีก่อนกำหนดเป็นค่ามาตรฐานในระบบ</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ส่วนต่างต้นทุนจริงเทียบมาตรฐาน (Cost Variance)</h3><span class="phase-tag phase-3">Phase 3</span></div>
+        <p>เทียบต้นทุนจริงที่เกิดขึ้นกับต้นทุนมาตรฐานที่ตั้งไว้ล่วงหน้าต่อรอบผลิต เพื่อแจ้งเตือนความผิดปกติ</p>
+        <pre class="formula">cost_variance = actual_cost - standard_cost
+cost_variance_pct = (actual_cost - standard_cost)
+    / standard_cost &#215; 100
+
+flag เตือนถ้า |cost_variance_pct| &gt; threshold (เช่น 10%)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>พยากรณ์กระแสเงินสด (Cash Flow Forecast)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ประมาณเงินสดคงเหลือ ณ วันที่ในอนาคต จากใบแจ้งหนี้ที่ยังไม่ชำระและรายจ่ายประจำที่คาดว่าจะเกิด</p>
+        <pre class="formula">projected_cash(T) = opening_cash
+  + SUM(ar_invoice.total_amount
+        WHERE due_date &lt;= T AND status != paid)
+  - SUM(ap_invoice.total_amount
+        WHERE due_date &lt;= T AND status != paid)
+  - SUM(recurring_expense
+        WHERE expected_date &lt;= T)</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "บัญชีและการเงิน" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>
