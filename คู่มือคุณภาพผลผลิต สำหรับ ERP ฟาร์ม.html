@@ -1,0 +1,738 @@
+<title>โมดูลคุณภาพผลผลิต (Produce Quality) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#crop">โมดูลเฉพาะพืชไร่/พืชสวน (Crop Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">คุณภาพผลผลิต</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Crop Module 5/6 · Produce Quality — Dev-Ready Spec</span>
+    <h1>โมดูลคุณภาพผลผลิต (Produce Quality)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้รับผลผลิตดิบจากการเก็บเกี่ยวมาคัดเกรดละเอียด แล้วแบ่งสต็อกและเชื่อมราคาตามเกรดให้โมดูลขายใช้ต่อ — ทำให้ผลผลิตเกรดต่างกันขายได้ราคาต่างกันแทนที่จะขายรวมราคาเดียว</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>มาตรฐานเกรดต่อชนิดพืช <span class="en">(Grading Standard)</span></li>
+          <li>บันทึกผลตรวจสอบและคัดเกรดผลผลิตละเอียด <span class="en">(ขนาด, ความหวาน, ความชื้น, ตำหนิ)</span></li>
+          <li>แบ่งสต็อกใหม่ตามเกรดที่คัดได้</li>
+          <li>เชื่อมราคารับซื้อ/ราคาแนะนำกับแต่ละเกรด</li>
+          <li>ดูสรุปสัดส่วนเกรดต่อรอบผลิต</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>ผลผลิตดิบที่ยังไม่คัดเกรด — รับจาก <span class="en">การเก็บเกี่ยว</span> (stock_lot ที่สร้างไว้)</li>
+          <li>การสร้าง lot ใหม่ตามเกรดที่คัดแล้ว — ส่งต่อให้ <span class="en">คลังสินค้า/สต็อก</span> จัดการ</li>
+          <li>ราคาขายจริงตามเกรด — ส่งไปที่ <span class="en">ขายและลูกค้า</span> ใช้ตั้งราคาตอนขาย</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่คุณภาพผลผลิตต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>การเก็บเกี่ยว</td><td>สร้าง stock_lot ผลผลิตดิบใหม่</td><td>รับมาคัดเกรดละเอียด</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คุณภาพผลผลิต (ตัวเอง) → คลังสินค้า/สต็อก</td><td>คัดเกรดเสร็จสมบูรณ์</td><td>แบ่ง stock_lot ใหม่ตามเกรดที่ได้</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คุณภาพผลผลิต (ตัวเอง) → ขายและลูกค้า</td><td>มีผลผลิตพร้อมขายแยกตามเกรด</td><td>ให้ข้อมูลเกรด+ราคาแนะนำไปใช้ตั้งราคาขาย</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ขายและลูกค้า</td><td>ลูกค้าต้องการเกรดเฉพาะ</td><td>ตรวจสอบว่ามีสต็อกเกรดนั้นพอไหม</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการคัดเกรดพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตั้งเกณฑ์มาตรฐานเกรดต่อชนิดพืช (ขนาด/ความหวาน/ความชื้น/ตำหนิ)</span></li>
+          <li class="func-item"><span class="txt">บันทึกผลตรวจคุณภาพและคัดเกรดผลผลิตแต่ละ lot</span></li>
+          <li class="func-item"><span class="txt">แบ่งสต็อกใหม่ตามเกรดที่คัดได้ พร้อมแจ้งคลังสร้าง lot แยกเกรด</span></li>
+          <li class="func-item"><span class="txt">เชื่อมราคารับซื้อ/ราคาแนะนำกับแต่ละเกรด</span></li>
+          <li class="func-item"><span class="txt">ดูสรุปสัดส่วนเกรดต่อรอบผลิต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เชื่อมกับอุปกรณ์วัดคุณภาพดิจิทัล (เครื่องวัด Brix/ความชื้น)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ตรวจสอบสต็อกเกรดที่ต้องการก่อนยืนยันคำสั่งขาย</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์แนวโน้มคุณภาพเทียบปัจจัยการดูแล (ปุ๋ย/น้ำ) ย้อนหลัง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ถ่ายภาพ/AI ช่วยคัดเกรดอัตโนมัติ</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์สัดส่วนเกรดล่วงหน้าจากข้อมูลการดูแลระหว่างรอบ</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>grading_standard <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มาตรฐานเกรด — เกณฑ์ที่ใช้ตัดสินว่าผลผลิตเป็นเกรดอะไร ต่อชนิดพืชหนึ่งชนิด เช่น เกรด A ต้องมีขนาด ≥ 6 ซม. ความหวาน ≥ 12 Brix</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ crop_variety จากโมดูลแผนการเพาะปลูก ถูกอ้างอิงจาก quality_inspection ตอนตัดสินเกรด</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">crop_variety_id</td><td class="type">เลขอ้างอิง (FK → crop_variety)</td><td>มาตรฐานนี้ใช้กับพืชพันธุ์ไหน</td></tr>
+              <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ชื่อเกรด เช่น A, B, C, reject</td></tr>
+              <tr><td class="mono">min_size / max_size</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ช่วงขนาดที่ยอมรับสำหรับเกรดนี้</td></tr>
+              <tr><td class="mono">min_brix</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ค่าความหวานขั้นต่ำที่ต้องผ่านสำหรับเกรดนี้</td></tr>
+              <tr><td class="mono">max_moisture_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ความชื้นสูงสุดที่ยอมรับได้</td></tr>
+              <tr><td class="mono">defect_tolerance_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>สัดส่วนตำหนิสูงสุดที่ยอมรับได้สำหรับเกรดนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>quality_inspection <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การตรวจสอบคุณภาพ — บันทึกผลตรวจคุณภาพจริงของ lot ผลผลิตหนึ่ง ก่อนตัดสินว่าจัดเป็นเกรดอะไรเทียบกับมาตรฐานที่ตั้งไว้</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ stock_lot (จากโมดูลคลังสินค้า ที่มาจาก harvest_record) และอ้างอิง grading_standard ที่ใช้ตัดสิน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">stock_lot_ref</td><td class="type">ข้อความ (อ้างอิง stock_lot)</td><td>ตรวจ lot ไหนในคลัง</td></tr>
+              <tr><td class="mono">inspection_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจสอบ</td></tr>
+              <tr><td class="mono">inspected_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจ</td></tr>
+              <tr><td class="mono">measured_size / measured_brix / measured_moisture_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ค่าที่วัดได้จริง แล้วแต่ว่าพืชชนิดนั้นวัดค่าไหนบ้าง</td></tr>
+              <tr><td class="mono">defect_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>สัดส่วนตำหนิที่พบจริง</td></tr>
+              <tr><td class="mono">assigned_grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดที่ตัดสินได้จากผลวัดเทียบ grading_standard</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>grade_stock_split <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การแบ่งสต็อกตามเกรด — บันทึกว่าจาก lot ต้นฉบับหนึ่ง แบ่งออกเป็นสต็อกย่อยตามเกรดเท่าไหร่ ก่อนส่งไปสร้าง lot ใหม่ในคลังสินค้า</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ quality_inspection และเป็นต้นทางให้สร้าง stock_lot ใหม่ (แยกตามเกรด) ในโมดูลคลังสินค้า</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">quality_inspection_id</td><td class="type">เลขอ้างอิง (FK → quality_inspection)</td><td>แบ่งสต็อกจากผลตรวจครั้งไหน</td></tr>
+              <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>สต็อกส่วนนี้เป็นเกรดอะไร</td></tr>
+              <tr><td class="mono">quantity</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณของเกรดนี้ที่แบ่งออกมา</td></tr>
+              <tr><td class="mono">new_stock_lot_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ lot ใหม่ที่สร้างในคลังสำหรับเกรดนี้โดยเฉพาะ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>grade_price <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ราคาต่อเกรด — ราคารับซื้อ/ราคาแนะนำต่อเกรดของพืชแต่ละชนิด ใช้อ้างอิงตอนตั้งราคาขาย</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ crop_variety และ grade ถูกอ้างอิงจากโมดูลขายและลูกค้าตอนตั้งราคา</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">crop_variety_id</td><td class="type">เลขอ้างอิง (FK → crop_variety)</td><td>ราคานี้ใช้กับพืชพันธุ์ไหน</td></tr>
+              <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ราคานี้เป็นของเกรดไหน</td></tr>
+              <tr><td class="mono">price_per_unit</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยของเกรดนี้</td></tr>
+              <tr><td class="mono">effective_date</td><td class="type">วันที่ (date)</td><td>วันที่ราคานี้เริ่มมีผล</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/crop/grading-standards</td><td>ดึงมาตรฐานเกรดทั้งหมด (filter: crop_variety_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/grading-standards</td><td>ตั้งมาตรฐานเกรดใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/grading-standards/{id}</td><td>แก้ไขเกณฑ์มาตรฐานเกรด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/quality-inspections</td><td>ดึงประวัติการตรวจสอบคุณภาพ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/quality-inspections</td><td>บันทึกผลตรวจ พร้อมคำนวณ assigned_grade อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/quality-inspections/{id}/split-stock</td><td>แบ่งสต็อกตามเกรด แจ้งคลังสร้าง lot ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/grade-distribution</td><td>สัดส่วนเกรดต่อรอบผลิต</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/grade-prices</td><td>ดึงราคาทั้งหมดต่อเกรด/พันธุ์</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/grade-prices</td><td>ตั้งราคาใหม่ต่อเกรด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/grade-prices/current</td><td>ราคาที่มีผลปัจจุบันต่อเกรด/พันธุ์</td><td><span class="phase-tag phase-1">1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">ตั้งมาตรฐานเกรดและราคาต่อเกรด เห็นรายงานสัดส่วนเกรดทั้งหมด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้ตรวจสอบคุณภาพ/หัวหน้างานเกษตร</div>
+        <div class="role-scope">บันทึกผลตรวจคุณภาพและตัดสินเกรดจริง แบ่งสต็อกตามเกรด</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่เกษตร/พนักงานภาคสนาม</div>
+        <div class="role-scope">ช่วยชั่ง/วัดค่าเบื้องต้น ไม่มีสิทธิ์ตัดสินเกรดสุดท้าย</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานขาย</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อดูสต็อกแยกตามเกรดและราคาก่อนขาย</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้ตรวจสอบคุณภาพ</th><th class="center">เจ้าหน้าที่เกษตร</th><th class="center">พนักงานขาย</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ตั้ง/แก้ไขมาตรฐานเกรด</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกผลตรวจคุณภาพและตัดสินเกรด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>แบ่งสต็อกตามเกรด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ตั้ง/แก้ไขราคาต่อเกรด</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานสัดส่วนเกรด/สต็อกแยกเกรด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตัดสินเกรดอัตโนมัติจากผลวัด (Auto Grade Assignment)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ตรวจไล่จากเกรดสูงสุดลงมา ตัวแรกที่ผ่านทุกเกณฑ์คือเกรดที่กำหนดให้</p>
+        <pre class="formula">assigned_grade =
+  grading_standard ตัวแรก (เรียงจากเกรดสูงสุด) ที่:
+    measured_size อยู่ในช่วง [min_size, max_size]
+    AND measured_brix &gt;= min_brix
+    AND measured_moisture_pct &lt;= max_moisture_pct
+    AND defect_pct &lt;= defect_tolerance_pct
+
+ถ้าไม่เข้าเกณฑ์เกรดใดเลย -&gt; assigned_grade = reject</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>สัดส่วนเกรดต่อรอบผลิต (Grade Distribution)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ดูภาพรวมว่ารอบนี้ได้เกรดดีมากน้อยแค่ไหน</p>
+        <pre class="formula">grade_distribution(planting_plan) =
+  สำหรับแต่ละ grade:
+    SUM(grade_stock_split.quantity WHERE grade = X)
+    / SUM(quantity ทั้งหมดของรอบนี้) &#215; 100</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>มูลค่ารวมตามเกรด (Value by Grade)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้เทียบว่าการคัดเกรดทำให้มูลค่ารวมเพิ่มขึ้นจริงเมื่อเทียบกับขายรวมราคาเดียว</p>
+        <pre class="formula">total_value(planting_plan) =
+  SUM( grade_stock_split.quantity &#215; grade_price.price_per_unit )
+  ต่อทุกเกรดของรอบนี้</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ราคาที่ใช้ ณ วันที่ขายจริง (Effective Price Lookup)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ราคาต่อเกรดเปลี่ยนได้ตามเวลา ต้องดึงราคาที่มีผล ณ วันนั้นจริง ๆ</p>
+        <pre class="formula">effective_price(crop_variety, grade, date) =
+  grade_price ที่ effective_date &lt;= date
+  เรียงจากวันที่ล่าสุดก่อน แล้วเลือกแถวแรก</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เตือนอัตราของเสีย/reject สูงผิดปกติ (Reject Rate Alert)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ช่วยจับสัญญาณปัญหาการดูแลพืชตั้งแต่เนิ่น ๆ ก่อนเสียหายมากในรอบถัดไป</p>
+        <pre class="formula">reject_rate_pct =
+  SUM(quantity WHERE grade = reject)
+  / SUM(quantity ทั้งหมด) &#215; 100
+
+reject_rate_pct &gt; threshold (เช่น 15%)
+  -&gt; flag เตือนให้ตรวจสอบสาเหตุ
+     (ปุ๋ย/สารเคมี/สภาพอากาศ/ช่วงเก็บเกี่ยว)</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "คุณภาพผลผลิต" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

@@ -1,0 +1,724 @@
+<title>โมดูลการเก็บเกี่ยว (Harvest) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#crop">โมดูลเฉพาะพืชไร่/พืชสวน (Crop Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">การเก็บเกี่ยว</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Crop Module 4/6 · Harvest — Dev-Ready Spec</span>
+    <h1>โมดูลการเก็บเกี่ยว (Harvest)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้เป็นจุดปิดวงจรของรอบผลิตพืช — ต้องผ่านการตรวจสอบ PHI ก่อนบันทึกได้ แล้วส่งผลลัพธ์ไปปิดแผน อัปเดตประวัติที่ดิน และสร้างสต็อกสินค้าสำเร็จรูป ไม่ทำหน้าที่คัดเกรดละเอียด (อยู่ในโมดูล "คุณภาพผลผลิต")</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>บันทึกการเก็บเกี่ยวจริง <span class="en">(Harvest Record)</span> — วันที่ ปริมาณ หน่วยนับ</li>
+          <li>บันทึกความสูญเสียหลังเก็บเกี่ยว <span class="en">(Post-Harvest Loss)</span></li>
+          <li>บันทึกแรงงานที่เก็บเกี่ยว (สำหรับค่าแรงตามผลงาน)</li>
+          <li>ปิดรอบแผนการเพาะปลูกพร้อมบันทึกผลจริง</li>
+          <li>คำนวณผลผลิตต่อไร่และเปรียบเทียบรอบย้อนหลัง</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>ตรวจสอบว่าปลอดภัยเก็บเกี่ยวหรือยัง (PHI) — รับจาก <span class="en">การให้น้ำ ปุ๋ย และยา</span></li>
+          <li>การรับผลผลิตเข้าคลังเป็นสินค้าสำเร็จรูป — ส่งต่อให้ <span class="en">คลังสินค้า/สต็อก</span> สร้าง stock_lot</li>
+          <li>การคัดเกรดละเอียด/ตรวจคุณภาพเพื่อขาย — ส่งต่อให้ <span class="en">คุณภาพผลผลิต</span></li>
+          <li>ค่าแรงเก็บเกี่ยวตามผลงาน — ส่งไปที่ <span class="en">บุคลากรและแรงงาน</span> (piece rate)</li>
+          <li>อัปเดตประวัติการใช้ที่ดิน — ส่งกลับไปที่ <span class="en">ผังแปลงและที่ดิน</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่การเก็บเกี่ยวต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>การให้น้ำ ปุ๋ย และยา</td><td>ต้องการบันทึกเก็บเกี่ยวจริง</td><td>ตรวจสอบสถานะ PHI ก่อนอนุญาตให้บันทึก</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว (ตัวเอง) → แผนการเพาะปลูก</td><td>บันทึกเก็บเกี่ยวครั้งสุดท้ายของรอบ</td><td>ปิดรอบแผนพร้อมบันทึกผลจริงเทียบประมาณการ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว (ตัวเอง) → ผังแปลงและที่ดิน</td><td>ปิดรอบแผนแล้ว</td><td>อัปเดตผลผลิตใน land_use_history</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว (ตัวเอง) → คลังสินค้า/สต็อก</td><td>เก็บเกี่ยวเสร็จ ได้ผลผลิตจริง</td><td>สร้าง stock_lot สินค้าสำเร็จรูปใหม่เข้าคลัง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คุณภาพผลผลิต</td><td>ต้องการคัดเกรดละเอียดก่อนขาย</td><td>ส่งต่อผลผลิตที่เก็บเกี่ยวแล้วไปคัดเกรด</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว (ตัวเอง) → บุคลากรและแรงงาน</td><td>มีแรงงานเก็บเกี่ยวแบบตามผลงาน</td><td>ส่งปริมาณที่เก็บได้ต่อคนไปคำนวณค่าแรง</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการปิดรอบผลิตพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตรวจสอบสถานะ PHI ก่อนอนุญาตให้บันทึกเก็บเกี่ยว</span></li>
+          <li class="func-item"><span class="txt">บันทึกการเก็บเกี่ยวจริง (วันที่ ปริมาณ หน่วยนับ)</span></li>
+          <li class="func-item"><span class="txt">บันทึกความสูญเสียหลังเก็บเกี่ยว/ระหว่างขนย้าย</span></li>
+          <li class="func-item"><span class="txt">ปิดรอบแผนการเพาะปลูกพร้อมบันทึกผลจริงเทียบประมาณการ</span></li>
+          <li class="func-item"><span class="txt">สร้างสต็อกสินค้าสำเร็จรูปเข้าคลังอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">คำนวณผลผลิตต่อไร่และดูรายงานเทียบรอบย้อนหลัง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">บันทึกแรงงาน/ทีมที่เก็บเกี่ยวและปริมาณที่แต่ละคนเก็บได้</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">รองรับเก็บเกี่ยวหลายครั้งต่อรอบสำหรับพืชที่ทยอยเก็บ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนล่วงหน้าก่อนถึงวันเก็บเกี่ยวตามแผน</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ปัจจัยที่กระทบผลผลิต (อากาศ/ปุ๋ย/สายพันธุ์) เทียบผลจริง</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">พยากรณ์วันเก็บเกี่ยวที่เหมาะสมจากข้อมูลการเจริญเติบโต</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>harvest_record <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการเก็บเกี่ยว — บันทึกการเก็บเกี่ยวจริงแต่ละครั้ง ผูกกับแผนการเพาะปลูกหนึ่งรอบ พืชบางชนิด (เช่น ผัก/ผลไม้) อาจเก็บเกี่ยวหลายครั้งต่อรอบแบบทยอยเก็บ</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ planting_plan และ field/field_zone เป็นต้นทางให้สร้าง stock_lot ในโมดูลคลังสินค้า</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">planting_plan_id</td><td class="type">เลขอ้างอิง (FK → planting_plan)</td><td>เก็บเกี่ยวของแผนปลูกรอบไหน</td></tr>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>เก็บเกี่ยวจากแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">harvest_date</td><td class="type">วันที่ (date)</td><td>วันที่เก็บเกี่ยวจริง</td></tr>
+              <tr><td class="mono">quantity_harvested</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่เก็บได้ในครั้งนี้</td></tr>
+              <tr><td class="mono">unit</td><td class="type">ข้อความ (text)</td><td>หน่วยนับ เช่น กก., ตัน, ลูก, ถุง</td></tr>
+              <tr><td class="mono">is_final_harvest</td><td class="type">จริง/เท็จ (boolean)</td><td>เป็นการเก็บเกี่ยวครั้งสุดท้ายของรอบนี้ไหม ถ้าใช่จะปิดรอบแผนอัตโนมัติ</td></tr>
+              <tr><td class="mono">stock_lot_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ stock_lot ที่สร้างในโมดูลคลังสินค้าจากการเก็บเกี่ยวครั้งนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>harvest_loss <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ความสูญเสียหลังเก็บเกี่ยว — บันทึกของเสีย/ความเสียหายระหว่างเก็บเกี่ยวหรือขนย้าย ใช้วิเคราะห์อัตราสูญเสียเทียบผลผลิตรวม</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ harvest_record หนึ่งครั้งเก็บเกี่ยวอาจมีหลายรายการความสูญเสีย</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">harvest_record_id</td><td class="type">เลขอ้างอิง (FK → harvest_record)</td><td>สูญเสียเกิดขึ้นตอนเก็บเกี่ยวครั้งไหน</td></tr>
+              <tr><td class="mono">loss_quantity</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่สูญเสียไป หน่วยเดียวกับ harvest_record.unit</td></tr>
+              <tr><td class="mono">loss_reason</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สาเหตุ เลือกได้เฉพาะ: pest_damage, transport_damage, quality_reject, other</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>harvest_labor <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แรงงานที่เก็บเกี่ยว — บันทึกว่าพนักงานคนไหนเก็บเกี่ยวได้ปริมาณเท่าไหร่ ใช้ส่งต่อคำนวณค่าแรงตามผลงาน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ harvest_record และ employee ในโมดูลบุคลากรและแรงงาน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">harvest_record_id</td><td class="type">เลขอ้างอิง (FK → harvest_record)</td><td>เป็นส่วนหนึ่งของการเก็บเกี่ยวครั้งไหน</td></tr>
+              <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครเป็นคนเก็บเกี่ยว</td></tr>
+              <tr><td class="mono">quantity_collected</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่พนักงานคนนี้เก็บได้จริง ใช้คำนวณ piece rate</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records</td><td>ดึงประวัติการเก็บเกี่ยว (filter: planting_plan_id, field_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records</td><td>บันทึกการเก็บเกี่ยวใหม่ (ตรวจสอบ PHI ก่อน ถ้าไม่ผ่านให้ reject)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>บันทึกความสูญเสียของการเก็บเกี่ยวครั้งนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>ดึงรายการความสูญเสียของการเก็บเกี่ยวครั้งนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/close-harvest</td><td>ปิดรอบแผน อัปเดตผลจริงและสร้าง stock_lot อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-per-rai</td><td>ผลผลิตต่อไร่ (filter: field_id, crop_variety_id, period)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-comparison</td><td>เปรียบเทียบผลผลิตรอบปัจจุบันกับย้อนหลัง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-labor</td><td>ดึงข้อมูลแรงงานที่เก็บเกี่ยวต่อครั้ง</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-labor</td><td>บันทึกปริมาณที่พนักงานแต่ละคนเก็บได้</td><td><span class="phase-tag phase-2">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">เห็นรายงานผลผลิตทุกแปลง เปรียบเทียบรอบย้อนหลัง</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการแปลง/หัวหน้างานเกษตร</div>
+        <div class="role-scope">อนุมัติการเก็บเกี่ยวและปิดรอบแผนสำหรับพื้นที่ตนดูแล</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่เกษตร/พนักงานภาคสนาม</div>
+        <div class="role-scope">บันทึกการเก็บเกี่ยวจริงและความสูญเสียหน้างาน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานคลังสินค้า</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อรับผลผลิตเข้าคลังตาม stock_lot ที่สร้างจากการเก็บเกี่ยว</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการแปลง</th><th class="center">เจ้าหน้าที่เกษตร</th><th class="center">พนักงานคลังสินค้า</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>บันทึกการเก็บเกี่ยวจริง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกความสูญเสีย</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ปิดรอบแผนการเพาะปลูก</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกแรงงานที่เก็บเกี่ยว (piece rate)</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ดูรายงานผลผลิตต่อไร่/เทียบรอบย้อนหลัง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบ PHI ก่อนบันทึกเก็บเกี่ยว (Pre-Harvest Safety Gate)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>เรียกใช้กฎจากโมดูล "การให้น้ำ ปุ๋ย และยา" ทุกครั้งก่อนบันทึก ห้าม implement ซ้ำเอง</p>
+        <pre class="formula">before insert harvest_record:
+  call is_safe_to_harvest(field_id, harvest_date)
+  (จากโมดูลการให้น้ำ ปุ๋ย และยา)
+
+ถ้า false -&gt; reject การบันทึก
+  พร้อมแจ้งวันที่ปลอดภัยที่แท้จริง (safe_harvest_date)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ผลผลิตต่อไร่ (Yield per Rai)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>รวมทุกครั้งที่เก็บเกี่ยวของรอบเดียวกัน หารด้วยพื้นที่จริง</p>
+        <pre class="formula">yield_per_rai =
+  SUM(harvest_record.quantity_harvested)
+  ของ planting_plan เดียวกัน
+  / field_or_zone.area_rai</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อัตราสูญเสียหลังเก็บเกี่ยว (Post-Harvest Loss Rate)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ติดตามว่าสูญเสียมากผิดปกติหรือไม่ในแต่ละรอบ</p>
+        <pre class="formula">loss_rate_pct =
+  SUM(harvest_loss.loss_quantity)
+  / SUM(harvest_record.quantity_harvested)
+  &#215; 100</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ปิดรอบแผนอัตโนมัติ (Auto-Close Planting Plan)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทำงานอัตโนมัติทันทีที่บันทึก harvest_record ที่ is_final_harvest = true</p>
+        <pre class="formula">ถ้า harvest_record.is_final_harvest = true:
+  -&gt; planting_plan.status = harvested
+  -&gt; yield_estimate.actual_yield =
+       SUM(quantity_harvested ทั้งหมดของรอบนี้)
+  -&gt; land_use_history.yield_result =
+       yield_estimate.actual_yield
+       (ในโมดูลผังแปลงและที่ดิน)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เปรียบเทียบผลผลิตรอบปัจจุบันกับย้อนหลัง</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>เทียบกับรอบก่อนหน้าของแปลง/โซนเดียวกันที่ปลูกพันธุ์เดียวกัน</p>
+        <pre class="formula">yield_variance_pct =
+  (current_yield_per_rai - previous_yield_per_rai)
+  / previous_yield_per_rai &#215; 100
+
+previous_yield_per_rai = รอบก่อนหน้าล่าสุด
+  ของ field/zone เดียวกัน ที่ crop_variety เดียวกัน</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "การเก็บเกี่ยว" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

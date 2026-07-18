@@ -1,0 +1,741 @@
+<title>โมดูลการให้น้ำ ปุ๋ย และยา (Irrigation, Fertilizer &amp; Pesticide) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#crop">โมดูลเฉพาะพืชไร่/พืชสวน (Crop Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">การให้น้ำ ปุ๋ย และยา</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Crop Module 3/6 · Irrigation, Fertilizer &amp; Pesticide — Dev-Ready Spec</span>
+    <h1>โมดูลการให้น้ำ ปุ๋ย และยา (Irrigation, Fertilizer &amp; Pesticide)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้บันทึกการปฏิบัติงานจริงตามกำหนดการจากแผนการเพาะปลูก และเป็นจุดสำคัญด้านความปลอดภัยอาหาร — ต้องคุมระยะเวลาห้ามเก็บเกี่ยวหลังฉีดพ่นสารเคมี (PHI) ไม่ให้พลาด</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>บันทึกการให้น้ำ <span class="en">(Irrigation Log)</span></li>
+          <li>บันทึกการให้ปุ๋ย <span class="en">(Fertilizer Application)</span></li>
+          <li>บันทึกการฉีดพ่นสารเคมี/ยาปราบศัตรูพืช <span class="en">(Pesticide Application)</span></li>
+          <li>คำนวณปริมาณที่ต้องใช้ตามพื้นที่</li>
+          <li>ตรวจสอบระยะเวลาห้ามเก็บเกี่ยวหลังฉีดพ่น <span class="en">(Pre-Harvest Interval, PHI)</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>กำหนดการดูแลพืชตามแผน — รับจาก <span class="en">แผนการเพาะปลูก</span></li>
+          <li>การตัดสต็อกปุ๋ย/สารเคมีที่ใช้จริง — ส่งต่อให้ <span class="en">คลังสินค้า/สต็อก</span></li>
+          <li>ต้นทุนปุ๋ย/สารเคมีเข้ารอบผลิต — สะท้อนผ่าน COGS ที่คลังตัดแล้ว ไม่คำนวณเอง</li>
+          <li>พยากรณ์ฝนตก/แล้ง — รับจาก <span class="en">สภาพอากาศ</span> ช่วยตัดสินใจวันให้น้ำ</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่โมดูลนี้ต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>แผนการเพาะปลูก</td><td>แผนได้รับอนุมัติ มีกำหนดการดูแลพืช</td><td>ดึงกำหนดการมาสร้างรายการงานที่ต้องทำ</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การให้น้ำฯ (ตัวเอง) → คลังสินค้า/สต็อก</td><td>บันทึกให้ปุ๋ย/ฉีดพ่นสารเคมีจริง</td><td>แจ้งตัดสต็อกปุ๋ย/สารเคมีที่ใช้</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเก็บเกี่ยว</td><td>จะเริ่มเก็บเกี่ยวจริง</td><td>ตรวจสอบว่าเลยระยะ PHI ปลอดภัยแล้วหรือยัง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>สภาพอากาศ</td><td>พยากรณ์ฝนตก/แล้งช่วงที่จะให้น้ำ</td><td>ช่วยแนะนำวันที่ควรให้น้ำ/เลื่อนการฉีดพ่น</td><td><span class="phase-tag phase-2">Phase 2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการบันทึกงานพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รับกำหนดการจากแผนการเพาะปลูกมาสร้างรายการงานที่ต้องทำ</span></li>
+          <li class="func-item"><span class="txt">บันทึกการให้น้ำจริง (วันที่ ปริมาณน้ำ)</span></li>
+          <li class="func-item"><span class="txt">บันทึกการให้ปุ๋ยจริง พร้อมแจ้งตัดสต็อก</span></li>
+          <li class="func-item"><span class="txt">บันทึกการฉีดพ่นสารเคมีจริง พร้อมแจ้งตัดสต็อก</span></li>
+          <li class="func-item"><span class="txt">คำนวณปริมาณปุ๋ย/สารเคมีที่ต้องใช้ตามพื้นที่ก่อนบันทึกจริง</span></li>
+          <li class="func-item"><span class="txt">ตรวจสอบและแจ้งเตือนระยะเวลาห้ามเก็บเกี่ยว (PHI) ต่อแปลง</span></li>
+          <li class="func-item"><span class="txt">ดูประวัติการดูแลพืชทั้งหมดต่อแปลง/รอบผลิต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แจ้งเตือนอัตโนมัติเมื่อถึงกำหนดต้องให้น้ำ/ปุ๋ย/ฉีดพ่น</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ปรับกำหนดการให้น้ำอัตโนมัติตามพยากรณ์ฝน</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">บันทึกผ่านแอปมือถือหน้างานพร้อมพิกัด GPS ยืนยันตำแหน่ง</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">เชื่อมเซนเซอร์ความชื้นดิน/ระบบให้น้ำอัตโนมัติ (IoT)</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">วิเคราะห์ประสิทธิภาพการใช้ปุ๋ย/สารเคมีต่อผลผลิตที่ได้</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>care_task <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>งานดูแลพืชตามแผน — รายการงานที่ต้องทำตามกำหนดการจากแผนการเพาะปลูก เช่น "ให้ปุ๋ยครั้งที่ 2 วันที่ x" ก่อนจะมีการบันทึกว่าทำจริงหรือยัง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ planting_plan จากโมดูลแผนการเพาะปลูก และเมื่อทำจริงจะเชื่อมกับ irrigation_log/fertilizer_application/pesticide_application ตามประเภทงาน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">planting_plan_id</td><td class="type">เลขอ้างอิง (FK → planting_plan)</td><td>งานนี้เป็นของแผนปลูกรอบไหน</td></tr>
+              <tr><td class="mono">task_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทงาน เลือกได้เฉพาะ: irrigation, fertilizer, pesticide</td></tr>
+              <tr><td class="mono">scheduled_date</td><td class="type">วันที่ (date)</td><td>วันที่ควรทำงานนี้ตามแผน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: pending, done, skipped, overdue</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>irrigation_log <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการให้น้ำ — บันทึกทุกครั้งที่ให้น้ำจริงในแปลง/โซนหนึ่ง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field/field_zone (จากโมดูลผังแปลง) และ care_task ถ้าเป็นไปตามแผน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ให้น้ำแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม ถ้าให้น้ำนอกแผนปล่อยว่าง</td></tr>
+              <tr><td class="mono">irrigation_date</td><td class="type">วันที่ (date)</td><td>วันที่ให้น้ำจริง</td></tr>
+              <tr><td class="mono">water_volume_liters</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณน้ำที่ใช้จริง หน่วยลิตร</td></tr>
+              <tr><td class="mono">method</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีให้น้ำ เลือกได้เฉพาะ: sprinkler, drip, flood, manual</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>fertilizer_application <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการให้ปุ๋ย — บันทึกทุกครั้งที่ใส่ปุ๋ยจริงในแปลง/โซนหนึ่ง พร้อมชนิดและปริมาณ</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field/field_zone, care_task และ item (ชนิดปุ๋ยจากโมดูลคลังสินค้า) ที่ถูกตัดสต็อก</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ให้ปุ๋ยแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม</td></tr>
+              <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → item)</td><td>ใช้ปุ๋ยชนิดไหนจากคลังสินค้า</td></tr>
+              <tr><td class="mono">application_date</td><td class="type">วันที่ (date)</td><td>วันที่ใส่ปุ๋ยจริง</td></tr>
+              <tr><td class="mono">quantity_used</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณปุ๋ยที่ใช้จริง</td></tr>
+              <tr><td class="mono">application_method</td><td class="type">ข้อความ/ตัวเลือกคงที่</td><td>วิธีการใส่ปุ๋ย เช่น หว่าน โรยโคน ผสมน้ำราด</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>pesticide_application <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการฉีดพ่นสารเคมี — บันทึกทุกครั้งที่ฉีดพ่นยาปราบศัตรูพืช/สารเคมีในแปลง/โซนหนึ่ง เป็นจุดสำคัญที่สุดสำหรับตรวจสอบความปลอดภัยอาหารก่อนเก็บเกี่ยว</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ field/field_zone, care_task และ item (ชนิดสารเคมีจากโมดูลคลังสินค้าที่มีค่า phi_days กำกับ)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ฉีดพ่นแปลงหรือโซนไหน</td></tr>
+              <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม</td></tr>
+              <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → item)</td><td>ใช้สารเคมีชนิดไหนจากคลังสินค้า</td></tr>
+              <tr><td class="mono">application_date</td><td class="type">วันที่ (date)</td><td>วันที่ฉีดพ่นจริง</td></tr>
+              <tr><td class="mono">quantity_used</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณสารเคมีที่ใช้จริง</td></tr>
+              <tr><td class="mono">target_pest</td><td class="type">ข้อความ (text)</td><td>ศัตรูพืชหรือโรคที่มุ่งกำจัด</td></tr>
+              <tr><td class="mono">phi_days</td><td class="type">ตัวเลข (integer)</td><td>จำนวนวันที่ต้องเว้นก่อนเก็บเกี่ยวได้ ดึงจากมาตรฐานของสารเคมีนั้น</td></tr>
+              <tr><td class="mono">safe_harvest_date</td><td class="type">วันที่ (date)</td><td>วันที่เก็บเกี่ยวได้อย่างปลอดภัย คำนวณจาก application_date + phi_days</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/crop/care-tasks</td><td>ดึงรายการงานตามแผน (filter: planting_plan_id, status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/care-tasks/{id}</td><td>อัปเดตสถานะงาน (done/skipped)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/irrigation-logs</td><td>ดึงประวัติการให้น้ำ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/irrigation-logs</td><td>บันทึกการให้น้ำจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fertilizer-applications</td><td>ดึงประวัติการให้ปุ๋ย</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fertilizer-applications</td><td>บันทึกการให้ปุ๋ยจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/pesticide-applications</td><td>ดึงประวัติการฉีดพ่นสารเคมี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/pesticide-applications</td><td>บันทึกการฉีดพ่นจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/phi-status</td><td>ตรวจสอบสถานะ PHI และวันที่ปลอดภัยเก็บเกี่ยวของแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/dosage-calculator</td><td>คำนวณปริมาณปุ๋ย/สารเคมีที่ต้องใช้ตามพื้นที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/care-history</td><td>ประวัติการดูแลพืชทั้งหมดต่อแปลง/รอบผลิต</td><td><span class="phase-tag phase-1">1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">เห็นรายงานทั้งหมด อนุมัติการใช้สารเคมีควบคุมพิเศษถ้ามี</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการแปลง/หัวหน้างานเกษตร</div>
+        <div class="role-scope">มอบหมายงานตามแผน ตรวจสอบสถานะ PHI ก่อนอนุมัติเก็บเกี่ยว</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่เกษตร/พนักงานภาคสนาม</div>
+        <div class="role-scope">บันทึกการให้น้ำ/ปุ๋ย/ฉีดพ่นสารเคมีจริงหน้างาน</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">พนักงานคลังสินค้า</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อตรวจสอบว่าเบิกอะไรไปใช้ตรงกับที่ตัดสต็อก</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการแปลง</th><th class="center">เจ้าหน้าที่เกษตร</th><th class="center">พนักงานคลังสินค้า</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>สร้าง/มอบหมายงานดูแลพืชตามแผน</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกการให้น้ำ/ปุ๋ยจริง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกการฉีดพ่นสารเคมีจริง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ดูสถานะ PHI ก่อนอนุมัติเก็บเกี่ยว</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>ดูประวัติการดูแลพืชทั้งหมด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะพื้นที่ตน)</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน — ข้อ 2-3 เป็นกฎความปลอดภัยอาหารที่สำคัญที่สุดของโมดูลนี้</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>คำนวณปริมาณตามพื้นที่ (Dosage Calculation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ก่อนบันทึกจริงทุกครั้ง เพื่อไม่ให้ใส่ปุ๋ย/ฉีดพ่นเกินหรือขาดจากที่ควร</p>
+        <pre class="formula">quantity_needed =
+  dosage_rate_per_rai (จากฉลากผลิตภัณฑ์/มาตรฐาน)
+  &#215; field_or_zone.area_rai</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>คำนวณวันที่ปลอดภัยเก็บเกี่ยว (Safe Harvest Date)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>คำนวณทันทีที่บันทึก pesticide_application ทุกครั้ง</p>
+        <pre class="formula">safe_harvest_date = application_date + phi_days
+
+ถ้า planting_plan.expected_harvest_date &lt; safe_harvest_date
+  -&gt; flag เตือนว่าต้องเลื่อนเก็บเกี่ยว
+     หรือเลือกสารที่มี phi_days สั้นกว่าในรอบถัดไป</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบก่อนอนุมัติเก็บเกี่ยวจริง (Pre-Harvest Safety Check)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>กฎบังคับที่ต้อง enforce ที่ระดับ API ไม่ใช่แค่เตือนใน UI</p>
+        <pre class="formula">is_safe_to_harvest(field, harvest_date) =
+  ไม่มี pesticide_application ใดของ field นี้
+  ที่ safe_harvest_date &gt; harvest_date ที่ต้องการเก็บจริง
+
+ถ้าไม่ผ่าน -&gt; ห้ามโมดูลเก็บเกี่ยว
+  บันทึกการเก็บเกี่ยวจนกว่าจะถึง safe_harvest_date</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> นี่คือกฎความปลอดภัยอาหารหลักที่ทำให้ผ่านมาตรฐาน GAP — ควรปรึกษาเจ้าหน้าที่เกษตร/มาตรฐานสารเคมีจริงก่อนกำหนดค่า phi_days ในระบบ</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจจับงานที่ล่าช้า (Task Overdue Detection)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ไล่ดูว่างานตามแผนไหนยังไม่ได้ทำทั้งที่ถึงกำหนดแล้ว</p>
+        <pre class="formula">status = overdue
+  ถ้า today &gt; scheduled_date AND status = pending</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ปริมาณน้ำสะสมต่อรอบผลิต (Cumulative Water Usage)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>ใช้วิเคราะห์ประสิทธิภาพการใช้น้ำเทียบผลผลิตที่ได้ในภายหลัง</p>
+        <pre class="formula">total_water_used(planting_plan) =
+  SUM(irrigation_log.water_volume_liters)
+  ของ field เดียวกัน
+  ในช่วง planting_start_date ถึง harvest_end_date</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "การให้น้ำ ปุ๋ย และยา" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>

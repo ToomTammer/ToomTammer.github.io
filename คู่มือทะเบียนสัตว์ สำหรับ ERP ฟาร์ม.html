@@ -1,0 +1,742 @@
+<title>โมดูลทะเบียนสัตว์ (Animal Registry) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  /* card is narrower than the field table needs — stack field/type/description
+     as labeled blocks instead of forcing a sideways scroll inside a small card */
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.method{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-weight:700;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  td.method.get{color:var(--moss-strong);}
+  td.method.post{color:var(--wheat);}
+  td.method.patch{color:var(--clay);}
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+  .formula-example{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+  }
+  .formula-example b{color:var(--ink);}
+
+  .role-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .role-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .role-card .role-name{
+    font-weight:700;
+    color:var(--ink);
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  .role-card .role-scope{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#livestock">โมดูลเฉพาะฟาร์มปศุสัตว์ (Livestock Modules)</a>
+    <span class="sep">/</span>
+    <span class="here">ทะเบียนสัตว์</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Livestock Module 1/7 · Animal Registry — Dev-Ready Spec</span>
+    <h1>โมดูลทะเบียนสัตว์ (Animal Registry)</h1>
+    <p class="sub">สเปกสำหรับเริ่มพัฒนาได้ทันที ครอบคลุมขอบเขตและจุดเชื่อมต่อกับโมดูลอื่น ฟังก์ชันหลักแยก MVP กับที่เพิ่มทีหลังได้ โครงสร้างฐานข้อมูล API หลักที่ต้องมี สิทธิ์การเข้าถึงตามบทบาท และสูตรคำนวณ/กฎทางธุรกิจ</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>18 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#scope">1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration)</a>
+    <a href="#functions">2. ฟังก์ชันหลัก (Core Functions)</a>
+    <a href="#database">3. ฐานข้อมูล (Database)</a>
+    <a href="#api">4. API</a>
+    <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
+    <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+  </nav>
+
+  <section class="block" id="scope">
+    <div class="block-head">
+      <span class="eyebrow">Scope &amp; Integration</span>
+      <h2>1. ขอบเขตและจุดเชื่อมต่อ (Scope &amp; Integration Points)</h2>
+      <p class="lede">โมดูลนี้เป็นรากฐานของโมดูลปศุสัตว์ทั้งหมด — กำหนด animal_id/animal_group_id ที่ทุกโมดูลอื่น (ผสมพันธุ์, สุขภาพ, อาหารสัตว์, การเจริญเติบโต, คัดแยกขาย) ต้องอ้างอิงตาม รองรับทั้งสัตว์ที่ติดตามรายตัวและเลี้ยงรวมเป็นฝูง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>อยู่ในขอบเขต</h3>
+        <ul>
+          <li>ทะเบียนสัตว์รายตัว <span class="en">(Individual Registry)</span> — เบอร์หู/ไมโครชิป สายพันธุ์ วันเกิด</li>
+          <li>ทะเบียนฝูง/รุ่น <span class="en">(Group/Batch Registry)</span> สำหรับสัตว์ที่ไม่แยกรายตัว</li>
+          <li>ทะเบียนโรงเรือน/คอก และการย้ายสัตว์ระหว่างพื้นที่</li>
+          <li>การเปลี่ยนสถานะสัตว์ (มีชีวิต/ตาย/คัดออก/ขาย)</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>อยู่นอกขอบเขต (รับ/ส่งข้อมูลกับโมดูลอื่น)</h3>
+        <ul>
+          <li>การสร้างศูนย์ต้นทุนต่อรุ่น — ส่งต่อให้ <span class="en">บัญชีและการเงิน</span></li>
+          <li>ประวัติการผสมพันธุ์/สายเลือด — ส่งต่อให้ <span class="en">ผสมพันธุ์และตั้งท้อง</span></li>
+          <li>ประวัติสุขภาพ/วัคซีน — ส่งต่อให้ <span class="en">สุขภาพและวัคซีน</span></li>
+          <li>น้ำหนัก/การเจริญเติบโต — ส่งต่อให้ <span class="en">การเจริญเติบโตและผลผลิต</span></li>
+          <li>การคัดแยกและขายจริง — ส่งต่อให้ <span class="en">คัดแยกและส่งขาย</span></li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data">
+        <thead>
+          <tr><th>โมดูลที่เกี่ยวข้อง</th><th>เหตุการณ์</th><th>สิ่งที่ทะเบียนสัตว์ต้องทำ</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ทะเบียนสัตว์ (ตัวเอง) → บัญชีและการเงิน</td><td>ลงทะเบียนฝูง/รุ่นใหม่</td><td>สร้าง cost_center ประเภท batch ผูกกับรุ่นนี้</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>ผสมพันธุ์และตั้งท้อง</td><td>สัตว์คลอด/มีลูกใหม่</td><td>สร้างทะเบียนสัตว์ใหม่ผูกกับพ่อแม่พันธุ์</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>สุขภาพและวัคซีน</td><td>ต้องการบันทึกการรักษา/วัคซีน</td><td>ให้ animal_id/animal_group_id อ้างอิง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>การเจริญเติบโตและผลผลิต</td><td>บันทึกน้ำหนัก/ผลผลิตต่อตัว/ฝูง</td><td>ให้ animal_id/animal_group_id อ้างอิง</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>คัดแยกและส่งขาย</td><td>คัดสัตว์ออกขาย/ส่งชำแหละ</td><td>อัปเดตสถานะสัตว์เป็น sold/culled</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Core Functions</span>
+      <h2>2. ฟังก์ชันหลัก (Core Functions)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องใช้งานได้ตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้โดยไม่กระทบการอ้างอิงทะเบียนพื้นฐาน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">จัดการทะเบียนสัตว์รายตัว พร้อมเบอร์หู/ไมโครชิป สายพันธุ์ วันเกิด แหล่งที่มา</span></li>
+          <li class="func-item"><span class="txt">จัดการทะเบียนฝูง/รุ่น สำหรับสัตว์ที่เลี้ยงรวมไม่แยกรายตัว</span></li>
+          <li class="func-item"><span class="txt">จัดการโรงเรือน/คอก และบันทึกการย้ายสัตว์ระหว่างพื้นที่</span></li>
+          <li class="func-item"><span class="txt">บันทึกการเปลี่ยนสถานะสัตว์ (มีชีวิต/ตาย/คัดออก/ขาย)</span></li>
+          <li class="func-item"><span class="txt">สร้างศูนย์ต้นทุน (batch) อัตโนมัติเมื่อลงทะเบียนฝูงใหม่</span></li>
+          <li class="func-item"><span class="txt">ค้นหา/ดูประวัติสัตว์ทั้งหมดต่อตัว/ฝูง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สแกนเบอร์หู/ไมโครชิปผ่านอุปกรณ์มือถือ (RFID reader)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">นำเข้าทะเบียนสัตว์เป็นชุด (bulk import) ตอนเริ่มใช้ระบบ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนอัตโนมัติเมื่อสัตว์ถึงช่วงอายุสำคัญ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">QR code/ป้ายดิจิทัลต่อตัว/ฝูงสำหรับตรวจสอบย้อนกลับ</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">เชื่อมเซนเซอร์ติดตามตัวสัตว์อัตโนมัติ (GPS collar)</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="database">
+    <div class="block-head">
+      <span class="eyebrow">Database</span>
+      <h2>3. ฐานข้อมูล (Database)</h2>
+      <p class="lede">แต่ละเอนทิตีคือ 1 ตารางในฐานข้อมูล พร้อมคำอธิบายว่าแทนอะไรในโลกจริง และแต่ละฟิลด์เก็บอะไร ชนิดข้อมูลแบบไหน</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>animal <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สัตว์รายตัว — ทะเบียนสัตว์ที่ติดตามเป็นรายตัว เหมาะกับสัตว์ที่มีมูลค่าสูงหรือต้องดูแลเฉพาะบุคคล เช่น วัว หมูแม่พันธุ์</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal_group ถ้าอยู่รวมกันเป็นฝูง และ housing_location เป็นต้นทางให้โมดูลสุขภาพ/การเจริญเติบโตอ้างอิง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">ear_tag / microchip_no</td><td class="type">ข้อความ (text)</td><td>เบอร์หูหรือเลขไมโครชิปที่ใช้ระบุตัวสัตว์</td></tr>
+              <tr><td class="mono">breed</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>สายพันธุ์ของสัตว์</td></tr>
+              <tr><td class="mono">birth_date</td><td class="type">วันที่ (date)</td><td>วันเกิดของสัตว์</td></tr>
+              <tr><td class="mono">source</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>แหล่งที่มา เลือกได้เฉพาะ: born_on_farm, purchased</td></tr>
+              <tr><td class="mono">animal_group_id</td><td class="type">เลขอ้างอิง (FK → animal_group, ว่างได้)</td><td>อยู่ในฝูง/รุ่นไหน ถ้าเลี้ยงรวมกัน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: alive, sold, culled, dead</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>animal_group <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ฝูง/รุ่น — กลุ่มสัตว์ที่เลี้ยงรวมกันโดยไม่แยกทะเบียนรายตัว เช่น ไก่เนื้อ 1 รุ่น 5,000 ตัว</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ cost_center (batch) ในโมดูลบัญชีและการเงิน และ housing_location</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">group_code</td><td class="type">ข้อความ (text)</td><td>รหัสรุ่น/ฝูง</td></tr>
+              <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ชนิดสัตว์ เลือกได้เฉพาะ: chicken, pig, cattle, other</td></tr>
+              <tr><td class="mono">initial_quantity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนตัวเริ่มต้นตอนลงทะเบียนรุ่นนี้</td></tr>
+              <tr><td class="mono">current_quantity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนคงเหลือปัจจุบัน ลดลงเมื่อมีตาย/คัดออก/ขาย</td></tr>
+              <tr><td class="mono">start_date</td><td class="type">วันที่ (date)</td><td>วันที่เริ่มรุ่นนี้</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนที่สร้างขึ้นสำหรับรุ่นนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>housing_location <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>โรงเรือน/คอก — สถานที่เลี้ยงสัตว์จริง ใช้ระบุว่าสัตว์หรือฝูงอยู่ที่ไหน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal และ animal_group ที่อยู่ในพื้นที่นี้ อาจผูกกับ cost_center ในโมดูลบัญชีถ้าแยกต้นทุนตามโรงเรือน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">location_code</td><td class="type">ข้อความ (text)</td><td>รหัสโรงเรือน/คอก</td></tr>
+              <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อโรงเรือน เช่น "โรงเรือนไก่ไข่ เบอร์ 2"</td></tr>
+              <tr><td class="mono">capacity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนสัตว์สูงสุดที่รองรับได้</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center, ว่างได้)</td><td>ศูนย์ต้นทุนของโรงเรือนนี้ ถ้าแยกจากรุ่น</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>animal_movement <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>การย้ายสัตว์ — บันทึกการย้ายสัตว์หรือฝูงระหว่างโรงเรือน/คอก</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ animal หรือ animal_group และ housing_location ต้นทาง-ปลายทาง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ย้ายสัตว์ตัวไหนหรือฝูงไหน</td></tr>
+              <tr><td class="mono">from_location_id / to_location_id</td><td class="type">เลขอ้างอิง (FK → housing_location)</td><td>ย้ายจากที่ไหนไปที่ไหน</td></tr>
+              <tr><td class="mono">movement_date</td><td class="type">วันที่ (date)</td><td>วันที่ย้ายจริง</td></tr>
+              <tr><td class="mono">reason</td><td class="type">ข้อความ/ตัวเลือกคงที่</td><td>เหตุผลที่ย้าย เช่น แยกตามอายุ, แยกรักษา, ขยายพื้นที่</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="api">
+    <div class="block-head">
+      <span class="eyebrow">API</span>
+      <h2>4. API</h2>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals</td><td>ดึงทะเบียนสัตว์รายตัวทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animals</td><td>ลงทะเบียนสัตว์รายตัวใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/animals/{id}</td><td>แก้ไขข้อมูลสัตว์</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animals/{id}/status</td><td>เปลี่ยนสถานะสัตว์ (alive/sold/culled/dead)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups</td><td>ดึงทะเบียนฝูง/รุ่นทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-groups</td><td>ลงทะเบียนฝูง/รุ่นใหม่ (สร้าง cost_center อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations</td><td>ดึงรายชื่อโรงเรือน/คอกทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/housing-locations</td><td>สร้างโรงเรือน/คอกใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-movements</td><td>บันทึกการย้ายสัตว์/ฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/history</td><td>ประวัติรวมของสัตว์ตัวหนึ่ง (ย้าย/สถานะ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/headcount-by-location</td><td>จำนวนสัตว์คงเหลือแยกตามโรงเรือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="roles">
+    <div class="block-head">
+      <span class="eyebrow">Roles &amp; Permissions</span>
+      <h2>5. สิทธิ์การเข้าถึง (Roles &amp; Permissions)</h2>
+      <p class="lede">ใครทำอะไรได้บ้างในโมดูลนี้ — ใช้ออกแบบ RBAC ได้ตรง ๆ</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">เจ้าของฟาร์ม / ผู้บริหาร</div>
+        <div class="role-scope">จัดการทะเบียนทั้งหมด อนุมัติการคัดออก/ขายสัตว์</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">ผู้จัดการฟาร์ม/โรงเรือน</div>
+        <div class="role-scope">จัดการสัตว์ในพื้นที่ตน บันทึกการย้ายและเปลี่ยนสถานะ</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">เจ้าหน้าที่ปศุสัตว์/พนักงานภาคสนาม</div>
+        <div class="role-scope">บันทึกข้อมูลพื้นฐานหน้างาน เช่น สแกนเบอร์หู ย้ายสัตว์</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">สัตวแพทย์/เจ้าหน้าที่สุขภาพสัตว์</div>
+        <div class="role-scope">อ่านอย่างเดียวเพื่อดูประวัติสัตว์ก่อนตรวจรักษา</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>การกระทำ</th><th class="center">เจ้าของ/ผู้บริหาร</th><th class="center">ผู้จัดการโรงเรือน</th><th class="center">เจ้าหน้าที่ปศุสัตว์</th><th class="center">สัตวแพทย์</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>สร้าง/แก้ไขทะเบียนสัตว์รายตัว</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>สร้าง/แก้ไขทะเบียนฝูง</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>บันทึกการย้ายสัตว์</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td></tr>
+          <tr><td>เปลี่ยนสถานะสัตว์ (ตาย/คัดออก/ขาย)</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓ (เฉพาะแจ้งตาย)</td><td class="center">✗</td></tr>
+          <tr><td>จัดการโรงเรือน/คอก</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td></tr>
+          <tr><td>ดูประวัติสัตว์ทั้งหมด</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="formulas">
+    <div class="block-head">
+      <span class="eyebrow">Business Rules &amp; Formulas</span>
+      <h2>6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules &amp; Formulas)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลัง entity/endpoint ด้านบน</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อัปเดตจำนวนคงเหลือในฝูงอัตโนมัติ</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทำงานอัตโนมัติทุกครั้งที่มีการเปลี่ยนสถานะสัตว์ในฝูง</p>
+        <pre class="formula">current_quantity =
+  initial_quantity
+  - SUM(สัตว์ที่ตาย + คัดออก + ขาย ของฝูงนี้)
+
+ทำงานทุกครั้งที่ animal.status เปลี่ยน
+  หรือมี animal_movement ที่ทำให้จำนวนลดลง</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบความจุโรงเรือนก่อนย้ายเข้า</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ป้องกันความหนาแน่นเกินที่ส่งผลต่อสุขภาพสัตว์</p>
+        <pre class="formula">current_headcount(location) =
+  SUM(สัตว์/ฝูงที่อยู่ในโรงเรือนนี้ตอนนี้)
+
+ถ้า current_headcount + จำนวนที่จะย้ายเข้า
+   &gt; location.capacity
+
+-&gt; flag เตือนความหนาแน่นเกิน</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อัตราการตาย/คัดออกสะสม (Cumulative Mortality Rate)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>KPI มาตรฐานของอุตสาหกรรมปศุสัตว์ที่ผู้บริหารต้องดูทุกรุ่น</p>
+        <pre class="formula">mortality_rate_pct(animal_group) =
+  SUM(สัตว์ที่ตายในฝูงนี้)
+  / initial_quantity &#215; 100</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อายุปัจจุบันของสัตว์/ฝูง</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ใช้ในหลายจุด เช่น ตรวจสอบพร้อมผสมพันธุ์ หรือพร้อมขาย</p>
+        <pre class="formula">current_age_days =
+  animal:       today - birth_date
+  animal_group: today - start_date</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบลำดับการเปลี่ยนสถานะที่ถูกต้อง</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ป้องกันข้อมูลผิดพลาดจากการแก้สถานะย้อนกลับตรง ๆ</p>
+        <pre class="formula">alive -&gt; sold / culled / dead เท่านั้น
+
+ห้ามเปลี่ยนกลับจาก sold/culled/dead -&gt; alive
+  ถ้าคีย์ผิด ต้องแก้ไขผ่านการ correction
+  ที่มี log กำกับ ไม่ใช่เปลี่ยนสถานะตรง ๆ</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นสเปกเริ่มพัฒนาโมดูล "ทะเบียนสัตว์" ควรรีวิวโครงสร้างฐานข้อมูลกับทีม dev จริงก่อนเริ่ม implement</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>
