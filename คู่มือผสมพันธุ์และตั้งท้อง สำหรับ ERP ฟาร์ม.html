@@ -539,6 +539,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">dam_id</td><td class="type">เลขอ้างอิง (FK → animal)</td><td>แม่พันธุ์ตัวไหน</td></tr>
               <tr><td class="mono">sire_id</td><td class="type">เลขอ้างอิง (FK → animal, ว่างได้)</td><td>พ่อพันธุ์ตัวไหน ถ้าเป็นพ่อพันธุ์ของฟาร์มเอง</td></tr>
               <tr><td class="mono">sire_semen_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>รหัสอ้างอิงน้ำเชื้อ ถ้าผสมเทียมจากภายนอก</td></tr>
@@ -558,6 +559,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">breeding_record_id</td><td class="type">เลขอ้างอิง (FK → breeding_record)</td><td>ท้องนี้มาจากการผสมพันธุ์ครั้งไหน</td></tr>
               <tr><td class="mono">confirmed_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจยืนยันว่าท้อง</td></tr>
               <tr><td class="mono">expected_due_date</td><td class="type">วันที่ (date)</td><td>วันครบกำหนดคลอดโดยประมาณ คำนวณจากวันผสมพันธุ์+ระยะตั้งท้องของชนิดสัตว์</td></tr>
@@ -575,6 +577,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">pregnancy_id</td><td class="type">เลขอ้างอิง (FK → pregnancy)</td><td>เป็นผลของการตั้งท้องครั้งไหน</td></tr>
               <tr><td class="mono">calving_date</td><td class="type">วันที่ (date)</td><td>วันที่คลอดจริง</td></tr>
               <tr><td class="mono">live_birth_count / stillbirth_count</td><td class="type">ตัวเลข (integer)</td><td>จำนวนลูกที่รอด และจำนวนที่ตายคลอด</td></tr>
@@ -592,6 +595,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">calving_record_id</td><td class="type">เลขอ้างอิง (FK → calving_record)</td><td>เป็นลูกจากการคลอดครั้งไหน</td></tr>
               <tr><td class="mono">birth_weight</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักแรกเกิด</td></tr>
               <tr><td class="mono">sex</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เพศ เลือกได้เฉพาะ: male, female</td></tr>

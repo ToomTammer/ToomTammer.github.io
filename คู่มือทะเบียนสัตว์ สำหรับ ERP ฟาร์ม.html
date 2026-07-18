@@ -541,6 +541,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">ear_tag / microchip_no</td><td class="type">ข้อความ (text)</td><td>เบอร์หูหรือเลขไมโครชิปที่ใช้ระบุตัวสัตว์</td></tr>
               <tr><td class="mono">breed</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>สายพันธุ์ของสัตว์</td></tr>
               <tr><td class="mono">birth_date</td><td class="type">วันที่ (date)</td><td>วันเกิดของสัตว์</td></tr>
@@ -560,6 +561,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">group_code</td><td class="type">ข้อความ (text)</td><td>รหัสรุ่น/ฝูง</td></tr>
               <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ชนิดสัตว์ เลือกได้เฉพาะ: chicken, pig, cattle, other</td></tr>
               <tr><td class="mono">initial_quantity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนตัวเริ่มต้นตอนลงทะเบียนรุ่นนี้</td></tr>
@@ -579,6 +581,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">location_code</td><td class="type">ข้อความ (text)</td><td>รหัสโรงเรือน/คอก</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อโรงเรือน เช่น "โรงเรือนไก่ไข่ เบอร์ 2"</td></tr>
               <tr><td class="mono">capacity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนสัตว์สูงสุดที่รองรับได้</td></tr>
@@ -596,6 +599,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ย้ายสัตว์ตัวไหนหรือฝูงไหน</td></tr>
               <tr><td class="mono">from_location_id / to_location_id</td><td class="type">เลขอ้างอิง (FK → housing_location)</td><td>ย้ายจากที่ไหนไปที่ไหน</td></tr>
               <tr><td class="mono">movement_date</td><td class="type">วันที่ (date)</td><td>วันที่ย้ายจริง</td></tr>

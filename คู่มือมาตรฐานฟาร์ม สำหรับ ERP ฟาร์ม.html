@@ -538,6 +538,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">standard_name</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ชื่อมาตรฐาน เลือกได้เฉพาะ: GAP, GMP, HACCP, ปศุสัตว์_OK, Organic, อื่นๆ</td></tr>
               <tr><td class="mono">version</td><td class="type">ข้อความ (text)</td><td>เวอร์ชัน/ปีของเกณฑ์มาตรฐานที่ใช้อ้างอิง</td></tr>
               <tr><td class="mono">issuing_body</td><td class="type">ข้อความ (text)</td><td>หน่วยงานที่ออกใบรับรอง เช่น กรมวิชาการเกษตร กรมปศุสัตว์</td></tr>
@@ -556,6 +557,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>ข้อกำหนดนี้เป็นของมาตรฐานไหน</td></tr>
               <tr><td class="mono">item_code</td><td class="type">ข้อความ (text)</td><td>รหัสข้อกำหนดตามเอกสารมาตรฐาน เช่น "GAP-4.2"</td></tr>
               <tr><td class="mono">requirement_text</td><td class="type">ข้อความ (text)</td><td>รายละเอียดสิ่งที่ต้องปฏิบัติตาม</td></tr>
@@ -574,6 +576,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>รอบตรวจนี้เป็นของมาตรฐานไหน</td></tr>
               <tr><td class="mono">audit_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจประเมิน</td></tr>
               <tr><td class="mono">audit_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: internal (ตรวจเอง), external (ผู้ตรวจภายนอก)</td></tr>
@@ -593,6 +596,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">audit_record_id</td><td class="type">เลขอ้างอิง (FK → audit_record)</td><td>ผลนี้เป็นของรอบตรวจไหน</td></tr>
               <tr><td class="mono">checklist_item_id</td><td class="type">เลขอ้างอิง (FK → standard_checklist_item)</td><td>ผลนี้เป็นของข้อกำหนดไหน</td></tr>
               <tr><td class="mono">result</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: comply, non_comply, not_applicable</td></tr>
@@ -613,6 +617,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">standard_id</td><td class="type">เลขอ้างอิง (FK → certification_standard)</td><td>ใบรับรองนี้เป็นของมาตรฐานไหน</td></tr>
               <tr><td class="mono">audit_record_id</td><td class="type">เลขอ้างอิง (FK → audit_record, ว่างได้)</td><td>ออกจากผลตรวจรอบไหน</td></tr>
               <tr><td class="mono">certificate_number</td><td class="type">ข้อความ (unique)</td><td>เลขที่ใบรับรองตามที่หน่วยงานออกให้</td></tr>

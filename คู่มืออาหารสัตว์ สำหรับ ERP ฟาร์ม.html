@@ -539,6 +539,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>สูตรนี้ใช้กับสัตว์ชนิดไหน</td></tr>
               <tr><td class="mono">stage_name</td><td class="type">ข้อความ (text)</td><td>ชื่อช่วงอายุ เช่น starter, grower, finisher</td></tr>
               <tr><td class="mono">age_days_start / age_days_end</td><td class="type">ตัวเลข (integer)</td><td>ช่วงอายุเป็นวันที่ใช้สูตรนี้</td></tr>
@@ -557,6 +558,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ให้อาหารสัตว์ตัวไหนหรือฝูงไหน</td></tr>
               <tr><td class="mono">feed_item_id</td><td class="type">เลขอ้างอิง (FK → item)</td><td>ใช้อาหารชนิดไหนจากคลังสินค้า</td></tr>
               <tr><td class="mono">feeding_date</td><td class="type">วันที่ (date)</td><td>วันที่ให้อาหารจริง</td></tr>
@@ -575,6 +577,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">animal_group_id</td><td class="type">เลขอ้างอิง (FK → animal_group)</td><td>คำนวณ FCR ของฝูงไหน</td></tr>
               <tr><td class="mono">period_start / period_end</td><td class="type">วันที่ (date)</td><td>ช่วงเวลาที่คำนวณ</td></tr>
               <tr><td class="mono">total_feed_consumed</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณอาหารรวมที่ใช้ในช่วงนี้</td></tr>
@@ -593,6 +596,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">animal_group_id</td><td class="type">เลขอ้างอิง (FK → animal_group)</td><td>ตารางนี้เป็นของฝูงไหน</td></tr>
               <tr><td class="mono">feeding_time</td><td class="type">เวลา (time)</td><td>เวลาที่ควรให้อาหารในแต่ละวัน</td></tr>
               <tr><td class="mono">feed_formula_id</td><td class="type">เลขอ้างอิง (FK → feed_formula)</td><td>มื้อนี้ควรใช้สูตรอาหารไหน</td></tr>

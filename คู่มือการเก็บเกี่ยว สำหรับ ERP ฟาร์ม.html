@@ -543,6 +543,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">planting_plan_id</td><td class="type">เลขอ้างอิง (FK → planting_plan)</td><td>เก็บเกี่ยวของแผนปลูกรอบไหน</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>เก็บเกี่ยวจากแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">harvest_date</td><td class="type">วันที่ (date)</td><td>วันที่เก็บเกี่ยวจริง</td></tr>
@@ -563,6 +564,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">harvest_record_id</td><td class="type">เลขอ้างอิง (FK → harvest_record)</td><td>สูญเสียเกิดขึ้นตอนเก็บเกี่ยวครั้งไหน</td></tr>
               <tr><td class="mono">loss_quantity</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่สูญเสียไป หน่วยเดียวกับ harvest_record.unit</td></tr>
               <tr><td class="mono">loss_reason</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สาเหตุ เลือกได้เฉพาะ: pest_damage, transport_damage, quality_reject, other</td></tr>
@@ -579,6 +581,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">harvest_record_id</td><td class="type">เลขอ้างอิง (FK → harvest_record)</td><td>เป็นส่วนหนึ่งของการเก็บเกี่ยวครั้งไหน</td></tr>
               <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครเป็นคนเก็บเกี่ยว</td></tr>
               <tr><td class="mono">quantity_collected</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่พนักงานคนนี้เก็บได้จริง ใช้คำนวณ piece rate</td></tr>

@@ -542,6 +542,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>มาตรฐานนี้ใช้กับสัตว์ชนิดไหน</td></tr>
               <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ชื่อเกรด เช่น A, B, C, reject</td></tr>
               <tr><td class="mono">min_weight / max_weight</td><td class="type">ตัวเลข (decimal)</td><td>ช่วงน้ำหนักที่ยอมรับสำหรับเกรดนี้</td></tr>
@@ -558,6 +559,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">animal_id / animal_group_id</td><td class="type">เลขอ้างอิง (FK)</td><td>คัดเกรดสัตว์ตัวไหนหรือฝูงไหน</td></tr>
               <tr><td class="mono">sorting_date</td><td class="type">วันที่ (date)</td><td>วันที่คัดเกรดจริง</td></tr>
               <tr><td class="mono">weight_at_sorting</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักที่ชั่งได้ตอนคัดเกรด</td></tr>
@@ -576,6 +578,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">sorting_record_id</td><td class="type">เลขอ้างอิง (FK → sorting_record)</td><td>ส่งออกตามผลคัดเกรดครั้งไหน</td></tr>
               <tr><td class="mono">dispatch_date</td><td class="type">วันที่ (date)</td><td>วันที่ส่งออกจริง</td></tr>
               <tr><td class="mono">destination_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ปลายทาง เลือกได้เฉพาะ: slaughterhouse, live_market, direct_customer</td></tr>
@@ -595,6 +598,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">buyer_ref</td><td class="type">ข้อความ (text)</td><td>ผู้รับซื้อรายไหน</td></tr>
               <tr><td class="mono">species / grade</td><td class="type">ข้อความ/ตัวเลือกคงที่</td><td>เสนอราคาสำหรับสัตว์ชนิด/เกรดไหน</td></tr>
               <tr><td class="mono">price_per_kg</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อกิโลกรัมที่เสนอ</td></tr>

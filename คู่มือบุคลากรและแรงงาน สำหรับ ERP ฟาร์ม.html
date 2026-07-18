@@ -542,6 +542,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">employee_code</td><td class="type">ข้อความ (text)</td><td>รหัสพนักงานที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อ-นามสกุลพนักงาน</td></tr>
               <tr><td class="mono">employment_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการจ้าง เลือกได้เฉพาะ: permanent, daily, seasonal</td></tr>
@@ -563,6 +564,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครมาทำงาน</td></tr>
               <tr><td class="mono">work_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำงาน</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ทำงานที่พื้นที่ไหนในวันนั้น</td></tr>
@@ -582,6 +584,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครเป็นคนทำงานนี้</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ทำผลงานให้รุ่นเลี้ยง/รอบปลูกไหน</td></tr>
               <tr><td class="mono">work_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำผลงานนี้</td></tr>
@@ -601,6 +604,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>ใครขอลา</td></tr>
               <tr><td class="mono">leave_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการลา เลือกได้เฉพาะ: sick, personal, vacation, unpaid</td></tr>
               <tr><td class="mono">start_date / end_date</td><td class="type">วันที่ (date)</td><td>ช่วงวันที่ลา</td></tr>
@@ -619,8 +623,10 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">period</td><td class="type">ข้อความ/วันที่</td><td>งวดเงินเดือนนี้ครอบคลุมช่วงไหน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, calculated, approved, paid, posted</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) payroll_run_id</td><td class="type">เลขอ้างอิง (FK → payroll_run)</td><td>บรรทัดนี้เป็นของรอบเงินเดือนไหน</td></tr>
               <tr><td class="mono">(line) employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>เงินเดือนงวดนี้ของใคร</td></tr>
               <tr><td class="mono">(line) gross_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้รวมก่อนหัก (ฐานค่าจ้าง + OT + piece rate)</td></tr>

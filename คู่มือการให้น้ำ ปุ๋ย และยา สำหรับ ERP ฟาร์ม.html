@@ -541,6 +541,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">planting_plan_id</td><td class="type">เลขอ้างอิง (FK → planting_plan)</td><td>งานนี้เป็นของแผนปลูกรอบไหน</td></tr>
               <tr><td class="mono">task_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทงาน เลือกได้เฉพาะ: irrigation, fertilizer, pesticide</td></tr>
               <tr><td class="mono">scheduled_date</td><td class="type">วันที่ (date)</td><td>วันที่ควรทำงานนี้ตามแผน</td></tr>
@@ -558,6 +559,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ให้น้ำแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม ถ้าให้น้ำนอกแผนปล่อยว่าง</td></tr>
               <tr><td class="mono">irrigation_date</td><td class="type">วันที่ (date)</td><td>วันที่ให้น้ำจริง</td></tr>
@@ -576,6 +578,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ให้ปุ๋ยแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม</td></tr>
               <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → item)</td><td>ใช้ปุ๋ยชนิดไหนจากคลังสินค้า</td></tr>
@@ -595,6 +598,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ฉีดพ่นแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">care_task_id</td><td class="type">เลขอ้างอิง (FK → care_task, ว่างได้)</td><td>เป็นไปตามงานที่วางแผนไว้ไหม</td></tr>
               <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → item)</td><td>ใช้สารเคมีชนิดไหนจากคลังสินค้า</td></tr>

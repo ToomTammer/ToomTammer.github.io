@@ -546,6 +546,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">vendor_code</td><td class="type">ข้อความ (text)</td><td>รหัสผู้ขายที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อผู้ขาย/บริษัท</td></tr>
               <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินค้าหลักที่ขาย เลือกได้เฉพาะ: feed, fertilizer, seed, medicine, equipment, other</td></tr>
@@ -565,6 +566,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">pr_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบขอซื้อ</td></tr>
               <tr><td class="mono">requested_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนขอซื้อ</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ขอซื้อให้พื้นที่/รอบผลิตไหน</td></tr>
@@ -583,11 +585,13 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">po_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้อ</td></tr>
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>สั่งซื้อจากผู้ขายรายไหน</td></tr>
               <tr><td class="mono">pr_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบขอซื้อต้นทาง ถ้ามาจาก PR</td></tr>
               <tr><td class="mono">order_date / expected_delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่สั่งซื้อ และวันที่คาดว่าจะได้รับของ</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: draft, pending_approval, approved, partially_received, received, closed, cancelled</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>บรรทัดนี้เป็นของใบสั่งซื้อไหน</td></tr>
               <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>สั่งซื้อสินค้าอะไร</td></tr>
               <tr><td class="mono">(line) quantity_ordered / quantity_received</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่สั่ง และจำนวนที่ได้รับแล้วสะสม</td></tr>
@@ -605,10 +609,12 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">gr_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบรับสินค้า</td></tr>
               <tr><td class="mono">purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>รับสินค้าตาม PO ใบไหน</td></tr>
               <tr><td class="mono">received_date</td><td class="type">วันที่ (date)</td><td>วันที่รับสินค้าจริง</td></tr>
               <tr><td class="mono">received_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจรับ</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) goods_receipt_id</td><td class="type">เลขอ้างอิง (FK → goods_receipt)</td><td>บรรทัดนี้เป็นของใบรับสินค้าไหน</td></tr>
               <tr><td class="mono">(line) po_line_id</td><td class="type">เลขอ้างอิง (FK → purchase_order_line)</td><td>รับสินค้าบรรทัดไหนของ PO</td></tr>
               <tr><td class="mono">(line) quantity_received / quantity_rejected</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่รับผ่าน และจำนวนที่ตีกลับ</td></tr>
@@ -626,6 +632,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>ใบเสนอราคาจากผู้ขายรายไหน</td></tr>
               <tr><td class="mono">item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้า)</td><td>เสนอราคาสินค้าตัวไหน</td></tr>
               <tr><td class="mono">quoted_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่เสนอ</td></tr>
@@ -643,6 +650,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">vendor_id / item_id</td><td class="type">เลขอ้างอิง (FK)</td><td>สัญญานี้ทำกับผู้ขายรายไหน สินค้าตัวไหน</td></tr>
               <tr><td class="mono">locked_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ล็อคไว้ตลอดอายุสัญญา</td></tr>
               <tr><td class="mono">quantity_committed</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณที่ตกลงซื้อขั้นต่ำตามสัญญา</td></tr>

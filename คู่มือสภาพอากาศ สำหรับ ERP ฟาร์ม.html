@@ -542,6 +542,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>เชื่อมพยากรณ์นี้กับแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">latitude / longitude</td><td class="type">ตัวเลข (decimal)</td><td>พิกัดที่ใช้สอบถามพยากรณ์ ดึงมาจากขอบเขตแปลงหรือระบุเอง</td></tr>
               <tr><td class="mono">provider</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ผู้ให้บริการพยากรณ์อากาศภายนอกที่ใช้</td></tr>
@@ -559,6 +560,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">weather_station_link_id</td><td class="type">เลขอ้างอิง (FK)</td><td>พยากรณ์นี้เป็นของพื้นที่ไหน</td></tr>
               <tr><td class="mono">forecast_date</td><td class="type">วันที่ (date)</td><td>วันที่พยากรณ์นี้ใช้กับวันไหน</td></tr>
               <tr><td class="mono">forecast_generated_at</td><td class="type">วันที่/เวลา (datetime)</td><td>ตอนที่ดึงพยากรณ์นี้มาจาก external API</td></tr>
@@ -579,6 +581,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>บันทึกอากาศของแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">record_date</td><td class="type">วันที่ (date)</td><td>วันที่ของข้อมูลอากาศนี้</td></tr>
               <tr><td class="mono">rainfall_mm</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณฝนที่ตกจริง หน่วยมิลลิเมตร</td></tr>
@@ -598,6 +601,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>คำเตือนนี้เกี่ยวกับแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">alert_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทความเสี่ยง เลือกได้เฉพาะ: heavy_rain, drought, storm, frost</td></tr>
               <tr><td class="mono">severity</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับความรุนแรง เลือกได้เฉพาะ: info, warning, critical</td></tr>

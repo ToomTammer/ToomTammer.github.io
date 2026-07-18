@@ -538,6 +538,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">crop_variety_id</td><td class="type">เลขอ้างอิง (FK → crop_variety)</td><td>มาตรฐานนี้ใช้กับพืชพันธุ์ไหน</td></tr>
               <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ชื่อเกรด เช่น A, B, C, reject</td></tr>
               <tr><td class="mono">min_size / max_size</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ช่วงขนาดที่ยอมรับสำหรับเกรดนี้</td></tr>
@@ -557,6 +558,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">stock_lot_ref</td><td class="type">ข้อความ (อ้างอิง stock_lot)</td><td>ตรวจ lot ไหนในคลัง</td></tr>
               <tr><td class="mono">inspection_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจสอบ</td></tr>
               <tr><td class="mono">inspected_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจ</td></tr>
@@ -576,6 +578,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">quality_inspection_id</td><td class="type">เลขอ้างอิง (FK → quality_inspection)</td><td>แบ่งสต็อกจากผลตรวจครั้งไหน</td></tr>
               <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>สต็อกส่วนนี้เป็นเกรดอะไร</td></tr>
               <tr><td class="mono">quantity</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณของเกรดนี้ที่แบ่งออกมา</td></tr>
@@ -593,6 +596,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">crop_variety_id</td><td class="type">เลขอ้างอิง (FK → crop_variety)</td><td>ราคานี้ใช้กับพืชพันธุ์ไหน</td></tr>
               <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ราคานี้เป็นของเกรดไหน</td></tr>
               <tr><td class="mono">price_per_unit</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยของเกรดนี้</td></tr>

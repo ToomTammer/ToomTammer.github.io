@@ -539,6 +539,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">stock_lot_ref</td><td class="type">ข้อความ (อ้างอิง stock_lot)</td><td>รหัสนี้เป็นของ lot ไหนในคลังสินค้า</td></tr>
               <tr><td class="mono">trace_code</td><td class="type">ข้อความ (unique)</td><td>รหัสที่ใช้พิมพ์เป็น QR code บนฉลากสินค้า</td></tr>
               <tr><td class="mono">generated_date</td><td class="type">วันที่ (date)</td><td>วันที่สร้างรหัสนี้</td></tr>
@@ -556,6 +557,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>เป็นการเชื่อมโยงของรหัสติดตามไหน</td></tr>
               <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ข้อมูลนี้มาจากโมดูลไหน เลือกได้เฉพาะ: crop, livestock, procurement, sales</td></tr>
               <tr><td class="mono">source_entity</td><td class="type">ข้อความ (text)</td><td>ชื่อเอนทิตีต้นทาง เช่น "harvest_record", "animal_group", "pesticide_application"</td></tr>
@@ -574,6 +576,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>เรียกคืน lot ไหน</td></tr>
               <tr><td class="mono">reason</td><td class="type">ข้อความ (text)</td><td>สาเหตุที่ต้องเรียกคืน</td></tr>
               <tr><td class="mono">initiated_date</td><td class="type">วันที่ (date)</td><td>วันที่เริ่มดำเนินการเรียกคืน</td></tr>
@@ -592,6 +595,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">trace_code_id</td><td class="type">เลขอ้างอิง (FK → trace_code)</td><td>รายงานนี้เป็นของรหัสติดตามไหน</td></tr>
               <tr><td class="mono">generated_date</td><td class="type">วันที่ (date)</td><td>วันที่สร้างรายงาน</td></tr>
               <tr><td class="mono">generated_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนสร้างรายงาน</td></tr>

@@ -545,6 +545,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">customer_code</td><td class="type">ข้อความ (text)</td><td>รหัสลูกค้าที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อลูกค้า/บริษัท</td></tr>
               <tr><td class="mono">customer_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทลูกค้า เลือกได้เฉพาะ: middleman, modern_trade, exporter, processor, other</td></tr>
@@ -565,10 +566,12 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">so_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งขาย</td></tr>
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → customer)</td><td>ขายให้ลูกค้ารายไหน</td></tr>
               <tr><td class="mono">order_date</td><td class="type">วันที่ (date)</td><td>วันที่ตกลงซื้อขาย</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, confirmed, delivered, invoiced, cancelled</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) sales_order_id</td><td class="type">เลขอ้างอิง (FK → sales_order)</td><td>บรรทัดนี้เป็นของใบสั่งขายไหน</td></tr>
               <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>ขายสินค้าอะไร</td></tr>
               <tr><td class="mono">(line) grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดที่ตกลงซื้อขาย เช่น A, B, C</td></tr>
@@ -587,6 +590,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">dn_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบส่งของ</td></tr>
               <tr><td class="mono">sales_order_id</td><td class="type">เลขอ้างอิง (FK → sales_order)</td><td>ส่งของตามใบสั่งขายใบไหน</td></tr>
               <tr><td class="mono">delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่ส่งของจริง</td></tr>
@@ -605,6 +609,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">customer_id / item_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ราคานี้เกิดขึ้นกับลูกค้ารายไหน สินค้าตัวไหน</td></tr>
               <tr><td class="mono">grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดของสินค้าตอนขาย</td></tr>
               <tr><td class="mono">price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ขายจริง</td></tr>
@@ -622,6 +627,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → customer)</td><td>ลูกค้ารายไหนจองซื้อ</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>จองซื้อรุ่นเลี้ยง/รอบปลูกไหน</td></tr>
               <tr><td class="mono">agreed_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาที่ตกลงล็อคไว้ล่วงหน้า</td></tr>

@@ -542,6 +542,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_code</td><td class="type">ข้อความ (text)</td><td>รหัสแปลงที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อแปลง เช่น "แปลงหลังบ้านริมคลอง"</td></tr>
               <tr><td class="mono">area_rai</td><td class="type">ตัวเลข (decimal)</td><td>ขนาดพื้นที่เป็นไร่</td></tr>
@@ -562,6 +563,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id</td><td class="type">เลขอ้างอิง (FK → field)</td><td>โซนนี้อยู่ในแปลงไหน</td></tr>
               <tr><td class="mono">zone_code</td><td class="type">ข้อความ (text)</td><td>รหัสโซนภายในแปลง เช่น "A1", "A2"</td></tr>
               <tr><td class="mono">area_rai</td><td class="type">ตัวเลข (decimal)</td><td>ขนาดพื้นที่ของโซนนี้เป็นไร่</td></tr>
@@ -580,6 +582,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ข้อมูลดินนี้เป็นของแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">soil_type</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>ประเภทดิน เช่น ดินร่วน ดินเหนียว ดินทราย</td></tr>
               <tr><td class="mono">ph_level</td><td class="type">ตัวเลข (decimal)</td><td>ค่าความเป็นกรด-ด่างของดิน</td></tr>
@@ -598,6 +601,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">field_id / field_zone_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ประวัตินี้เป็นของแปลงหรือโซนไหน</td></tr>
               <tr><td class="mono">crop_type</td><td class="type">ข้อความ (text)</td><td>ชนิดพืชที่ปลูกในรอบนั้น</td></tr>
               <tr><td class="mono">planting_start_date / harvest_end_date</td><td class="type">วันที่ (date, ว่างได้)</td><td>ช่วงเวลาปลูกจนถึงเก็บเกี่ยวเสร็จ (ว่างถ้ายังไม่จบรอบ)</td></tr>

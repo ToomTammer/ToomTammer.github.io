@@ -539,6 +539,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">species</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกณฑ์นี้ใช้กับสัตว์ชนิดไหน</td></tr>
               <tr><td class="mono">age_days_start / age_days_end</td><td class="type">ตัวเลข (integer)</td><td>ช่วงอายุที่เกณฑ์นี้ใช้ (สัตว์เล็กมักต้องการอุณหภูมิสูงกว่า)</td></tr>
               <tr><td class="mono">temp_min / temp_max</td><td class="type">ตัวเลข (decimal)</td><td>ช่วงอุณหภูมิที่เหมาะสม (องศาเซลเซียส)</td></tr>
@@ -557,6 +558,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">housing_location_id</td><td class="type">เลขอ้างอิง (FK → housing_location)</td><td>วัดค่าจากโรงเรือนไหน</td></tr>
               <tr><td class="mono">recorded_at</td><td class="type">วันที่/เวลา (datetime)</td><td>เวลาที่บันทึกค่านี้</td></tr>
               <tr><td class="mono">temperature</td><td class="type">ตัวเลข (decimal)</td><td>อุณหภูมิที่วัดได้ (องศาเซลเซียส)</td></tr>
@@ -575,6 +577,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">housing_location_id</td><td class="type">เลขอ้างอิง (FK → housing_location)</td><td>ควบคุมระบายอากาศของโรงเรือนไหน</td></tr>
               <tr><td class="mono">action_time</td><td class="type">วันที่/เวลา (datetime)</td><td>เวลาที่สั่งการ</td></tr>
               <tr><td class="mono">action_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>การกระทำ เลือกได้เฉพาะ: fan_on, fan_off, curtain_open, curtain_close</td></tr>
@@ -592,6 +595,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">housing_location_id</td><td class="type">เลขอ้างอิง (FK → housing_location)</td><td>เตือนเกี่ยวกับโรงเรือนไหน</td></tr>
               <tr><td class="mono">alert_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทความผิดปกติ เลือกได้เฉพาะ: temperature_high, temperature_low, humidity_high, density_exceeded</td></tr>
               <tr><td class="mono">severity</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับความรุนแรง เลือกได้เฉพาะ: warning, critical</td></tr>

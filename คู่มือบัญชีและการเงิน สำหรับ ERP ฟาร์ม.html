@@ -552,6 +552,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">account_code</td><td class="type">ข้อความ (text)</td><td>เลขที่บัญชีที่มนุษย์อ่านได้ เช่น "1100" ใช้อ้างอิงในเอกสารบัญชีจริง</td></tr>
               <tr><td class="mono">account_name_th / account_name_en</td><td class="type">ข้อความ (text)</td><td>ชื่อบัญชีภาษาไทย/อังกฤษ เช่น "เงินสด" / "Cash"</td></tr>
               <tr><td class="mono">account_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>หมวดบัญชี เลือกได้เฉพาะ: asset, liability, equity, revenue, expense, biological_asset</td></tr>
@@ -570,6 +571,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">code</td><td class="type">ข้อความ (text)</td><td>รหัสย่อของศูนย์ต้นทุน เช่น "FARM-A-HOUSE-2"</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อเต็มที่คนอ่านเข้าใจ เช่น "โรงเรือนไก่ไข่ เบอร์ 2"</td></tr>
               <tr><td class="mono">type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับของศูนย์ต้นทุนนี้ เลือกได้เฉพาะ: farm, plot, house, batch</td></tr>
@@ -588,10 +590,12 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">entry_no</td><td class="type">ข้อความ (text)</td><td>เลขที่เอกสารอ้างอิง สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">entry_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำรายการ</td></tr>
               <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสร้างรายการนี้ เลือกได้เฉพาะ: manual, sales, procurement, inventory, hr, asset</td></tr>
               <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบขายที่ทำให้เกิดรายการนี้</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) journal_entry_id</td><td class="type">เลขอ้างอิง (FK → journal_entry)</td><td>บรรทัดนี้เป็นของใบบันทึกรายการไหน</td></tr>
               <tr><td class="mono">(line) account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>บรรทัดนี้ลงบัญชีไหน</td></tr>
               <tr><td class="mono">(line) cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>บรรทัดนี้ลงศูนย์ต้นทุนไหน ปล่อยว่างได้ถ้าไม่เจาะจง</td></tr>
@@ -610,6 +614,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้</td></tr>
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → ลูกค้า)</td><td>ลูกค้ารายไหนเป็นหนี้</td></tr>
               <tr><td class="mono">sales_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่คำสั่งขายอ้างอิงจากโมดูลขาย</td></tr>
@@ -630,6 +635,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้จากผู้ขาย</td></tr>
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → ผู้ขาย)</td><td>เป็นหนี้ผู้ขายรายไหน</td></tr>
               <tr><td class="mono">purchase_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้ออ้างอิงจากโมดูลจัดซื้อ</td></tr>
@@ -649,6 +655,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>รับเงินหรือจ่ายเงิน เลือกได้เฉพาะ: receipt, payment</td></tr>
               <tr><td class="mono">ref_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice/ap_invoice)</td><td>ชำระใบแจ้งหนี้ใบไหน</td></tr>
               <tr><td class="mono">amount</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนเงินที่รับ/จ่ายจริง</td></tr>
@@ -668,6 +675,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">doc_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทแบบภาษี เลือกได้เฉพาะ: ภ.ง.ด., ภ.พ.30</td></tr>
               <tr><td class="mono">period</td><td class="type">วันที่/ข้อความ</td><td>งวดภาษีที่เอกสารนี้เกี่ยวข้อง เช่น เดือน-ปี</td></tr>
               <tr><td class="mono">related_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice/ap_invoice)</td><td>ใบแจ้งหนี้ที่เอกสารภาษีนี้อ้างอิงถึง</td></tr>
@@ -685,6 +693,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">valuation_date</td><td class="type">วันที่ (date)</td><td>วันที่ประเมินมูลค่า</td></tr>
               <tr><td class="mono">weight_or_age</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักหรืออายุ ณ วันประเมิน รับมาจากโมดูลปศุสัตว์/พืช</td></tr>
               <tr><td class="mono">market_price_ref</td><td class="type">ตัวเลข (decimal)</td><td>ราคาตลาดอ้างอิง ณ วันประเมิน</td></tr>
@@ -704,6 +713,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">period</td><td class="type">วันที่/ข้อความ</td><td>งวดงบประมาณ เช่น ปีงบประมาณหรือรอบผลิต</td></tr>
               <tr><td class="mono">account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>ตั้งงบให้บัญชีไหน</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ตั้งงบให้ศูนย์ต้นทุนไหน</td></tr>

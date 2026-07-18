@@ -546,6 +546,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">item_code</td><td class="type">ข้อความ (text)</td><td>รหัสสินค้าที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อสินค้า เช่น "อาหารไก่ไข่สูตรเข้มข้น"</td></tr>
               <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินค้า เลือกได้เฉพาะ: feed, seed, fertilizer, medicine, equipment, other</td></tr>
@@ -566,6 +567,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">warehouse_code</td><td class="type">ข้อความ (text)</td><td>รหัสคลัง</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อคลัง เช่น "โกดังกลาง" หรือ "โรงเก็บอาหาร โรงเรือน 2"</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center, ว่างได้)</td><td>ถ้าคลังนี้ผูกกับพื้นที่เฉพาะ ให้ชี้ไปยังศูนย์ต้นทุนนั้น</td></tr>
@@ -582,6 +584,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">lot_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ล็อต สร้างอัตโนมัติตอนรับเข้า</td></tr>
               <tr><td class="mono">item_id / warehouse_id</td><td class="type">เลขอ้างอิง (FK)</td><td>ล็อตนี้เป็นสินค้าอะไร เก็บอยู่คลังไหน</td></tr>
               <tr><td class="mono">goods_receipt_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบรับสินค้าต้นทางจากโมดูลจัดซื้อ</td></tr>
@@ -602,6 +605,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">movement_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการเคลื่อนไหว เลือกได้เฉพาะ: receipt, issue, sale, transfer, adjustment</td></tr>
               <tr><td class="mono">stock_lot_id</td><td class="type">เลขอ้างอิง (FK → stock_lot)</td><td>เคลื่อนไหวกับล็อตไหน</td></tr>
               <tr><td class="mono">quantity</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่เคลื่อนไหว ค่าบวก=เข้าคลัง ค่าลบ=ออกจากคลัง</td></tr>
@@ -621,10 +625,12 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">count_date</td><td class="type">วันที่ (date)</td><td>วันที่ตรวจนับ</td></tr>
               <tr><td class="mono">warehouse_id</td><td class="type">เลขอ้างอิง (FK → warehouse)</td><td>ตรวจนับคลังไหน</td></tr>
               <tr><td class="mono">counted_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจนับ</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, completed, adjusted</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) stock_count_id</td><td class="type">เลขอ้างอิง (FK → stock_count)</td><td>บรรทัดนี้เป็นของรอบตรวจนับไหน</td></tr>
               <tr><td class="mono">(line) stock_lot_id</td><td class="type">เลขอ้างอิง (FK → stock_lot)</td><td>นับล็อตไหน</td></tr>
               <tr><td class="mono">(line) system_quantity / counted_quantity</td><td class="type">ตัวเลข (decimal)</td><td>ยอดในระบบตอนเริ่มนับ เทียบกับยอดที่นับได้จริง</td></tr>
@@ -641,6 +647,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">from_warehouse_id / to_warehouse_id</td><td class="type">เลขอ้างอิง (FK → warehouse)</td><td>โอนจากคลังไหนไปคลังไหน</td></tr>
               <tr><td class="mono">transfer_date</td><td class="type">วันที่ (date)</td><td>วันที่โอนย้าย</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, in_transit, completed</td></tr>

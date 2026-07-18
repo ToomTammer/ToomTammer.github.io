@@ -542,6 +542,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">asset_code</td><td class="type">ข้อความ (text)</td><td>รหัสสินทรัพย์ที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อสินทรัพย์ เช่น "รถไถคูโบต้า M6040"</td></tr>
               <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินทรัพย์ เลือกได้เฉพาะ: vehicle, machinery, building, equipment, other</td></tr>
@@ -563,6 +564,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">asset_id</td><td class="type">เลขอ้างอิง (FK → asset)</td><td>แผนนี้เป็นของสินทรัพย์ตัวไหน</td></tr>
               <tr><td class="mono">interval_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีนับรอบ เลือกได้เฉพาะ: time_based (ตามเวลา), usage_based (ตามชั่วโมงใช้งาน)</td></tr>
               <tr><td class="mono">interval_value</td><td class="type">ตัวเลข (integer)</td><td>ทุกกี่วัน หรือทุกกี่ชั่วโมงใช้งาน แล้วแต่ interval_type</td></tr>
@@ -581,6 +583,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">asset_id</td><td class="type">เลขอ้างอิง (FK → asset)</td><td>ซ่อมบำรุงสินทรัพย์ตัวไหน</td></tr>
               <tr><td class="mono">maintenance_schedule_id</td><td class="type">เลขอ้างอิง (FK → maintenance_schedule, ว่างได้)</td><td>เป็นไปตามแผนไหน ถ้าเป็นซ่อมฉุกเฉินนอกแผนปล่อยว่าง</td></tr>
               <tr><td class="mono">maintenance_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทงานซ่อม เลือกได้เฉพาะ: preventive (ตามแผน), corrective (ซ่อมฉุกเฉิน)</td></tr>
@@ -601,6 +604,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">asset_id</td><td class="type">เลขอ้างอิง (FK → asset)</td><td>ค่าเสื่อมของสินทรัพย์ตัวไหน</td></tr>
               <tr><td class="mono">period</td><td class="type">ข้อความ/วันที่</td><td>งวดบัญชีที่คำนวณค่าเสื่อมนี้</td></tr>
               <tr><td class="mono">depreciation_amount</td><td class="type">ตัวเลข (decimal)</td><td>ค่าเสื่อมราคาของงวดนี้</td></tr>
@@ -619,6 +623,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">asset_id</td><td class="type">เลขอ้างอิง (FK → asset)</td><td>จองเครื่องจักรตัวไหน</td></tr>
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>จองไปใช้พื้นที่/แปลงไหน</td></tr>
               <tr><td class="mono">booking_date / start_time / end_time</td><td class="type">วันที่ / เวลา</td><td>ช่วงเวลาที่จองใช้งาน</td></tr>

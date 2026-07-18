@@ -544,6 +544,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">report_code</td><td class="type">ข้อความ (text)</td><td>รหัสรายงานที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อรายงาน เช่น "งบกำไรขาดทุนรายเดือน"</td></tr>
               <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>หมวดรายงาน เลือกได้เฉพาะ: financial, inventory, sales, hr, asset, production</td></tr>
@@ -562,6 +563,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">widget_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>รูปแบบการแสดงผล เลือกได้เฉพาะ: kpi_card, line_chart, bar_chart, table</td></tr>
               <tr><td class="mono">report_definition_id</td><td class="type">เลขอ้างอิง (FK → report_definition)</td><td>widget นี้ดึงข้อมูลจากรายงานนิยามไหน</td></tr>
               <tr><td class="mono">title</td><td class="type">ข้อความ (text)</td><td>หัวข้อที่แสดงบน widget</td></tr>
@@ -579,6 +581,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">user_id / role</td><td class="type">เลขอ้างอิง (FK) / ตัวเลือกคงที่</td><td>เลย์เอาต์นี้เป็นของผู้ใช้คนไหน หรือบทบาทไหน</td></tr>
               <tr><td class="mono">widget_id</td><td class="type">เลขอ้างอิง (FK → dashboard_widget)</td><td>แสดง widget ตัวไหน</td></tr>
               <tr><td class="mono">position_order</td><td class="type">ตัวเลข (integer)</td><td>ลำดับตำแหน่งที่แสดงบนหน้าแดชบอร์ด</td></tr>
@@ -595,6 +598,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">report_definition_id</td><td class="type">เลขอ้างอิง (FK → report_definition)</td><td>ส่งรายงานตัวไหน</td></tr>
               <tr><td class="mono">recipient_emails</td><td class="type">ข้อความ (list)</td><td>รายชื่ออีเมลผู้รับ</td></tr>
               <tr><td class="mono">schedule_cron</td><td class="type">ข้อความ (text)</td><td>รูปแบบเวลาที่ส่ง เช่น ทุกวันจันทร์ 8:00 น.</td></tr>
@@ -613,6 +617,7 @@
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>มาจากโมดูลไหน เลือกได้เฉพาะ: inventory, asset, accounting, sales, procurement</td></tr>
               <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงรายการต้นทางที่ทำให้เกิดการแจ้งเตือนนี้</td></tr>
               <tr><td class="mono">severity</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับความสำคัญ เลือกได้เฉพาะ: info, warning, critical</td></tr>
