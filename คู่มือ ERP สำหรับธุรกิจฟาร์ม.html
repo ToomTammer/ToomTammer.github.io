@@ -510,39 +510,166 @@
     <div class="block-head">
       <span class="eyebrow">Technical Requirements</span>
       <h2>5. ข้อกำหนดด้านเทคนิคและโครงสร้างพื้นฐาน (Technical &amp; Infrastructure Requirements)</h2>
-      <p class="lede">ข้อกำหนดที่มักถูกมองข้าม แต่กระทบการใช้งานจริงในฟาร์ม</p>
+      <p class="lede">สแตกที่เลือกจริงสำหรับเริ่มพัฒนา — เลือกให้เหมาะกับทีมพัฒนาคนเดียว (.NET dev, ไม่มีทีม IT) และงบประมาณเริ่มต้นของธุรกิจใหม่ โดยยังรักษาทางเลือกย้ายกลับ on-premise ไว้ได้ในอนาคตตามนโยบายบริษัท</p>
     </div>
     <div class="card-grid">
       <article class="card">
-        <h3>การติดตั้ง (Deployment)</h3>
+        <h3>ระบบหลังบ้านและ API (Backend &amp; API)</h3>
         <ul>
-          <li>รองรับติดตั้งแบบ On-Premise / Self-hosted ได้ ไม่ผูกกับ cloud อย่างเดียว</li>
-          <li>ทำงานได้แม้อินเทอร์เน็ตในพื้นที่ไม่เสถียร</li>
+          <li>ASP.NET Core Web API + Entity Framework Core</li>
+          <li>สิทธิ์การเข้าถึง: ASP.NET Core Identity <span class="en">(role-based)</span></li>
+          <li>งาน background/สูตรคำนวณตามกำหนดเวลา (เช่น แจ้งเตือนใบรับรองหมดอายุ, คำนวณ FCR/THI): Hangfire ฝังในแอปเดียวกัน</li>
         </ul>
       </article>
       <article class="card">
-        <h3>การใช้งานภาคสนาม (Field Operations)</h3>
+        <h3>หน้าเว็บ/แดชบอร์ด (Web &amp; Dashboard)</h3>
         <ul>
-          <li>แอปมือถือแบบ offline-first แล้วซิงค์ภายหลัง</li>
-          <li>บันทึกข้อมูลหน้างานโดยพนักงานฟาร์ม</li>
+          <li>.NET MVC สำหรับใช้งานฝั่งสำนักงาน</li>
+          <li>กราฟ/แดชบอร์ด: Chart.js หรือ ApexCharts ฝังในแอปเดียวกัน (ไม่ใช้บริการ BI แยกต่างหาก)</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>แอปภาคสนาม (Field App, offline-first)</h3>
+        <ul>
+          <li>Flutter — รองรับเฉพาะ <span class="en">Android</span> เท่านั้น เพื่อลดความซับซ้อนและค่าใช้จ่ายด้าน iOS</li>
+          <li>เครื่องเป็นของบริษัทจัดซื้อแจกพนักงาน (ไม่ใช่ BYOD) ควบคุมรุ่น/เวอร์ชันได้ง่ายกว่า</li>
+          <li>แจกแอปผ่านไฟล์ APK โดยตรง ไม่ผ่าน Google Play</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>ฐานข้อมูลและไฟล์ (Database &amp; Storage)</h3>
+        <ul>
+          <li>Azure SQL Database — จับคู่กับ EF Core ได้ลื่นสุด มี backup อัตโนมัติในตัว</li>
+          <li>ไฟล์ (QR code, ใบรับรอง, PDF): Azure Blob Storage</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>การติดตั้งและ CI/CD (Hosting &amp; CI/CD)</h3>
+        <ul>
+          <li>Azure App Service — deploy โค้ดตรง (native) ไม่ใช้ Docker ในช่วงเริ่มต้น เพื่อความง่ายสุดสำหรับคนดูแลคนเดียว</li>
+          <li>CI/CD: GitHub Actions — push โค้ดแล้ว deploy อัตโนมัติ</li>
         </ul>
       </article>
       <article class="card">
         <h3>สิทธิ์และความปลอดภัย (Access &amp; Security)</h3>
         <ul>
-          <li>กำหนดสิทธิ์ตามบทบาท <span class="en">(role-based access)</span></li>
-          <li>สำรองข้อมูลและแผนกู้คืน</li>
-        </ul>
-      </article>
-      <article class="card">
-        <h3>การเชื่อมต่อภายนอก (External Integration)</h3>
-        <ul>
-          <li>API เชื่อมธนาคาร ระบบบัญชี ตลาดกลาง</li>
-          <li>เซนเซอร์ IoT สำหรับโรงเรือน/แปลง (ถ้าต้องการ)</li>
+          <li>กำหนดสิทธิ์ตามบทบาท <span class="en">(role-based access)</span> ผ่าน ASP.NET Core Identity</li>
+          <li>Azure SQL Database สำรองข้อมูลอัตโนมัติทุกวัน</li>
         </ul>
       </article>
     </div>
-    <p class="note"><b>หมายเหตุ</b> ....</p>
+
+    <div class="block-head" style="margin-top:36px;">
+      <span class="eyebrow">Estimated Monthly Cost</span>
+      <h2 style="font-size:19px;">ประมาณการค่าใช้จ่ายต่อเดือน (Estimated Monthly Cost)</h2>
+      <p class="lede">อ้างอิงราคา Azure ปัจจุบัน (กรกฎาคม 2569) อัตราแลกเปลี่ยนโดยประมาณ 35 บาท/ดอลลาร์ — ราคาจริงต้องเช็คผ่าน Azure Pricing Calculator อีกครั้งก่อนซื้อจริง เพราะราคาและอัตราแลกเปลี่ยนเปลี่ยนแปลงได้</p>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>บริการที่ใช้</th><th>ระดับเริ่มต้น</th><th>บาท/เดือน</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Hosting (Web API + MVC ในแอปเดียว)</td><td>Azure App Service B1 Basic</td><td>~460</td></tr>
+          <tr><td class="num">2</td><td>ฐานข้อมูล</td><td>Azure SQL Database Standard S0 (10 DTU)</td><td>~515</td></tr>
+          <tr><td class="num">3</td><td>ไฟล์ (QR/ใบรับรอง/PDF)</td><td>Azure Blob Storage Hot tier</td><td>~105-175</td></tr>
+          <tr><td class="num">4</td><td>รายงาน/แดชบอร์ด</td><td>Chart.js/ApexCharts ในแอปเดิม</td><td>0</td></tr>
+          <tr><td class="num">5</td><td>CI/CD</td><td>GitHub Actions (free tier)</td><td>0</td></tr>
+          <tr><td class="num">6</td><td>แจกแอปภาคสนาม</td><td>Android APK ตรง (เครื่องบริษัทแจก)</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>รวมค่าใช้จ่ายเริ่มต้นโดยประมาณ ~1,080-1,150 บาท/เดือน</b> ไม่รวมค่าเครื่อง Android ที่บริษัทจัดซื้อแจกพนักงาน (ค่าใช้จ่ายครั้งเดียว) — เมื่อผู้ใช้โตขึ้นถึง ~30-60 คน อัปเกรดเป็น App Service S1 + SQL S1 (~3,600 บาท/เดือน) และเมื่อขยายเป็นหลายฟาร์มหรือผู้ใช้เกิน 100 คน อัปเกรดเป็น App Service P1V3 + SQL S2 (~8,260 บาท/เดือน) หากย้ายกลับ on-premise ในอนาคตตามนโยบายบริษัท SQL Server Express รุ่นฟรีเพียงพอสำหรับข้อมูลไม่เกิน 10GB ต่อฐานข้อมูล ค่อยพิจารณาซื้อ license เมื่อข้อมูลโตเกินขีดจำกัดนั้น</p>
+
+    <div class="block-head" style="margin-top:36px;">
+      <span class="eyebrow">Alternative Options Considered</span>
+      <h2 style="font-size:19px;">ทางเลือกอื่นที่เคยพิจารณา (Alternative Options Considered)</h2>
+      <p class="lede">ปรับใช้ระดับ (tier) สำหรับใช้งานจริงเท่านั้น ไม่นับ free tier/dev tier ที่ไม่มี SLA — เก็บไว้เป็นข้อมูลอ้างอิงเผื่อทบทวนใหม่ในอนาคต ปัจจุบันยังแนะนำ Azure ตามตารางค่าใช้จ่ายด้านบน</p>
+    </div>
+
+    <div class="block-head" style="margin-top:20px;margin-bottom:10px;">
+      <span class="eyebrow">Option A</span>
+      <h3 style="font-size:16px;margin:0;">ทางเลือก A: Google Cloud Run + PostgreSQL</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>บริการที่ใช้</th><th>บาท/เดือน</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Hosting (compute)</td><td>Google Cloud Run — 1 vCPU/512MiB, min-instance=1 (always-on ไม่มี cold start, ไม่นับ free tier) ~2,290</td></tr>
+          <tr><td class="num">2</td><td>ฐานข้อมูล</td><td>Cloud SQL for PostgreSQL — db-custom-1-3840 (1 vCPU dedicated, 3.75GB) + storage 20GB + public IP ~2,240</td></tr>
+          <tr><td class="num">3</td><td>ไฟล์ (QR/ใบรับรอง/PDF)</td><td>Google Cloud Storage Standard ~35-70</td></tr>
+          <tr><td class="num">4</td><td>เก็บ Docker image</td><td>Google Artifact Registry ~18</td></tr>
+          <tr><td class="num">5</td><td>CI/CD</td><td>GitHub Actions (โควตาฟรีถาวร ไม่ใช่ trial) — 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>รวมโดยประมาณ ~4,585-4,620 บาท/เดือน</b> — <b>แพงกว่า Azure ถึง ~4 เท่า</b> เพราะราคาก่อนหน้าที่เคยเสนอ (~525-980 บาท) อิงจาก free tier/dev tier (db-f1-micro ไม่มี SLA) ซึ่งใช้งานจริงจังไม่ได้ พอปรับเป็นระดับที่มี SLA รองรับการใช้งานจริง (dedicated vCPU ทั้ง compute และ DB, ปิด cold start ด้วย min-instance=1) ราคาสูงกว่า Azure ชัดเจน เพราะ Cloud Run/Cloud SQL ไม่ได้ถูกออกแบบมาให้ถูกที่สุดตอนต้อง "เปิดทิ้งไว้ตลอด" แบบ Azure App Service</p>
+
+    <div class="block-head" style="margin-top:28px;margin-bottom:10px;">
+      <span class="eyebrow">Option B</span>
+      <h3 style="font-size:16px;margin:0;">ทางเลือก B: VPS + Docker (self-managed)</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>บริการที่ใช้</th><th>บาท/เดือน</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Hosting (VPS ตัวเดียว รันทุกอย่าง)</td><td>DigitalOcean CPU-Optimized Droplet 2vCPU/4GB (dedicated vCPU ไม่ใช่ shared) ~1,400</td></tr>
+          <tr><td class="num">2</td><td>ฐานข้อมูล</td><td>PostgreSQL รันเป็น container บน VPS เดียวกัน — 0 (ใช้ทรัพยากร VPS เดิม)</td></tr>
+          <tr><td class="num">3</td><td>ไฟล์ + backup</td><td>DigitalOcean Spaces (S3-compatible, 250GB) ~175</td></tr>
+          <tr><td class="num">4</td><td>เก็บ Docker image</td><td>DigitalOcean Container Registry (starter) ~175 (ข้ามได้ถ้า build ตรงบน VPS)</td></tr>
+          <tr><td class="num">5</td><td>CI/CD</td><td>GitHub Actions (SSH deploy เข้า VPS) — 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>รวมโดยประมาณ ~1,750 บาท/เดือน</b> — ข้อควรระวังสำคัญที่สุด: แบบนี้<b>ไม่มี managed service ใด ๆ เลย</b> ต้องดูแลเอง patch OS, patch PostgreSQL, ตั้ง backup เอง, จัดการ SSL certificate เอง (ใช้ Let's Encrypt ผ่าน Caddy/Nginx ได้ฟรีแต่ต้องตั้งเอง) — แพงกว่า Azure แล้วยังต้องดูแลเองทั้งหมด จึงไม่ใช่ทางเลือกที่คุ้มค่าเมื่อเทียบกับ Azure สำหรับผู้ดูแลระบบคนเดียว</p>
+
+    <div class="block-head" style="margin-top:28px;margin-bottom:10px;">
+      <span class="eyebrow">Option C</span>
+      <h3 style="font-size:16px;margin:0;">ทางเลือก C: รันที่เครื่อง Local/On-Premise เอง</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>แนวทาง</th><th>ค่าใช้จ่าย</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>ฮาร์ดแวร์ (ครั้งเดียว)</td><td>เครื่อง mini PC/tower เล็กในออฟฟิศ ~15,000-40,000 บาท</td></tr>
+          <tr><td class="num">2</td><td>ระบบปฏิบัติการ</td><td>Ubuntu Server (ฟรี) หรือ Windows Server (มีค่า license ~25,000 บาทครั้งเดียว)</td></tr>
+          <tr><td class="num">3</td><td>ฐานข้อมูล</td><td>SQL Server Express — ฟรี (จำกัด 10GB ต่อฐานข้อมูล)</td></tr>
+          <tr><td class="num">4</td><td>ไฟล์ + สำรองข้อมูล</td><td>เก็บบน disk เครื่องเดียวกัน + external HDD/NAS แยก ~3,000-10,000 บาทครั้งเดียว</td></tr>
+          <tr><td class="num">5</td><td>เครื่องสำรองไฟ (UPS)</td><td>จำเป็น เพราะไฟดับกลางคันคือสาเหตุอันดับ 1 ที่ฐานข้อมูลพัง ~3,000-8,000 บาทครั้งเดียว</td></tr>
+          <tr><td class="num">6</td><td>การเข้าถึงจากภาคสนาม/นอกสถานที่</td><td>Tailscale VPN (ฟรีสำหรับทีมเล็ก) — 0/เดือน</td></tr>
+          <tr><td class="num">7</td><td>สำรองข้อมูลนอกสถานที่ (แนะนำ)</td><td>คลาวด์เก็บไฟล์ backup อย่างเดียว (เช่น Backblaze B2) ~50-200 บาท/เดือน</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>ค่าใช้จ่ายครั้งเดียว ~21,000-83,000 บาท (ขึ้นกับเลือก Windows Server หรือไม่) + รายเดือนแทบไม่มีเลย ~50-200 บาท/เดือน</b> — ถูกที่สุดในระยะยาวแบบชัดเจน เพราะไม่มีค่าเช่าเซิร์ฟเวอร์รายเดือนเลย แต่ต้องดูแลเองทั้งหมดเหมือนทางเลือก B บวกความเสี่ยงเพิ่ม: ไฟดับ/เน็ตหลุด/เครื่องพัง กระทบระบบทันทีโดยไม่มี data center รองรับ และถ้าเครื่องพังโดยไม่มี backup ที่ทดสอบแล้ว ข้อมูลอาจหายถาวร — เหมาะกับกรณีที่นโยบายบริษัทต้องการ on-premise จริงจังและยอมรับความเสี่ยงนี้ได้ ไม่เหมาะถ้าต้องการความมั่นใจสูงสุดเรื่อง uptime</p>
+
+    <div class="block-head" style="margin-top:28px;margin-bottom:10px;">
+      <span class="eyebrow">Option D</span>
+      <h3 style="font-size:16px;margin:0;">ทางเลือก D: App/เว็บรันที่ local — ฐานข้อมูล/ไฟล์/backup อยู่บน Cloud (Hybrid)</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>แนวทาง</th><th>ค่าใช้จ่าย</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>ฮาร์ดแวร์ (ครั้งเดียว)</td><td>เครื่อง mini PC ในออฟฟิศ รัน ASP.NET Core Web API + MVC เท่านั้น (ไม่ต้องเผื่อพื้นที่เก็บข้อมูลมาก) ~10,000-25,000 บาท</td></tr>
+          <tr><td class="num">2</td><td>ระบบปฏิบัติการ</td><td>Ubuntu Server (ฟรี)</td></tr>
+          <tr><td class="num">3</td><td>ฐานข้อมูล</td><td>Azure SQL Database Standard S0 — บนคลาวด์ ~515/เดือน</td></tr>
+          <tr><td class="num">4</td><td>ไฟล์ (QR/ใบรับรอง/PDF)</td><td>Azure Blob Storage — บนคลาวด์ ~105-175/เดือน</td></tr>
+          <tr><td class="num">5</td><td>สำรองข้อมูล</td><td>รวมอยู่ใน Azure SQL Database อัตโนมัติแล้ว — 0 เพิ่ม</td></tr>
+          <tr><td class="num">6</td><td>เครื่องสำรองไฟ (UPS)</td><td>ยังแนะนำสำหรับเครื่อง local กันแอปหยุดกะทันหัน ~3,000-8,000 บาทครั้งเดียว</td></tr>
+          <tr><td class="num">7</td><td>CI/CD</td><td>GitHub Actions + self-hosted runner ติดตั้งบนเครื่อง local (ฟรี)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>ค่าใช้จ่ายครั้งเดียว ~13,000-33,000 บาท + รายเดือน ~620-690 บาท/เดือน</b> — ถูกกว่าตารางค่าใช้จ่าย Azure หลักด้านบน (~1,080-1,150 บาท) เพราะตัดค่า Azure App Service ออก (ใช้เครื่อง local รันแทน) แต่ยังได้ backup/ความปลอดภัยของข้อมูลระดับ cloud เต็มที่ เพราะข้อมูลจริงไม่ได้อยู่ที่เครื่อง local เลย — <b>ข้อควรระวังสำคัญที่สุด: พึ่งอินเทอร์เน็ตมากกว่าทางเลือก C (on-premise ล้วน)</b> เพราะแม้แต่คนที่ใช้งานในออฟฟิศเองก็ต้องผ่านอินเทอร์เน็ตไปเรียก Azure SQL/Blob Storage ทุกครั้ง ถ้าเน็ตที่ฟาร์มหลุด ระบบหยุดทำงานทั้งหมดทันทีแม้จะอยู่ในพื้นที่เดียวกับเครื่อง local ก็ตาม (ต่างจากทางเลือก C ที่ยังใช้งานผ่าน LAN ภายในต่อได้ระหว่างเน็ตหลุด) เหมาะกับกรณีที่อินเทอร์เน็ตที่ฟาร์มเสถียรพอสมควร และอยากประหยัดค่าใช้จ่าย hosting โดยไม่เสียความปลอดภัยของข้อมูล</p>
   </section>
 
   <section class="block" id="rollout">
