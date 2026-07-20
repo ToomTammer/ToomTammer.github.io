@@ -670,6 +670,27 @@
       </table>
     </div>
     <p class="note"><b>ค่าใช้จ่ายครั้งเดียว ~13,000-33,000 บาท + รายเดือน ~620-690 บาท/เดือน</b> — ถูกกว่าตารางค่าใช้จ่าย Azure หลักด้านบน (~1,080-1,150 บาท) เพราะตัดค่า Azure App Service ออก (ใช้เครื่อง local รันแทน) แต่ยังได้ backup/ความปลอดภัยของข้อมูลระดับ cloud เต็มที่ เพราะข้อมูลจริงไม่ได้อยู่ที่เครื่อง local เลย — <b>ข้อควรระวังสำคัญที่สุด: พึ่งอินเทอร์เน็ตมากกว่าทางเลือก C (on-premise ล้วน)</b> เพราะแม้แต่คนที่ใช้งานในออฟฟิศเองก็ต้องผ่านอินเทอร์เน็ตไปเรียก Azure SQL/Blob Storage ทุกครั้ง ถ้าเน็ตที่ฟาร์มหลุด ระบบหยุดทำงานทั้งหมดทันทีแม้จะอยู่ในพื้นที่เดียวกับเครื่อง local ก็ตาม (ต่างจากทางเลือก C ที่ยังใช้งานผ่าน LAN ภายในต่อได้ระหว่างเน็ตหลุด) เหมาะกับกรณีที่อินเทอร์เน็ตที่ฟาร์มเสถียรพอสมควร และอยากประหยัดค่าใช้จ่าย hosting โดยไม่เสียความปลอดภัยของข้อมูล</p>
+
+    <div class="block-head" style="margin-top:28px;margin-bottom:10px;">
+      <span class="eyebrow">Option E</span>
+      <h3 style="font-size:16px;margin:0;">ทางเลือก E: VPS + Docker (ผู้ให้บริการไทย)</h3>
+      <p class="lede" style="margin-top:6px;">เหมือนทางเลือก B แต่เปลี่ยนจาก DigitalOcean (ต่างประเทศ) เป็นผู้ให้บริการไทย — ถูกกว่าและ latency ต่ำกว่าสำหรับผู้ใช้ในประเทศ</p>
+    </div>
+    <div class="table-wrap">
+      <table class="phases">
+        <thead>
+          <tr><th>รายการ</th><th>บริการที่ใช้</th><th>บาท/เดือน</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Hosting (VPS ตัวเดียว รันทุกอย่าง)</td><td>VisperHost VPS-02 — 2 vCore/4GB/60GB SSD, data center กรุงเทพฯ (unmanaged) — 350</td></tr>
+          <tr><td class="num">2</td><td>ฐานข้อมูล</td><td>PostgreSQL รันเป็น container บน VPS เดียวกัน — 0</td></tr>
+          <tr><td class="num">3</td><td>ไฟล์ + backup</td><td>VisperHost ไม่มี object storage ให้ — ต้อง self-host MinIO บน VPS เดียวกัน (0) หรือใช้ Azure Blob Storage แบบ hybrid (~105-175)</td></tr>
+          <tr><td class="num">4</td><td>CI/CD</td><td>GitHub Actions (SSH deploy เข้า VPS) — 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>รวมโดยประมาณ ~350-525 บาท/เดือน</b> — ถูกที่สุดในบรรดาทางเลือกที่ใช้ VPS ทั้งหมด (ถูกกว่าทางเลือก B แบบ DigitalOcean ถึง ~5 เท่า) เพราะเป็นผู้ให้บริการไทยราคาถูกกว่ามาก แต่ยังมีข้อเสียเดิมของทางเลือก B ครบ: <b>unmanaged เต็มรูป</b> ต้อง patch OS/PostgreSQL/SSL เอง ไม่มี managed backup อัตโนมัติ</p>
+    <p class="note"><b>ทางเลือกเสริม: Bangmod Cloud</b> (ไทย+สิงคโปร์, ISO 27001) — ราคาใกล้เคียงกัน (~300-600 บาท ขึ้นกับเทียร์) แต่มี <b>Object Storage ให้ในตัวจากเจ้าเดียว</b> (แก้จุดอ่อนเรื่องไฟล์ของ VisperHost ได้พอดี) และมีตัวเลือก Managed (DirectAdmin/Plesk) ถ้าอยากได้ความช่วยเหลือเพิ่มโดยไม่ดูแลเองทั้งหมด — เหมาะกว่าถ้าไม่อยากผสมหลาย vendor สำหรับไฟล์แยกจากเซิร์ฟเวอร์</p>
   </section>
 
   <section class="block" id="rollout">
