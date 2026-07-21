@@ -1,0 +1,638 @@
+<title>คู่มือหลักการจัดการข้อมูล Offline (Offline Data Management) — ERP ฟาร์ม</title>
+<style>
+  :root{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11170F;
+      --paper-raised:#171F14;
+      --ink:#E7EAE0;
+      --ink-soft:#AAB6A2;
+      --moss:#7CB584;
+      --moss-strong:#9CCBA1;
+      --wheat:#D9A94A;
+      --clay:#C08863;
+      --line:#2B3527;
+      --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11170F;
+    --paper-raised:#171F14;
+    --ink:#E7EAE0;
+    --ink-soft:#AAB6A2;
+    --moss:#7CB584;
+    --moss-strong:#9CCBA1;
+    --wheat:#D9A94A;
+    --clay:#C08863;
+    --line:#2B3527;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.28);
+  }
+  :root[data-theme="light"]{
+    --paper:#EDEFE4;
+    --paper-raised:#F7F8F0;
+    --ink:#16241B;
+    --ink-soft:#4B5647;
+    --moss:#2F5233;
+    --moss-strong:#1F3D28;
+    --wheat:#9C7420;
+    --clay:#8B5E45;
+    --line:#C9CFBB;
+    --card-shadow: 0 1px 2px rgba(22,36,27,0.06), 0 6px 16px rgba(22,36,27,0.05);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 96px;
+  }
+
+  .crumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .crumb a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+  .crumb a:hover{color:var(--moss-strong);border-color:var(--moss);}
+  .crumb .sep{opacity:0.5;}
+  .crumb .here{color:var(--ink);font-weight:600;}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--moss);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:68ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta span b{color:var(--ink);font-weight:600;}
+
+  nav.toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin:28px 0 44px;
+    padding:14px 16px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  nav.toc a{
+    font-size:13px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:4px 10px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible{
+    color:var(--moss-strong);
+    border-color:var(--moss);
+  }
+
+  section.block{
+    margin-bottom:52px;
+    scroll-margin-top:20px;
+  }
+  .block-head{
+    margin-bottom:20px;
+    max-width:72ch;
+  }
+  .block-head .eyebrow{margin-bottom:8px;}
+  h2{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:23px;
+    font-weight:700;
+    margin:0 0 6px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  h3{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0 0 10px;
+    color:var(--moss-strong);
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .card li{
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .card li:last-child{margin-bottom:0;}
+  .card li .en{
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entity-card > p{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+  .rel-line{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .rel-line b{color:var(--ink);}
+  .field-table-wrap{
+    overflow-x:auto;
+    margin-top:2px;
+  }
+  .field-table-wrap table.data th,
+  .field-table-wrap table.data td{
+    padding:8px 10px;
+    font-size:13px;
+  }
+  .field-table-wrap table.data th{font-size:10.5px;}
+  .field-table-wrap table.data td.type{
+    white-space:nowrap;
+    color:var(--ink-soft);
+    font-size:12.5px;
+  }
+  .entity-card{ container-type: inline-size; }
+  @container (max-width: 500px){
+    .field-table-wrap{ overflow-x:visible; }
+    .field-table-wrap table.data thead{ display:none; }
+    .field-table-wrap table.data,
+    .field-table-wrap table.data tbody,
+    .field-table-wrap table.data tr,
+    .field-table-wrap table.data td{
+      display:block;
+      width:100%;
+    }
+    .field-table-wrap table.data tr{
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      margin-bottom:10px;
+    }
+    .field-table-wrap table.data tr:last-child{margin-bottom:0;}
+    .field-table-wrap table.data td{
+      padding:5px 0;
+      white-space:normal;
+    }
+    .field-table-wrap table.data td.type{white-space:normal;}
+    .field-table-wrap table.data td::before{
+      display:block;
+      font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--ink-soft);
+      margin-bottom:2px;
+    }
+    .field-table-wrap table.data td:nth-child(1)::before{content:"ฟิลด์";}
+    .field-table-wrap table.data td:nth-child(2)::before{content:"ชนิดข้อมูล";}
+    .field-table-wrap table.data td:nth-child(3)::before{content:"เก็บอะไร";}
+  }
+
+  .phase-tag{
+    flex:none;
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .phase-1{ color:var(--moss-strong); background:color-mix(in srgb, var(--moss) 16%, transparent); border-color:color-mix(in srgb, var(--moss) 40%, transparent); }
+  .phase-2{ color:var(--wheat); background:color-mix(in srgb, var(--wheat) 16%, transparent); border-color:color-mix(in srgb, var(--wheat) 40%, transparent); }
+  .phase-3{ color:var(--clay); background:color-mix(in srgb, var(--clay) 16%, transparent); border-color:color-mix(in srgb, var(--clay) 40%, transparent); }
+
+  .func-card h3{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .func-list{margin:0;padding:0;list-style:none;}
+  .func-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .func-item:last-child{border-bottom:none;padding-bottom:0;}
+  .func-item span.txt{flex:1;}
+
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.data th{
+    font-family:"Archivo Narrow","Barlow Semi Condensed","Arial Narrow",sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  table.data td.mono{
+    font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    color:var(--moss-strong);
+  }
+  table.data td.center{text-align:center;}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);}
+  .table-wrap table{border:none;}
+  .table-wrap th, .table-wrap td{border-bottom:1px solid var(--line);}
+  .table-wrap tr:last-child td{border-bottom:none;}
+
+  .note{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-left:3px solid var(--clay);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+  .note b{color:var(--ink);}
+
+  .formula{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:12.5px;
+    line-height:1.55;
+    background:color-mix(in srgb, var(--moss) 8%, var(--paper-raised));
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:4px 0 0;
+    overflow-x:auto;
+    color:var(--ink);
+    white-space:pre;
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer a{color:var(--moss-strong);}
+
+  a{color:var(--moss-strong);}
+</style>
+
+<div class="wrap">
+
+  <div class="crumb">
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">ERP ฟาร์ม</a>
+    <span class="sep">/</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html#tech">ข้อกำหนดด้านเทคนิคและโครงสร้างพื้นฐาน (Technical &amp; Infrastructure)</a>
+    <span class="sep">/</span>
+    <span class="here">หลักการจัดการข้อมูล Offline</span>
+  </div>
+
+  <header class="top">
+    <span class="eyebrow">Technical Guide · Field App — Dev-Ready Reference</span>
+    <h1>คู่มือหลักการจัดการข้อมูล Offline (Offline Data Management)</h1>
+    <p class="sub">แนวทางออกแบบและ implement การเก็บ/ซิงค์ข้อมูลของแอปภาคสนาม (Flutter, offline-first) ให้ทำงานได้แม้ไม่มีอินเทอร์เน็ต แล้วซิงค์กับ ASP.NET Core API + Azure SQL Database ได้อย่างปลอดภัย ไม่ชนกัน ไม่ข้อมูลหาย</p>
+    <div class="meta">
+      <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
+      <span>อัปเดต <b>19 ก.ค. 2569</b></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#principles">1. หลักการพื้นฐาน (Core Principles)</a>
+    <a href="#functions">2. องค์ประกอบของระบบ Sync (Sync Engine Components)</a>
+    <a href="#localdata">3. โครงสร้างข้อมูลบนเครื่อง (Local Data Structure)</a>
+    <a href="#conflict">4. การจัดการข้อมูลขัดแย้งและไฟล์ (Conflict &amp; File Handling)</a>
+    <a href="#checklist">5. Checklist สำหรับ Dev</a>
+    <a href="#rules">6. กฎสำคัญที่ต้องยึด (Critical Rules)</a>
+  </nav>
+
+  <section class="block" id="principles">
+    <div class="block-head">
+      <span class="eyebrow">Core Principles</span>
+      <h2>1. หลักการพื้นฐาน (Core Principles)</h2>
+      <p class="lede">แนวคิดหลักที่ทุกฟีเจอร์ในแอปภาคสนามต้องยึดตาม เพื่อให้พนักงานบันทึกข้อมูลได้ต่อเนื่องแม้เน็ตหลุดกลางทาง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>Local-First</h3>
+        <ul>
+          <li>ทุกการบันทึกข้อมูลเขียนลง SQLite ในเครื่องก่อนเสมอ ไม่รอเชื่อมเน็ตก่อนบันทึก</li>
+          <li>ซิงค์ขึ้นเซิร์ฟเวอร์เป็นขั้นตอนที่เกิด "ทีหลัง" ไม่ใช่เงื่อนไขของการบันทึกสำเร็จ</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Optimistic UI</h3>
+        <ul>
+          <li>ผู้ใช้เห็นข้อมูลของตัวเองทันทีที่กดบันทึก ไม่ต้องรอ round-trip ไปเซิร์ฟเวอร์</li>
+          <li>แสดงสถานะ "รอซิงค์" กำกับไว้ ไม่ใช่ทำให้ดูเหมือนบันทึกไม่สำเร็จ</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Idempotent Sync</h3>
+        <ul>
+          <li>ส่งข้อมูลเดิมซ้ำไปเซิร์ฟเวอร์กี่ครั้งก็ต้องได้ผลลัพธ์เดียวกัน ไม่สร้างข้อมูลซ้ำ</li>
+          <li>สำคัญมากเพราะเน็ตในพื้นที่ฟาร์มหลุดกลางการส่งได้บ่อย ต้อง retry ได้อย่างปลอดภัย</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Server Time is Truth</h3>
+        <ul>
+          <li>ใช้เวลาของเซิร์ฟเวอร์ตัดสิน conflict ไม่ใช่เวลาในเครื่องมือถือ (นาฬิกาเครื่องอาจเพี้ยน/ไม่ตรงกัน)</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="functions">
+    <div class="block-head">
+      <span class="eyebrow">Sync Engine Components</span>
+      <h2>2. องค์ประกอบของระบบ Sync (Sync Engine Components)</h2>
+      <p class="lede">แยกชัดว่าอะไรต้องมีตั้งแต่วันแรก (MVP) และอะไรเพิ่มทีหลังได้</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">SQLite local database เก็บข้อมูลทุกฟอร์มที่พนักงานกรอกในพื้นที่</span></li>
+          <li class="func-item"><span class="txt">ตาราง sync_queue เก็บรายการที่รอส่งขึ้นเซิร์ฟเวอร์ ตามลำดับเวลาที่เกิด</span></li>
+          <li class="func-item"><span class="txt">ตรวจจับสถานะอินเทอร์เน็ต แล้วเริ่ม sync อัตโนมัติทันทีที่กลับมาออนไลน์</span></li>
+          <li class="func-item"><span class="txt">สร้าง client-generated UUID ให้ทุกเรคคอร์ดใหม่ที่สร้างตอนออฟไลน์</span></li>
+          <li class="func-item"><span class="txt">แสดงสถานะ pending/synced/failed ต่อเรคคอร์ดในหน้า UI</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เพิ่มทีหลังได้</h3>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">Background sync อัตโนมัติเป็นช่วง ๆ แม้แอปไม่ได้เปิดอยู่หน้าจอ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">Batch sync ส่งหลายเรคคอร์ดพร้อมกันในคำขอเดียวเพื่อลดรอบการเชื่อมต่อ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ลบข้อมูลเก่าที่ซิงค์แล้วออกจากเครื่องเป็นระยะ เพื่อประหยัดพื้นที่</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนแอดมินอัตโนมัติเมื่อพบ conflict ที่ต้องตรวจสอบด้วยคน</span><span class="phase-tag phase-3">Phase 3</span></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="localdata">
+    <div class="block-head">
+      <span class="eyebrow">Local Data Structure</span>
+      <h2>3. โครงสร้างข้อมูลบนเครื่อง (Local Data Structure)</h2>
+      <p class="lede">ทุกตารางข้อมูลที่กรอกในพื้นที่ (เช่น feeding_record, harvest_record) ต้องมีฟิลด์เสริมเหล่านี้เพิ่มจากฟิลด์ปกติที่ spec ไว้ในแต่ละโมดูล</p>
+    </div>
+    <div class="card-grid">
+      <article class="card entity-card">
+        <h3>ฟิลด์เสริมที่ทุกตาราง local ต้องมี</h3>
+        <p>เพิ่มเข้าไปในทุกเอนทิตีที่พนักงานภาคสนามกรอกได้แบบออฟไลน์ (นอกเหนือจากฟิลด์ธุรกิจปกติที่ spec ไว้ในโมดูลนั้น ๆ)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">local_uuid</td><td class="type">ข้อความ (UUID, สร้างที่เครื่อง)</td><td>รหัสเฉพาะของเรคคอร์ดนี้ สร้างตอนออฟไลน์ก็ได้ ไม่ชนกับเครื่องอื่น</td></tr>
+              <tr><td class="mono">server_id</td><td class="type">เลขอ้างอิง (ว่างได้จนกว่าจะ sync สำเร็จ)</td><td>รหัสที่เซิร์ฟเวอร์ตอบกลับมาหลัง sync ครั้งแรกสำเร็จ</td></tr>
+              <tr><td class="mono">sync_status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: pending, synced, failed</td></tr>
+              <tr><td class="mono">created_at_local</td><td class="type">วันเวลา (timestamp)</td><td>เวลาที่เครื่องมือถือบันทึกไว้ ณ ตอนกรอก (ใช้แสดงผล ไม่ใช้ตัดสิน conflict)</td></tr>
+              <tr><td class="mono">synced_at</td><td class="type">วันเวลา (timestamp, ว่างได้)</td><td>เวลาที่ sync ขึ้นเซิร์ฟเวอร์สำเร็จจริง</td></tr>
+              <tr><td class="mono">retry_count</td><td class="type">ตัวเลข (int)</td><td>จำนวนครั้งที่ลอง sync แล้วไม่สำเร็จ ใช้ตัดสินใจ backoff/แจ้งเตือน</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>sync_queue</h3>
+        <p>คิวงานที่รอส่งขึ้นเซิร์ฟเวอร์ — แยกจากตารางข้อมูลจริง เพื่อให้ควบคุมลำดับ/สถานะการส่งได้อิสระจากตัวข้อมูล</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> อ้างอิง local_uuid ของเรคคอร์ดในตารางข้อมูลจริงที่ต้องซิงค์</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">target_table</td><td class="type">ข้อความ (text)</td><td>ชื่อตารางข้อมูลที่ต้องซิงค์ เช่น "feeding_record"</td></tr>
+              <tr><td class="mono">target_local_uuid</td><td class="type">ข้อความ (UUID)</td><td>เรคคอร์ดไหนในตารางนั้นที่ต้องส่ง</td></tr>
+              <tr><td class="mono">operation</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: create, update, delete</td></tr>
+              <tr><td class="mono">idempotency_key</td><td class="type">ข้อความ (UUID, สร้างครั้งแรกที่เข้าคิว)</td><td>กันส่งซ้ำสร้างข้อมูลซ้ำ ถ้า retry ต้องส่ง key เดิมทุกครั้ง</td></tr>
+              <tr><td class="mono">queued_at</td><td class="type">วันเวลา (timestamp)</td><td>เวลาที่เข้าคิว ใช้เรียงลำดับการส่ง (เก่าไปใหม่)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="conflict">
+    <div class="block-head">
+      <span class="eyebrow">Conflict &amp; File Handling</span>
+      <h2>4. การจัดการข้อมูลขัดแย้งและไฟล์ (Conflict &amp; File Handling)</h2>
+      <p class="lede">เกิดขึ้นเมื่อพนักงานหลายคนแก้ข้อมูลเดียวกันตอนออฟไลน์พร้อมกัน แล้วมาซิงค์ชนกันทีหลัง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>ข้อมูลทั่วไป (บันทึกกิจกรรม)</h3>
+        <ul>
+          <li>ใช้ <span class="en">Last-Write-Wins</span> เทียบด้วยเวลาเซิร์ฟเวอร์ (ไม่ใช่เวลาเครื่อง) เรคคอร์ดที่ sync ถึงเซิร์ฟเวอร์ก่อนแต่เวลาบันทึกจริงทีหลัง ยังชนะได้ถ้าเวลาบันทึกจริงใหม่กว่า</li>
+          <li>เหมาะกับข้อมูลเช่น feeding_record, care_task ที่แก้ไขซ้อนกันไม่กระทบความถูกต้องทางบัญชี</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>ข้อมูลอ่อนไหว (การเงิน/สต็อก)</h3>
+        <ul>
+          <li>ห้ามใช้ Last-Write-Wins เงียบ ๆ — ให้ flag เป็น conflict แล้วเก็บทั้งสองเวอร์ชันไว้ให้แอดมินเลือกด้วยคน</li>
+          <li>ใช้กับ stock_movement, payment, journal_entry ที่ overwrite ผิดพลาดกระทบเงินจริง</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>รูปภาพ/ไฟล์ที่ถ่ายในพื้นที่</h3>
+        <ul>
+          <li>เก็บไฟล์ไว้ใน local storage ของเครื่องก่อน พร้อม path อ้างอิงในเรคคอร์ด</li>
+          <li>อัปโหลดขึ้น Azure Blob Storage เฉพาะตอนออนไลน์ อัปเดต path เป็น URL จริงหลังอัปโหลดสำเร็จเท่านั้น</li>
+          <li>ห้ามลบไฟล์ local ทิ้งจนกว่าจะยืนยันว่าอัปโหลดสำเร็จแล้ว</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="checklist">
+    <div class="block-head">
+      <span class="eyebrow">Developer Checklist</span>
+      <h2>5. Checklist สำหรับ Dev</h2>
+      <p class="lede">สิ่งที่ต้องทดสอบจริงก่อนปล่อยฟีเจอร์ offline ทุกครั้ง — เน็ตในพื้นที่ฟาร์มไม่เสถียรกว่าออฟฟิศมาก ทดสอบเฉพาะกรณีเน็ตดีไม่พอ</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>สถานการณ์ทดสอบ</th><th>สิ่งที่ต้องตรวจสอบ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>เปิด airplane mode แล้วกรอกข้อมูล</td><td>บันทึกสำเร็จ แสดงสถานะ "รอ sync" ถูกต้อง</td></tr>
+          <tr><td>เน็ตหลุดกลางการส่ง sync</td><td>retry ได้เองโดยไม่สร้างข้อมูลซ้ำ (เช็ค idempotency_key ทำงานจริง)</td></tr>
+          <tr><td>ปิดแอปกลาง sync แล้วเปิดใหม่</td><td>sync_queue ยังอยู่ครบ ไม่หายไปกับการปิดแอป</td></tr>
+          <tr><td>สองเครื่องแก้เรคคอร์ดเดียวกันตอนออฟไลน์</td><td>conflict ถูกจัดการตามกฎที่กำหนด ไม่มีข้อมูลหายเงียบ ๆ</td></tr>
+          <tr><td>ถอดปลั๊ก/แบตหมดกลาง sync</td><td>ข้อมูลใน local DB ไม่พังหลังเปิดเครื่องใหม่ (SQLite transaction ปลอดภัย)</td></tr>
+          <tr><td>ใช้งานต่อเนื่องหลายวันแบบออฟไลน์</td><td>sync_queue ไม่ล้นจนแอปช้า/พื้นที่เครื่องเต็ม</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="rules">
+    <div class="block-head">
+      <span class="eyebrow">Critical Rules</span>
+      <h2>6. กฎสำคัญที่ต้องยึด (Critical Rules)</h2>
+      <p class="lede">ตรรกะที่ dev ต้อง implement จริงเบื้องหลังกลไก sync ทั้งหมด</p>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h3>สร้าง ID แบบออฟไลน์ปลอดภัย</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ห้ามใช้ auto-increment integer สำหรับเรคคอร์ดที่สร้างตอนออฟไลน์ เพราะสองเครื่องอาจสร้างเลขชนกัน</p>
+        <pre class="formula">record.local_uuid = generate_uuid_v4()  // สร้างตอนกรอกฟอร์ม ไม่ใช่ตอน sync
+server_id = null  // จนกว่า sync ครั้งแรกสำเร็จ
+API ตอบกลับ server_id -&gt; อัปเดตกลับเข้า local record</pre>
+      </article>
+
+      <article class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h3>ป้องกันการ Sync ซ้ำ (Idempotency)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ทุก request sync ต้องส่ง idempotency_key เดิมซ้ำได้อย่างปลอดภัยถ้าต้อง retry</p>
+        <pre class="formula">ที่ฝั่ง API:
+  ถ้า idempotency_key นี้เคยประมวลผลสำเร็จแล้ว
+    -&gt; ตอบผลลัพธ์เดิมกลับไปทันที ไม่สร้างเรคคอร์ดใหม่ซ้ำ
+  ถ้ายังไม่เคยเห็น key นี้
+    -&gt; ประมวลผลตามปกติ แล้วบันทึก key ไว้</pre>
+      </article>
+
+      <article class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h3>ลำดับการส่ง Sync</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ส่งตามลำดับเวลาที่เข้าคิว ไม่ใช่สุ่ม เพื่อรักษาลำดับเหตุการณ์ทางธุรกิจให้ถูกต้อง</p>
+        <pre class="formula">sync_queue ORDER BY queued_at ASC
+ส่งทีละรายการ (หรือ batch ตามลำดับ) จนครบคิว
+ถ้ารายการใดล้มเหลว -&gt; หยุดที่รายการนั้น ไม่ข้ามไปส่งรายการถัดไปก่อน
+  (กันกรณีรายการถัดไปอ้างอิงรายการที่ยังไม่สำเร็จ)</pre>
+      </article>
+
+      <article class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h3>Retry แบบ Exponential Backoff</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>กันไม่ให้แอปยิง request รัว ๆ ตอนเน็ตแย่ ๆ จนแบตหมด/เปลืองดาต้าโดยไม่จำเป็น</p>
+        <pre class="formula">retry_delay = min(2^retry_count วินาที, 5 นาที)
+ถ้า retry_count &gt; 10 ครั้งติดกัน
+  -&gt; sync_status = failed, แจ้งเตือนผู้ใช้ให้ตรวจสอบเอง</pre>
+      </article>
+
+      <article class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h3>เกณฑ์เลือก Last-Write-Wins vs Manual Conflict</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ตัดสินตอนออกแบบตาราง ไม่ใช่ตัดสินสด ๆ ตอน implement</p>
+        <pre class="formula">ถ้า target_table อยู่ในกลุ่ม การเงิน/สต็อก/สุขภาพ-วัคซีน
+  -&gt; conflict ต้องถูก flag ให้คนตรวจสอบ ห้าม auto-overwrite
+ถ้า target_table เป็นบันทึกกิจกรรมทั่วไป (feeding, care_task)
+  -&gt; ใช้ Last-Write-Wins เทียบด้วยเวลาเซิร์ฟเวอร์ได้</pre>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>เอกสารนี้เป็นแนวทางออกแบบสำหรับแอปภาคสนาม (Flutter) ควรทดสอบสถานการณ์ offline จริงในพื้นที่ฟาร์มก่อนใช้งานจริง ไม่ใช่แค่จำลองในห้อง dev</span>
+    <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">← กลับไปภาพรวม ERP ฟาร์ม</a>
+  </footer>
+
+</div>
