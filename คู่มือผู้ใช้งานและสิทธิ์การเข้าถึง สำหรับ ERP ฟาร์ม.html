@@ -435,7 +435,7 @@
   <header class="top">
     <span class="eyebrow">Foundation Module 0 · User &amp; Authentication — Dev-Ready Spec</span>
     <h1>โมดูลผู้ใช้งานและสิทธิ์การเข้าถึง (User &amp; Authentication)</h1>
-    <p class="sub">สเปกฐานที่ต้องสร้างก่อนโมดูลอื่นทั้งหมด — ครอบคลุมบัญชีผู้ใช้ การ login สิทธิ์ตามบทบาท และจุดเชื่อมโยงกับตาราง employee ในโมดูลบุคลากรและแรงงาน ใช้ ASP.NET Core Identity เป็นฐานสำหรับเก็บผู้ใช้/รหัสผ่าน/บทบาท (ไม่ต้องสร้างระบบ login เองตั้งแต่ศูนย์) แต่ออก <span class="en">JWT (JSON Web Token)</span> แทน cookie เป็นกลไก session เพื่อรองรับทั้งเว็บ MVC และแอป Flutter ด้วยมาตรฐานเดียวกัน</p>
+    <p class="sub">สเปกฐานที่ต้องสร้างก่อนโมดูลอื่นทั้งหมด — ครอบคลุมบัญชีผู้ใช้ การ login สิทธิ์ตามบทบาท และจุดเชื่อมโยงกับตาราง employee ในโมดูลบุคลากรและแรงงาน ออกแบบตาราง User/Role/UserRole <b>เอง</b> (ไม่พึ่งตาราง AspNetUsers/AspNetRoles/AspNetUserRoles ที่ ASP.NET Core Identity สร้างให้อัตโนมัติ) จึงต้องระบุทุกฟิลด์ที่ระบบ auth ต้องใช้ไว้ในสเปกนี้ให้ครบ ไม่มีอะไร "มาฟรี" จาก framework — ออก <span class="en">JWT (JSON Web Token)</span> เป็นกลไก session เพื่อรองรับทั้งเว็บ MVC และแอป Flutter ด้วยมาตรฐานเดียวกัน</p>
     <div class="meta">
       <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
       <span>อัปเดต <b>19 ก.ค. 2569</b></span>
@@ -472,7 +472,7 @@
         <ul>
           <li>ข้อมูลธุรกิจของพนักงาน (ตำแหน่ง, ค่าแรง, วันลา) เป็นของ <span class="en">บุคลากรและแรงงาน (employee)</span> — โมดูลนี้แค่เก็บ FK เชื่อมไปหาเท่านั้น</li>
           <li>ไม่กำหนดกฎธุรกิจเฉพาะโมดูล (เช่น ใครดูรายงานบัญชีได้) — แต่ละโมดูลอ้างอิง Role จากที่นี่ไปบังคับใช้เอง</li>
-          <li>ไม่ต้องเขียน password hashing/lockout เอง — ใช้กลไกของ ASP.NET Core Identity ตรวจสอบรหัสผ่าน แล้วค่อยออก JWT เองแทนการใช้ cookie ของ Identity</li>
+          <li>ยังแนะนำให้ใช้คลาส <span class="en">PasswordHasher&lt;T&gt;</span> ของ ASP.NET Core (ใช้แยกเดี่ยวได้ ไม่ต้องพ่วงทั้งระบบ Identity) มาช่วย hash รหัสผ่านให้ถูกต้องปลอดภัย ไม่ต้องเขียนอัลกอริทึม hash เอง</li>
         </ul>
       </article>
     </div>
@@ -483,7 +483,7 @@
         </thead>
         <tbody>
           <tr><td>ทุกโมดูล (23 โมดูล)</td><td>ตรวจสอบ Role ก่อนอนุญาตเข้าถึงแต่ละหน้าจอ/ฟังก์ชัน</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
-          <tr><td>บุคลากรและแรงงาน</td><td>ผูก employee.application_user_id เข้ากับบัญชีผู้ใช้ที่มีอยู่แล้ว</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
+          <tr><td>บุคลากรและแรงงาน</td><td>ผูก employee.user_id เข้ากับบัญชีผู้ใช้ที่มีอยู่แล้ว</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
           <tr><td>รายงานและแดชบอร์ด</td><td>แสดงชื่อผู้ใช้ปัจจุบัน/ปรับ widget ตามสิทธิ์</td><td><span class="phase-tag phase-1">Phase 1</span></td></tr>
         </tbody>
       </table>
@@ -526,23 +526,32 @@
     <div class="block-head">
       <span class="eyebrow">Database</span>
       <h2>3. ฐานข้อมูล (Database)</h2>
-      <p class="lede">ตาราง AspNetUsers/AspNetRoles/AspNetUserRoles มาพร้อม ASP.NET Core Identity อยู่แล้วโดยอัตโนมัติ ไม่ต้องสร้างเอง — ที่ต้องทำเพิ่มคือขยาย (extend) ตารางเหล่านี้ให้มีฟิลด์ที่ธุรกิจฟาร์มต้องใช้จริง</p>
+      <p class="lede">ไม่ใช้ตาราง AspNetUsers/AspNetRoles/AspNetUserRoles ของ ASP.NET Core Identity — ออกแบบตาราง User/Role/UserRole เองทั้งหมด จึงต้องระบุฟิลด์ที่ปกติ Identity จะสร้างให้อัตโนมัติ (password hash, security stamp, lockout ฯลฯ) ไว้ในสเปกนี้ครบทุกฟิลด์ ไม่ให้ตกหล่น</p>
     </div>
 
     <div class="card-grid">
       <article class="card entity-card">
-        <h3>ApplicationUser <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>ต่อยอดจาก AspNetUsers ของ Identity — เพิ่มฟิลด์เฉพาะธุรกิจที่ Identity ไม่มีให้ ฟิลด์ login/รหัสผ่าน/lockout เดิมของ Identity ยังอยู่ครบไม่ต้องเขียนเอง</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> หนึ่งบัญชีมีได้หลาย Role (many-to-many ผ่าน AspNetUserRoles ที่ Identity สร้างให้อัตโนมัติ) และอาจถูกอ้างอิงจาก employee.application_user_id</p>
+        <h3>User <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตารางผู้ใช้ที่ออกแบบเอง<b>ทั้งหมด</b> (ไม่ใช่ AspNetUsers ของ Identity) — รวมทั้งฟิลด์ที่ปกติ Identity จะสร้างให้อัตโนมัติ (password hash, security stamp, lockout) และฟิลด์เฉพาะธุรกิจฟาร์ม ต้องมีครบทุกฟิลด์ด้านล่างนี้ ไม่มีอะไรมาให้ฟรีจาก framework</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> หนึ่งบัญชีมีได้หลาย Role ผ่านตาราง UserRole และอาจถูกอ้างอิงจาก employee.user_id</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
-              <tr><td class="mono">full_name_th</td><td class="type">ข้อความ (text)</td><td>ชื่อ-นามสกุลภาษาไทยสำหรับแสดงผลในระบบ (Identity เก็บแค่ username/email ไม่มีชื่อจริง)</td></tr>
+              <tr><td class="mono">username</td><td class="type">ข้อความ (unique)</td><td>ชื่อผู้ใช้สำหรับ login</td></tr>
+              <tr><td class="mono">email</td><td class="type">ข้อความ (unique)</td><td>อีเมลสำหรับ login/รับลิงก์รีเซ็ตรหัสผ่าน</td></tr>
+              <tr><td class="mono">password_hash</td><td class="type">ข้อความ (text)</td><td>รหัสผ่านที่ hash แล้ว — สร้างด้วย <span class="en">PasswordHasher&lt;T&gt;</span> ของ ASP.NET Core ห้ามเก็บรหัสผ่านจริงหรือ hash เองแบบไม่มี salt</td></tr>
+              <tr><td class="mono">security_stamp</td><td class="type">ข้อความ (GUID)</td><td>เปลี่ยนค่าทุกครั้งที่รหัสผ่านถูกแก้ไข ใช้ตรวจสอบว่า token เก่าควรถูกมองว่าไม่ถูกต้องแล้ว</td></tr>
+              <tr><td class="mono">phone_number</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เบอร์โทรศัพท์ (เผื่อใช้ 2FA แบบ SMS ใน Phase 2)</td></tr>
+              <tr><td class="mono">email_confirmed</td><td class="type">ค่าจริง/เท็จ (boolean)</td><td>ยืนยันอีเมลแล้วหรือยัง</td></tr>
+              <tr><td class="mono">lockout_end</td><td class="type">วันเวลา (timestamp, ว่างได้)</td><td>ล็อกบัญชีถึงเมื่อไหร่ — ว่าง = ไม่ได้ถูกล็อก</td></tr>
+              <tr><td class="mono">access_failed_count</td><td class="type">ตัวเลข (int)</td><td>จำนวนครั้งที่ login ผิดติดต่อกัน รีเซ็ตเป็น 0 เมื่อ login สำเร็จ</td></tr>
+              <tr><td class="mono">two_factor_enabled</td><td class="type">ค่าจริง/เท็จ (boolean)</td><td>เปิดใช้ 2FA หรือยัง (Phase 2)</td></tr>
+              <tr><td class="mono">full_name_th</td><td class="type">ข้อความ (text)</td><td>ชื่อ-นามสกุลภาษาไทยสำหรับแสดงผลในระบบ</td></tr>
               <tr><td class="mono">profile_image_url</td><td class="type">ข้อความ (text, ว่างได้)</td><td>รูปโปรไฟล์ที่เก็บใน Azure Blob Storage</td></tr>
               <tr><td class="mono">is_active</td><td class="type">ค่าจริง/เท็จ (boolean)</td><td>ปิดใช้งานบัญชีได้โดยไม่ลบข้อมูล (เมื่อพนักงานลาออก)</td></tr>
               <tr><td class="mono">created_at</td><td class="type">วันเวลา (timestamp)</td><td>วันที่สร้างบัญชี</td></tr>
-              <tr><td class="mono">created_by</td><td class="type">เลขอ้างอิง (FK → ApplicationUser)</td><td>ใครเป็นคนสร้างบัญชีนี้ให้ (ต้องเป็นเจ้าของฟาร์ม/ผู้บริหารเท่านั้น)</td></tr>
+              <tr><td class="mono">created_by</td><td class="type">เลขอ้างอิง (FK → User)</td><td>ใครเป็นคนสร้างบัญชีนี้ให้ (ต้องเป็นเจ้าของฟาร์ม/ผู้บริหารเท่านั้น)</td></tr>
               <tr><td class="mono">last_login_at</td><td class="type">วันเวลา (timestamp, ว่างได้)</td><td>เวลา login ล่าสุด ใช้ตรวจสอบบัญชีที่ไม่มีการใช้งานนาน</td></tr>
             </tbody>
           </table>
@@ -550,9 +559,9 @@
       </article>
 
       <article class="card entity-card">
-        <h3>ApplicationRole <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>ต่อยอดจาก AspNetRoles ของ Identity — นิยามบทบาทที่ใช้ร่วมกันทั้ง 23 โมดูล เป็น "แหล่งความจริงเดียว" (single source of truth) ที่ทุกโมดูลอ้างอิงในหัวข้อสิทธิ์การเข้าถึงของตัวเอง</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> many-to-many กับ ApplicationUser ผ่าน AspNetUserRoles</p>
+        <h3>Role <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตารางบทบาทที่ออกแบบเอง — นิยามบทบาทที่ใช้ร่วมกันทั้ง 23 โมดูล เป็น "แหล่งความจริงเดียว" (single source of truth) ที่ทุกโมดูลอ้างอิงในหัวข้อสิทธิ์การเข้าถึงของตัวเอง</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> many-to-many กับ User ผ่านตาราง UserRole</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
@@ -565,14 +574,29 @@
       </article>
 
       <article class="card entity-card">
-        <h3>RefreshToken <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>เก็บ refresh token ที่ออกให้แต่ละอุปกรณ์/บัญชี เพื่อให้ "เพิกถอน" (revoke) การใช้งานได้ — JWT access token เองยกเลิกกลางทางไม่ได้ (ตรวจสอบแค่ signature+วันหมดอายุ) จึงต้องมีตารางนี้ควบคุมชั้นของ refresh token แทน</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ApplicationUser หนึ่งบัญชีมีได้หลาย token (คนละอุปกรณ์/เบราว์เซอร์)</p>
+        <h3>UserRole <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตารางเชื่อม many-to-many ระหว่าง User กับ Role — ปกติ Identity สร้างตาราง AspNetUserRoles ให้อัตโนมัติ แต่พอออกแบบเอง ต้องสร้างตารางนี้เองด้วย</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> composite key จาก user_id + role_id</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
-              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → ApplicationUser)</td><td>token นี้ออกให้บัญชีไหน</td></tr>
+              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → User)</td><td>บัญชีไหน</td></tr>
+              <tr><td class="mono">role_id</td><td class="type">เลขอ้างอิง (FK → Role)</td><td>ได้รับบทบาทอะไร</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>RefreshToken <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เก็บ refresh token ที่ออกให้แต่ละอุปกรณ์/บัญชี เพื่อให้ "เพิกถอน" (revoke) การใช้งานได้ — JWT access token เองยกเลิกกลางทางไม่ได้ (ตรวจสอบแค่ signature+วันหมดอายุ) จึงต้องมีตารางนี้ควบคุมชั้นของ refresh token แทน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ User หนึ่งบัญชีมีได้หลาย token (คนละอุปกรณ์/เบราว์เซอร์)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → User)</td><td>token นี้ออกให้บัญชีไหน</td></tr>
               <tr><td class="mono">token_hash</td><td class="type">ข้อความ (text, hash แล้ว)</td><td>เก็บ hash ของ refresh token ไม่เก็บค่าจริงตรง ๆ (เหมือนรหัสผ่าน กันฐานข้อมูลหลุดแล้วเอาไปใช้ต่อได้)</td></tr>
               <tr><td class="mono">device_info</td><td class="type">ข้อความ (text, ว่างได้)</td><td>อุปกรณ์/แอปที่ขอ token นี้ (เว็บ/Flutter Android)</td></tr>
               <tr><td class="mono">issued_at</td><td class="type">วันเวลา (timestamp)</td><td>วันที่ออก token</td></tr>
@@ -586,12 +610,12 @@
       <article class="card entity-card">
         <h3>LoginAuditLog <span class="phase-tag phase-2">Phase 2</span></h3>
         <p>ประวัติการ login แต่ละครั้ง ใช้ตรวจสอบความปลอดภัยและสืบสวนกรณีมีปัญหา</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ApplicationUser</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ User</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
-              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → ApplicationUser)</td><td>ใคร login</td></tr>
+              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → User)</td><td>ใคร login</td></tr>
               <tr><td class="mono">login_at</td><td class="type">วันเวลา (timestamp)</td><td>เวลาที่พยายาม login</td></tr>
               <tr><td class="mono">ip_address</td><td class="type">ข้อความ (text)</td><td>IP ที่ใช้ login</td></tr>
               <tr><td class="mono">device_info</td><td class="type">ข้อความ (text)</td><td>อุปกรณ์/เบราว์เซอร์ที่ใช้ login</td></tr>
@@ -602,7 +626,7 @@
       </article>
     </div>
 
-    <p class="note"><b>หมายเหตุ:</b> ตารางรหัสผ่าน (password hash), token รีเซ็ตรหัสผ่าน, และการ lockout หลัง login ผิดหลายครั้ง — ทั้งหมดนี้ ASP.NET Core Identity จัดการให้อัตโนมัติในตาราง AspNetUsers อยู่แล้ว ไม่ต้องออกแบบตารางเองเพิ่ม ส่วน JWT access token เองไม่มีตารางเก็บ (เป็น stateless เข้ารหัสลงในตัว token เอง) มีแค่ RefreshToken ที่ต้องเก็บไว้ควบคุมการเพิกถอน</p>
+    <p class="note"><b>หมายเหตุ:</b> เนื่องจากไม่ใช้ AspNetUsers ของ Identity ฟิลด์ password_hash, security_stamp, lockout_end, access_failed_count ในตาราง User ด้านบนคือส่วนที่ปกติ Identity จะสร้างให้อัตโนมัติ — ตอนนี้ต้อง migrate/สร้างเองทั้งหมด ยังแนะนำใช้คลาส <span class="en">PasswordHasher&lt;T&gt;</span> ของ ASP.NET Core ช่วย hash รหัสผ่านอยู่ดี (ใช้แยกเดี่ยวได้โดยไม่ต้องติดตั้งทั้งระบบ Identity) ส่วน JWT access token เองไม่มีตารางเก็บ (เป็น stateless เข้ารหัสลงในตัว token เอง) มีแค่ RefreshToken ที่ต้องเก็บไว้ควบคุมการเพิกถอน</p>
   </section>
 
   <section class="block" id="api">
@@ -678,27 +702,34 @@
       <article class="card">
         <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>เชื่อมโยงบัญชีผู้ใช้กับพนักงาน (Optional Link)</h3><span class="phase-tag phase-1">Phase 1</span></div>
         <p>ไม่ใช่ทุกบัญชีผู้ใช้ต้องเป็น employee และไม่ใช่ทุก employee ต้องมีบัญชีผู้ใช้</p>
-        <pre class="formula">employee.application_user_id = FK -&gt; ApplicationUser.Id (ว่างได้)
+        <pre class="formula">employee.user_id = FK -&gt; User.Id (ว่างได้)
 
 พนักงานที่ต้อง login เข้าระบบเอง
-  -&gt; ผูก application_user_id เข้ากับบัญชีที่สร้างไว้
+  -&gt; ผูก user_id เข้ากับบัญชีที่สร้างไว้
 พนักงานที่ไม่ต้อง login (เช่น แรงงานรายวัน)
-  -&gt; ปล่อย application_user_id เป็นค่าว่าง ไม่กระทบระบบ</pre>
+  -&gt; ปล่อย user_id เป็นค่าว่าง ไม่กระทบระบบ</pre>
       </article>
 
       <article class="card">
         <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ล็อกบัญชีชั่วคราวหลัง login ผิดซ้ำ (Account Lockout)</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>ใช้ฟีเจอร์ lockout ที่มีอยู่แล้วใน ASP.NET Core Identity ไม่ต้องเขียนเอง</p>
-        <pre class="formula">ถ้า login ผิดติดต่อกัน &gt;= 5 ครั้ง
-  -&gt; ล็อกบัญชีชั่วคราว 5 นาที (ค่าเริ่มต้นของ Identity ปรับได้)
-  -&gt; แจ้งข้อความชัดเจนว่าอีกกี่นาทีถึงจะลองใหม่ได้</pre>
+        <p>ต้อง implement เอง (ไม่มี Identity ทำให้อัตโนมัติแล้ว) โดยใช้ฟิลด์ access_failed_count และ lockout_end ในตาราง User</p>
+        <pre class="formula">ทุกครั้งที่ login ผิด:
+  access_failed_count += 1
+  ถ้า access_failed_count &gt;= 5
+    -&gt; lockout_end = now() + 5 นาที
+ทุกครั้งที่ login สำเร็จ:
+  access_failed_count = 0, lockout_end = null
+
+ก่อนตรวจรหัสผ่านทุกครั้ง:
+  ถ้า lockout_end != null AND lockout_end &gt; now()
+    -&gt; ปฏิเสธ login ทันที แจ้งอีกกี่นาทีถึงจะลองใหม่ได้ (ไม่ต้องเช็ครหัสผ่านด้วยซ้ำ)</pre>
       </article>
 
       <article class="card">
         <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ปิดใช้งานบัญชีไม่ใช่การลบ (Soft Deactivation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
         <p>รักษาความสัมพันธ์ของข้อมูลเดิม (เช่น "ใครสร้างรายการนี้") แม้พนักงานคนนั้นจะออกจากงานแล้ว</p>
         <pre class="formula">เมื่อพนักงานลาออก:
-  is_active = false (ห้ามลบ ApplicationUser ทิ้ง)
+  is_active = false (ห้ามลบ User ทิ้ง)
   -&gt; ห้าม login ได้อีก แต่ประวัติ/รายการที่เคยสร้างไว้ยังอ้างอิงชื่อได้ปกติ
   -&gt; เพิกถอน RefreshToken ทุกตัวของบัญชีนี้ทันที (is_revoked = true ทุกแถว)
   -&gt; ถ้าผูกกับ employee ไว้ สถานะ employee ก็ต้องปิดคู่กัน (เรียกจากโมดูล HR)</pre>
