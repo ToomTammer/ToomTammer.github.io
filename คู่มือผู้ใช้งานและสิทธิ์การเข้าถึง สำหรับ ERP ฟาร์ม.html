@@ -435,7 +435,7 @@
   <header class="top">
     <span class="eyebrow">Foundation Module 0 · User &amp; Authentication — Dev-Ready Spec</span>
     <h1>โมดูลผู้ใช้งานและสิทธิ์การเข้าถึง (User &amp; Authentication)</h1>
-    <p class="sub">สเปกฐานที่ต้องสร้างก่อนโมดูลอื่นทั้งหมด — ครอบคลุมบัญชีผู้ใช้ การ login สิทธิ์ตามบทบาท และจุดเชื่อมโยงกับตาราง employee ในโมดูลบุคลากรและแรงงาน โดยใช้ ASP.NET Core Identity เป็นฐาน ไม่ต้องสร้างระบบ login เองตั้งแต่ศูนย์</p>
+    <p class="sub">สเปกฐานที่ต้องสร้างก่อนโมดูลอื่นทั้งหมด — ครอบคลุมบัญชีผู้ใช้ การ login สิทธิ์ตามบทบาท และจุดเชื่อมโยงกับตาราง employee ในโมดูลบุคลากรและแรงงาน ใช้ ASP.NET Core Identity เป็นฐานสำหรับเก็บผู้ใช้/รหัสผ่าน/บทบาท (ไม่ต้องสร้างระบบ login เองตั้งแต่ศูนย์) แต่ออก <span class="en">JWT (JSON Web Token)</span> แทน cookie เป็นกลไก session เพื่อรองรับทั้งเว็บ MVC และแอป Flutter ด้วยมาตรฐานเดียวกัน</p>
     <div class="meta">
       <span>ส่วนหนึ่งของ <a href="คู่มือ ERP สำหรับธุรกิจฟาร์ม.html">คู่มือ ERP สำหรับธุรกิจฟาร์ม</a></span>
       <span>อัปเดต <b>19 ก.ค. 2569</b></span>
@@ -462,8 +462,8 @@
         <h3>อยู่ในขอบเขต</h3>
         <ul>
           <li>สร้าง/แก้ไข/ปิดใช้งานบัญชีผู้ใช้ (ไม่ใช่ข้อมูลพนักงานเชิงธุรกิจ)</li>
-          <li>Login / Logout / ลืมรหัสผ่าน / เปลี่ยนรหัสผ่าน</li>
-          <li>กำหนดบทบาท (Role) ให้บัญชีผู้ใช้แต่ละคน</li>
+          <li>Login / Logout / ลืมรหัสผ่าน / เปลี่ยนรหัสผ่าน — ออกเป็น <span class="en">JWT access token + refresh token</span></li>
+          <li>กำหนดบทบาท (Role) ให้บัญชีผู้ใช้แต่ละคน — ฝังเป็น claim ใน JWT</li>
           <li>บันทึกประวัติการ login (Phase 2)</li>
         </ul>
       </article>
@@ -472,7 +472,7 @@
         <ul>
           <li>ข้อมูลธุรกิจของพนักงาน (ตำแหน่ง, ค่าแรง, วันลา) เป็นของ <span class="en">บุคลากรและแรงงาน (employee)</span> — โมดูลนี้แค่เก็บ FK เชื่อมไปหาเท่านั้น</li>
           <li>ไม่กำหนดกฎธุรกิจเฉพาะโมดูล (เช่น ใครดูรายงานบัญชีได้) — แต่ละโมดูลอ้างอิง Role จากที่นี่ไปบังคับใช้เอง</li>
-          <li>ไม่ต้องสร้างระบบ login เอง — ใช้ ASP.NET Core Identity เป็นฐาน (ตาราง AspNetUsers, AspNetRoles มีมาให้แล้ว)</li>
+          <li>ไม่ต้องเขียน password hashing/lockout เอง — ใช้กลไกของ ASP.NET Core Identity ตรวจสอบรหัสผ่าน แล้วค่อยออก JWT เองแทนการใช้ cookie ของ Identity</li>
         </ul>
       </article>
     </div>
@@ -500,12 +500,13 @@
       <article class="card func-card">
         <h3>MVP — ต้องมีวันแรก <span class="phase-tag phase-1">Phase 1</span></h3>
         <ul class="func-list">
-          <li class="func-item"><span class="txt">Login ด้วยอีเมล/ชื่อผู้ใช้ + รหัสผ่าน</span></li>
-          <li class="func-item"><span class="txt">Logout และหมดอายุ session อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">Login ด้วยอีเมล/ชื่อผู้ใช้ + รหัสผ่าน — ออก JWT access token + refresh token กลับไป</span></li>
+          <li class="func-item"><span class="txt">ใช้ refresh token ขอ access token ใหม่โดยไม่ต้อง login ซ้ำ</span></li>
+          <li class="func-item"><span class="txt">Logout — เพิกถอน (revoke) refresh token ทันที</span></li>
           <li class="func-item"><span class="txt">ลืมรหัสผ่าน/รีเซ็ตผ่านอีเมล</span></li>
           <li class="func-item"><span class="txt">เจ้าของฟาร์ม/ผู้บริหารสร้างบัญชีผู้ใช้ใหม่ให้พนักงานได้</span></li>
           <li class="func-item"><span class="txt">กำหนด/แก้ไข Role ของแต่ละบัญชี</span></li>
-          <li class="func-item"><span class="txt">ปิดใช้งานบัญชี (ไม่ลบ) เมื่อพนักงานลาออก</span></li>
+          <li class="func-item"><span class="txt">ปิดใช้งานบัญชี (ไม่ลบ) เมื่อพนักงานลาออก — เพิกถอน refresh token ทั้งหมดของบัญชีนั้นทันที</span></li>
         </ul>
       </article>
       <article class="card func-card">
@@ -564,6 +565,25 @@
       </article>
 
       <article class="card entity-card">
+        <h3>RefreshToken <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เก็บ refresh token ที่ออกให้แต่ละอุปกรณ์/บัญชี เพื่อให้ "เพิกถอน" (revoke) การใช้งานได้ — JWT access token เองยกเลิกกลางทางไม่ได้ (ตรวจสอบแค่ signature+วันหมดอายุ) จึงต้องมีตารางนี้ควบคุมชั้นของ refresh token แทน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ApplicationUser หนึ่งบัญชีมีได้หลาย token (คนละอุปกรณ์/เบราว์เซอร์)</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">user_id</td><td class="type">เลขอ้างอิง (FK → ApplicationUser)</td><td>token นี้ออกให้บัญชีไหน</td></tr>
+              <tr><td class="mono">token_hash</td><td class="type">ข้อความ (text, hash แล้ว)</td><td>เก็บ hash ของ refresh token ไม่เก็บค่าจริงตรง ๆ (เหมือนรหัสผ่าน กันฐานข้อมูลหลุดแล้วเอาไปใช้ต่อได้)</td></tr>
+              <tr><td class="mono">device_info</td><td class="type">ข้อความ (text, ว่างได้)</td><td>อุปกรณ์/แอปที่ขอ token นี้ (เว็บ/Flutter Android)</td></tr>
+              <tr><td class="mono">issued_at</td><td class="type">วันเวลา (timestamp)</td><td>วันที่ออก token</td></tr>
+              <tr><td class="mono">expires_at</td><td class="type">วันเวลา (timestamp)</td><td>วันหมดอายุ (แนะนำ 7-30 วัน)</td></tr>
+              <tr><td class="mono">is_revoked</td><td class="type">ค่าจริง/เท็จ (boolean)</td><td>ถูกเพิกถอนแล้วหรือยัง (ตอน logout/เปลี่ยนรหัสผ่าน/ปิดบัญชี)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
         <h3>LoginAuditLog <span class="phase-tag phase-2">Phase 2</span></h3>
         <p>ประวัติการ login แต่ละครั้ง ใช้ตรวจสอบความปลอดภัยและสืบสวนกรณีมีปัญหา</p>
         <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ ApplicationUser</p>
@@ -582,14 +602,14 @@
       </article>
     </div>
 
-    <p class="note"><b>หมายเหตุ:</b> ตารางรหัสผ่าน (password hash), token รีเซ็ตรหัสผ่าน, และการ lockout หลัง login ผิดหลายครั้ง — ทั้งหมดนี้ ASP.NET Core Identity จัดการให้อัตโนมัติในตาราง AspNetUsers อยู่แล้ว ไม่ต้องออกแบบตารางเองเพิ่ม</p>
+    <p class="note"><b>หมายเหตุ:</b> ตารางรหัสผ่าน (password hash), token รีเซ็ตรหัสผ่าน, และการ lockout หลัง login ผิดหลายครั้ง — ทั้งหมดนี้ ASP.NET Core Identity จัดการให้อัตโนมัติในตาราง AspNetUsers อยู่แล้ว ไม่ต้องออกแบบตารางเองเพิ่ม ส่วน JWT access token เองไม่มีตารางเก็บ (เป็น stateless เข้ารหัสลงในตัว token เอง) มีแค่ RefreshToken ที่ต้องเก็บไว้ควบคุมการเพิกถอน</p>
   </section>
 
   <section class="block" id="api">
     <div class="block-head">
       <span class="eyebrow">API</span>
       <h2>4. API</h2>
-      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2 — ส่วน login/logout ใช้ Endpoint ที่ ASP.NET Core Identity สร้างให้อัตโนมัติได้เลย ไม่ต้องเขียนเอง</p>
+      <p class="lede">Endpoint หลักที่ต้องมีสำหรับ MVP (Phase 1) และที่ตามมาใน Phase 2 — ใช้ Identity ตรวจสอบรหัสผ่านเบื้องหลัง แต่เขียน endpoint auth เองเพื่อออก JWT แทน cookie ที่ Identity ให้มา default</p>
     </div>
     <div class="table-wrap">
       <table class="data">
@@ -597,13 +617,14 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method post">POST</td><td class="mono">/auth/login</td><td>เข้าสู่ระบบ (มาจาก Identity อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/logout</td><td>ออกจากระบบ (มาจาก Identity อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/login</td><td>ตรวจรหัสผ่านผ่าน Identity แล้วออก access token + refresh token กลับไป</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/refresh-token</td><td>ใช้ refresh token ที่ยังไม่หมดอายุ/ไม่ถูกเพิกถอน ขอ access token ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/logout</td><td>เพิกถอน (revoke) refresh token ของอุปกรณ์นี้ทันที</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/auth/forgot-password</td><td>ขอลิงก์รีเซ็ตรหัสผ่านทางอีเมล</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/reset-password</td><td>ตั้งรหัสผ่านใหม่จากลิงก์ที่ได้รับ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/reset-password</td><td>ตั้งรหัสผ่านใหม่จากลิงก์ที่ได้รับ แล้วเพิกถอน refresh token เดิมทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/users</td><td>ดึงรายชื่อผู้ใช้ทั้งหมด (เฉพาะเจ้าของ/ผู้บริหาร)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/users</td><td>สร้างบัญชีผู้ใช้ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/users/{id}</td><td>แก้ไขข้อมูล/ปิดใช้งานบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/users/{id}</td><td>แก้ไขข้อมูล/ปิดใช้งานบัญชี — ปิดใช้งานแล้วเพิกถอน refresh token ทั้งหมดของบัญชีนั้นด้วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/users/{id}/assign-role</td><td>กำหนด/เปลี่ยน Role ของบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/users/{id}/login-history</td><td>ดูประวัติการ login ของบัญชีนี้</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
@@ -679,7 +700,23 @@
         <pre class="formula">เมื่อพนักงานลาออก:
   is_active = false (ห้ามลบ ApplicationUser ทิ้ง)
   -&gt; ห้าม login ได้อีก แต่ประวัติ/รายการที่เคยสร้างไว้ยังอ้างอิงชื่อได้ปกติ
+  -&gt; เพิกถอน RefreshToken ทุกตัวของบัญชีนี้ทันที (is_revoked = true ทุกแถว)
   -&gt; ถ้าผูกกับ employee ไว้ สถานะ employee ก็ต้องปิดคู่กัน (เรียกจากโมดูล HR)</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>อายุและการเพิกถอน JWT (Token Expiry &amp; Revocation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>Access token อายุสั้นโดยตั้งใจ เพื่อจำกัดความเสียหายถ้า token หลุด — refresh token คือตัวที่คุมการเพิกถอนจริง</p>
+        <pre class="formula">access_token: อายุ 15-60 นาที
+  ฝัง claim: user_id, role, full_name_th
+  ตรวจสอบด้วย signature เท่านั้น (ไม่ query DB ทุก request)
+
+refresh_token: อายุ 7-30 วัน
+  เก็บเป็น token_hash ใน RefreshToken table เท่านั้น (ไม่เก็บค่าจริง)
+  ทุกครั้งที่ใช้ขอ access token ใหม่ -&gt; ต้อง query DB เช็ค is_revoked/expires_at
+
+เพิกถอน refresh token ทันทีเมื่อ:
+  logout, เปลี่ยนรหัสผ่าน, ปิดใช้งานบัญชี, หรือแอดมินสั่งเพิกถอนเอง</pre>
       </article>
 
       <article class="card">
