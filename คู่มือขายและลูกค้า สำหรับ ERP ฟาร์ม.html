@@ -596,9 +596,12 @@
               <tr><td class="mono">delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่ส่งของจริง</td></tr>
               <tr><td class="mono">delivered_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนส่ง/ชั่งของ</td></tr>
               <tr><td class="mono">actual_weight</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>น้ำหนักจริงตอนชั่งส่งของ อาจต่างจากที่ประเมินไว้ตอนสั่งขาย</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมของใบส่งของนี้ คำนวณจาก final_amount ของทุกบรรทัด (ดูสูตรในหัวข้อ 6) แล้วบันทึกเป็นค่านิ่งตอนปิดใบส่งของ เพื่อให้ ar_invoice.total_amount ที่โมดูลบัญชีดึงไปใช้มีค่าคงที่ ไม่ต้องคำนวณซ้ำ</td></tr>
+              <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดชำระเงิน = delivery_date + customer.payment_terms_days คำนวณตอนปิดใบส่งของ ส่งต่อให้ ar_invoice.due_date</td></tr>
             </tbody>
           </table>
         </div>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> ปิดใบส่งของ (status ของ sales_order เปลี่ยนเป็น invoiced) จะยิง event ให้โมดูลบัญชีสร้าง ar_invoice + journal entry อัตโนมัติผ่าน <span class="mono">POST /accounting/journal-entries/from-source</span> (source_module = sales) โดยส่ง total_amount, due_date, customer_id, sales_order_ref ไปด้วย — ดู endpoint ด้านล่าง</p>
       </article>
 
       <article class="card entity-card">
@@ -660,7 +663,7 @@
           <tr><td class="method get">GET</td><td class="mono">/sales/orders/{id}</td><td>ดูรายละเอียดใบสั่งขายใบเดียว</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/confirm</td><td>ยืนยันใบสั่งขาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/cancel</td><td>ยกเลิกใบสั่งขายที่ยังไม่ส่งของ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/delivery-notes</td><td>ออกใบส่งของผูกกับใบสั่งขายนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/delivery-notes</td><td>ออกใบส่งของผูกกับใบสั่งขายนี้ — เมื่อปิดใบส่งของจะเปลี่ยน sales_order.status เป็น invoiced และยิงไปสร้าง ar_invoice ที่โมดูลบัญชีอัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/sales/delivery-notes</td><td>ดึงประวัติการส่งของทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/sales/reports/customer-sales-history</td><td>ประวัติการขาย/ราคาย้อนหลังต่อลูกค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/sales/reports/pending-deliveries</td><td>ใบสั่งขายที่ยืนยันแล้วแต่ยังไม่ส่งของ</td><td><span class="phase-tag phase-1">1</span></td></tr>

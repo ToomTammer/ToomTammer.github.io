@@ -612,6 +612,7 @@
               <tr><td class="mono">movement_date</td><td class="type">วันที่ (date)</td><td>วันที่เกิดการเคลื่อนไหวจริง</td></tr>
               <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสั่งให้เกิดรายการนี้ เลือกได้เฉพาะ: procurement, sales, livestock, crop, manual</td></tr>
               <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบส่งของที่ทำให้ตัดสต็อก</td></tr>
+              <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center, ว่างได้)</td><td>ศูนย์ต้นทุนที่รับ/เสียของนี้ไป ค่าเริ่มต้น default มาจาก stock_lot.warehouse_id → warehouse.cost_center_id แต่ override ได้ตอนเบิกใช้จริง เช่น เบิกอาหารสัตว์ให้ batch ที่ไม่ตรงกับคลังตั้งต้น — ต้องมีค่านี้ก่อนโพสต์ COGS เข้าบัญชี ถ้า resolve ไม่ได้ทั้งสองทางให้ reject การตัดสต็อก</td></tr>
             </tbody>
           </table>
         </div>
@@ -678,7 +679,7 @@
           <tr><td class="method get">GET</td><td class="mono">/inventory/stock-lots</td><td>ดึงล็อตสินค้า (filter: item_id, warehouse_id, expiry_before)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/inventory/stock-levels</td><td>ยอดคงเหลือสรุปต่อสินค้า/คลัง</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/inventory/stock-movements</td><td>บันทึกเบิกจ่าย/รับเข้าแบบ manual</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-movements/from-source</td><td>Internal endpoint ให้โมดูลอื่น (ขาย/ปศุสัตว์/พืช) เรียกตัดสต็อกอัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/inventory/stock-movements/from-source</td><td>Internal endpoint ให้โมดูลอื่น (ขาย/ปศุสัตว์/พืช) เรียกตัดสต็อกอัตโนมัติ — ถ้า movement_type = issue/sale จะคำนวณ cost_of_issue ตาม FIFO (ดูสูตรหัวข้อ 6) แล้วยิงต่อไปโพสต์ journal entry ต้นทุนขาย (COGS) ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = inventory)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/inventory/reports/expiring-soon</td><td>รายงานสินค้าใกล้หมดอายุ</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/inventory/reports/below-reorder-point</td><td>รายงานสินค้าที่ต่ำกว่าจุดสั่งซื้อซ้ำ</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/inventory/reports/stock-valuation</td><td>มูลค่าสต็อกคงเหลือ ส่งให้บัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>

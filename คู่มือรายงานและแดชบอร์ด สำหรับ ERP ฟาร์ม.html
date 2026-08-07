@@ -643,8 +643,8 @@
         </thead>
         <tbody>
           <tr><td class="method get">GET</td><td class="mono">/reports/dashboard/overview</td><td>ข้อมูลแดชบอร์ดภาพรวมฟาร์ม</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/reports/profit-loss</td><td>งบกำไรขาดทุน (filter: cost_center_id, period)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/reports/cost-breakdown</td><td>ต้นทุนรวมแยกตามแหล่งที่มา (วัตถุดิบ/แรงงาน/ค่าเสื่อม) ต่อศูนย์ต้นทุน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/reports/profit-loss</td><td>งบกำไรขาดทุน (filter: cost_center_id, period) — proxy เรียก GET /accounting/reports/profit-loss ตรงๆ ไม่คำนวณซ้ำเอง เพื่อไม่ให้ตัวเลขเพี้ยนจากบัญชี (single source of truth)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/reports/cost-breakdown</td><td>ต้นทุนรวมแยกตามแหล่งที่มา (วัตถุดิบ/แรงงาน/ค่าเสื่อม) ต่อศูนย์ต้นทุน — รวมข้อมูลจาก accounting.cogs_from_journal_entry() กับ journal_entry_line อื่นๆ ของศูนย์ต้นทุนนั้น ไม่สร้างตัวเลขต้นทุนขึ้นใหม่เอง</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/reports/definitions</td><td>ดึงรายชื่อรายงานที่ผู้ใช้ปัจจุบันมีสิทธิ์ดู</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/reports/{report_code}/export</td><td>ส่งออกรายงานเป็น PDF/Excel</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/reports/dashboard-layouts</td><td>ดึงการจัดวางแดชบอร์ดของผู้ใช้/บทบาทปัจจุบัน</td><td><span class="phase-tag phase-1">1</span></td></tr>

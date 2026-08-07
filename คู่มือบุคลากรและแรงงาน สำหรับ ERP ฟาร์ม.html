@@ -535,9 +535,26 @@
 
     <div class="card-grid">
       <article class="card entity-card">
+        <h3>position <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตำแหน่งงาน — รายชื่อตำแหน่งทั้งหมดที่มีในฟาร์ม เช่น ผู้จัดการฟาร์ม หัวหน้าคนงาน คนงานทั่วไป สัตวแพทย์ประจำฟาร์ม แยกเป็นตารางต่างหากจาก employee เพราะแต่ละตำแหน่งมีข้อมูลของตัวเอง (ไม่ใช่ enum คงที่) และหลายฟาร์มมักมีชื่อตำแหน่งไม่เหมือนกัน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> เป็นต้นทางให้ employee.position_id — 1 ตำแหน่งมีได้หลายพนักงาน</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
+              <tr><td class="mono">title</td><td class="type">ข้อความ (text)</td><td>ชื่อตำแหน่ง เช่น "หัวหน้าคนงาน"</td></tr>
+              <tr><td class="mono">department</td><td class="type">ข้อความ (text, ว่างได้)</td><td>ฝ่าย/แผนกที่ตำแหน่งนี้อยู่ เช่น "ฝ่ายผลิต" ปล่อยว่างได้ถ้าฟาร์มเล็กไม่แบ่งแผนก</td></tr>
+              <tr><td class="mono">is_active</td><td class="type">จริง/เท็จ (boolean)</td><td>ยังเปิดรับ/ใช้ตำแหน่งนี้อยู่ไหม ปิดแล้วพนักงานเก่าที่อยู่ตำแหน่งนี้ไม่หายไป แค่เลือกใช้กับคนใหม่ไม่ได้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card entity-card">
         <h3>employee <span class="phase-tag phase-1">Phase 1</span></h3>
         <p>พนักงาน — ทะเบียนคนทำงานทุกคนของฟาร์ม ทั้งพนักงานประจำและแรงงานรายวัน/ตามฤดูกาล</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ attendance, piece_work_record, leave_request และ payroll_run_line</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับ attendance, piece_work_record, leave_request และ payroll_run_line, ผูกกับ position</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
@@ -545,6 +562,7 @@
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">employee_code</td><td class="type">ข้อความ (text)</td><td>รหัสพนักงานที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อ-นามสกุลพนักงาน</td></tr>
+              <tr><td class="mono">position_id</td><td class="type">เลขอ้างอิง (FK → position)</td><td>ตำแหน่งงานปัจจุบันของพนักงานคนนี้</td></tr>
               <tr><td class="mono">employment_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทการจ้าง เลือกได้เฉพาะ: permanent, daily, seasonal</td></tr>
               <tr><td class="mono">wage_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีคิดค่าแรง เลือกได้เฉพาะ: monthly, daily_rate, piece_rate</td></tr>
               <tr><td class="mono">base_wage</td><td class="type">ตัวเลข (decimal)</td><td>อัตราค่าจ้างพื้นฐาน หน่วยขึ้นกับ wage_type (ต่อเดือน/ต่อวัน/ต่อหน่วยผลงาน)</td></tr>
@@ -629,6 +647,7 @@
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) payroll_run_id</td><td class="type">เลขอ้างอิง (FK → payroll_run)</td><td>บรรทัดนี้เป็นของรอบเงินเดือนไหน</td></tr>
               <tr><td class="mono">(line) employee_id</td><td class="type">เลขอ้างอิง (FK → employee)</td><td>เงินเดือนงวดนี้ของใคร</td></tr>
+              <tr><td class="mono">(line) cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนที่ปันค่าแรงนี้ไป — snapshot จาก employee.default_cost_center_id ตอนคำนวณ payroll (ถ้าพนักงานทำงานหลายพื้นที่ในงวดเดียว ให้ใช้พื้นที่ที่ทำงานมากที่สุดในงวดนั้นแทน ยังไม่รองรับการแบ่งสัดส่วนต่อคนใน Phase 1)</td></tr>
               <tr><td class="mono">(line) gross_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้รวมก่อนหัก (ฐานค่าจ้าง + OT + piece rate)</td></tr>
               <tr><td class="mono">(line) social_security_deduction / tax_deduction</td><td class="type">ตัวเลข (decimal)</td><td>ยอดหักประกันสังคมและภาษี ณ ที่จ่าย</td></tr>
               <tr><td class="mono">(line) net_pay</td><td class="type">ตัวเลข (decimal)</td><td>เงินได้สุทธิที่จ่ายจริงให้พนักงาน</td></tr>
@@ -651,7 +670,9 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/positions</td><td>ดึงรายชื่อตำแหน่งงานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/positions</td><td>สร้างตำแหน่งงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด (filter: position_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/employees</td><td>สร้างพนักงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/hr/employees/{id}</td><td>แก้ไข/ปิดใช้งานพนักงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -763,6 +784,15 @@ unpaid_leave_deduction =
         <pre class="formula">social_security_deduction =
   MIN(gross_pay, ceiling_wage) &#215; ss_rate</pre>
         <p class="formula-example"><b>หมายเหตุ:</b> ceiling_wage และ ss_rate เปลี่ยนแปลงได้ตามประกาศสำนักงานประกันสังคม ต้องตั้งเป็นค่าปรับได้ในระบบ ไม่ hardcode และควรตรวจสอบอัตราปัจจุบันกับฝ่ายบุคคล/สำนักงานบัญชีก่อนใช้งานจริง</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>หักภาษี ณ ที่จ่าย (Withholding Tax Deduction)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>คำนวณตามอัตราภาษีเงินได้บุคคลธรรมดาแบบขั้นบันได (progressive) จากเงินได้สุทธิทั้งปีเทียบเป็นรายงวด แล้วยอดสะสมทั้งปีต้องยื่นแบบ ภ.ง.ด.1 (หัก ณ ที่จ่ายเงินเดือน) ที่โมดูลบัญชีทุกเดือน</p>
+        <pre class="formula">annualized_income = gross_pay &#215; pay_periods_per_year
+tax_annual = progressive_tax_table(annualized_income - deductions)
+tax_deduction = tax_annual / pay_periods_per_year</pre>
+        <p class="formula-example"><b>หมายเหตุ:</b> ตารางอัตราภาษีขั้นบันไดและค่าลดหย่อนเปลี่ยนแปลงได้ตามประกาศกรมสรรพากร ต้องตั้งเป็นค่าปรับได้ในระบบ ไม่ hardcode และควรให้สำนักงานบัญชียืนยันก่อนใช้งานจริง — ยอด tax_deduction สะสมของทุกคนในรอบต้องส่งไปสร้าง tax_document (doc_type = ภ.ง.ด.1, period = งวดนี้) ที่โมดูลบัญชีตอน post payroll_run เดียวกับที่โพสต์ journal entry ค่าแรง</p>
       </article>
 
       <article class="card">

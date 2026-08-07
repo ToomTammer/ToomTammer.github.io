@@ -590,6 +590,7 @@
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>สั่งซื้อจากผู้ขายรายไหน</td></tr>
               <tr><td class="mono">pr_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบขอซื้อต้นทาง ถ้ามาจาก PR</td></tr>
               <tr><td class="mono">order_date / expected_delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่สั่งซื้อ และวันที่คาดว่าจะได้รับของ</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมของ PO = SUM(po_line.line_total) (ดูสูตรหัวข้อ 6) — คำนวณแล้วบันทึกเป็นค่านิ่งตอน approve เพื่อให้โมดูลบัญชีดึงไปสร้าง ap_invoice.total_amount ได้โดยไม่ต้องคำนวณซ้ำ</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: draft, pending_approval, approved, partially_received, received, closed, cancelled</td></tr>
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>บรรทัดนี้เป็นของใบสั่งซื้อไหน</td></tr>
@@ -614,6 +615,7 @@
               <tr><td class="mono">purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>รับสินค้าตาม PO ใบไหน</td></tr>
               <tr><td class="mono">received_date</td><td class="type">วันที่ (date)</td><td>วันที่รับสินค้าจริง</td></tr>
               <tr><td class="mono">received_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจรับ</td></tr>
+              <tr><td class="mono">vendor_invoice_no / vendor_invoice_date</td><td class="type">ข้อความ/วันที่ (ว่างได้)</td><td>เลขที่และวันที่ใบกำกับภาษีซื้อจากผู้ขาย ถ้ามาพร้อมของ — ใช้เป็น ap_invoice.invoice_no ตอนสร้างอัตโนมัติ ถ้ายังไม่มี (ใบกำกับมาทีหลัง) ให้สร้าง ap_invoice เป็น draft ก่อนแล้วอัปเดตทีหลัง</td></tr>
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) goods_receipt_id</td><td class="type">เลขอ้างอิง (FK → goods_receipt)</td><td>บรรทัดนี้เป็นของใบรับสินค้าไหน</td></tr>
               <tr><td class="mono">(line) po_line_id</td><td class="type">เลขอ้างอิง (FK → purchase_order_line)</td><td>รับสินค้าบรรทัดไหนของ PO</td></tr>
@@ -682,7 +684,7 @@
           <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders/{id}</td><td>ดูรายละเอียด PO ใบเดียว</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/approve</td><td>อนุมัติ PO</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/cancel</td><td>ยกเลิก PO ที่ยังไม่ได้รับสินค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้ — ถ้า received_ratio ครบ (status = received) จะยิงไปสร้าง ap_invoice + journal entry ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = procurement)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/goods-receipts</td><td>ดึงประวัติการรับสินค้าทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/reports/pending-deliveries</td><td>รายงาน PO ที่ยังไม่ได้รับสินค้าหรือเลยกำหนดส่งมอบ</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/requisitions</td><td>ดึงใบขอซื้อทั้งหมด</td><td><span class="phase-tag phase-2">2</span></td></tr>

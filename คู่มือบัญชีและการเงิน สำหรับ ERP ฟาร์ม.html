@@ -576,10 +576,30 @@
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อเต็มที่คนอ่านเข้าใจ เช่น "โรงเรือนไก่ไข่ เบอร์ 2"</td></tr>
               <tr><td class="mono">type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ระดับของศูนย์ต้นทุนนี้ เลือกได้เฉพาะ: farm, plot, house, batch</td></tr>
               <tr><td class="mono">parent_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนแม่ เช่น โรงเรือนนี้อยู่ใต้ฟาร์มไหน</td></tr>
-              <tr><td class="mono">ref_batch_id</td><td class="type">เลขอ้างอิง (FK → โมดูลปศุสัตว์/พืช)</td><td>ถ้า type = batch ให้ชี้ไปยังรุ่นเลี้ยง/รอบปลูกจริง ปล่อยว่างได้ถ้าไม่ใช่ระดับ batch</td></tr>
+              <tr><td class="mono">ref_batch_id</td><td class="type">เลขอ้างอิง (FK → โมดูลปศุสัตว์/พืช)</td><td>ถ้า type = batch ให้ชี้ไปยังรุ่นเลี้ยง/รอบปลูกจริง ปล่อยว่างได้ถ้าไม่ใช่ระดับ batch — เป็น FK แบบ polymorphic เพราะฟาร์มปศุสัตว์กับพืชมีเอนทิตีต้นทางคนละตัวกัน: ฟาร์มปศุสัตว์ชี้ไปที่ animal_group (โมดูลทะเบียนสัตว์), ฟาร์มพืชชี้ไปที่ planting_plan (โมดูลแผนการเพาะปลูก) — ดู ref_batch_type ด้านล่างเพื่อรู้ว่าจะ join กับตารางไหน</td></tr>
+              <tr><td class="mono">ref_batch_type</td><td class="type">ตัวเลือกคงที่ (enum, ว่างได้)</td><td>บอกว่า ref_batch_id ชี้ไปยังตารางไหน เลือกได้เฉพาะ: animal_group, planting_plan — ต้องมีค่าคู่กับ ref_batch_id เสมอถ้า type = batch</td></tr>
             </tbody>
           </table>
         </div>
+      </article>
+
+      <article class="card entity-card">
+        <h3>accounting_period <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>งวดบัญชี — ตัวแทนของ 1 เดือนบัญชี ใช้เก็บสถานะว่างวดนั้นปิดแล้วหรือยัง เพื่อล็อกไม่ให้มีการสร้าง/แก้ไข journal_entry ย้อนเข้าไปในงวดที่ปิดแล้ว</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ไม่มี FK เข้า/ออกตรง ๆ แต่ระบบต้องเช็ค entry_date ของ journal_entry เทียบกับงวดนี้ก่อนบันทึกทุกครั้ง</p>
+        <div class="field-table-wrap">
+          <table class="data">
+            <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
+              <tr><td class="mono">period</td><td class="type">ข้อความ (text)</td><td>งวดบัญชี รูปแบบ "YYYY-MM" เช่น "2026-08" ต้องไม่ซ้ำกัน</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะงวด เลือกได้เฉพาะ: open, closed</td></tr>
+              <tr><td class="mono">closed_at</td><td class="type">วันที่-เวลา (timestamp, ว่างได้)</td><td>วันเวลาที่ปิดงวด ปล่อยว่างถ้ายัง open</td></tr>
+              <tr><td class="mono">closed_by</td><td class="type">เลขอ้างอิง (FK → ผู้ใช้, ว่างได้)</td><td>ใครเป็นคนกดปิดงวด</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> ห้ามสร้างหรือแก้ไข journal_entry ที่ entry_date ตกอยู่ในงวดที่ status = closed — enforce ที่ระดับ API/database เท่านั้น</p>
       </article>
 
       <article class="card entity-card">
@@ -593,8 +613,9 @@
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">entry_no</td><td class="type">ข้อความ (text)</td><td>เลขที่เอกสารอ้างอิง สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">entry_date</td><td class="type">วันที่ (date)</td><td>วันที่ทำรายการ</td></tr>
-              <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสร้างรายการนี้ เลือกได้เฉพาะ: manual, sales, procurement, inventory, hr, asset</td></tr>
+              <tr><td class="mono">source_module</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ใครสร้างรายการนี้ เลือกได้เฉพาะ: manual, sales, procurement, inventory, hr, asset, biological_asset</td></tr>
               <tr><td class="mono">source_ref_id</td><td class="type">ข้อความ (text)</td><td>เลขอ้างอิงเอกสารต้นทาง เช่น เลขที่ใบขายที่ทำให้เกิดรายการนี้</td></tr>
+              <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะใบบันทึกรายการ เลือกได้เฉพาะ: draft, posted, reversed — draft แก้ไข/ลบได้ตามปกติ, posted ห้ามแก้ไข/ลบตรง ๆ (ดูหมายเหตุด้านล่าง), reversed คือใบที่ถูกกลับรายการแล้ว</td></tr>
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) journal_entry_id</td><td class="type">เลขอ้างอิง (FK → journal_entry)</td><td>บรรทัดนี้เป็นของใบบันทึกรายการไหน</td></tr>
               <tr><td class="mono">(line) account_id</td><td class="type">เลขอ้างอิง (FK → chart_of_accounts)</td><td>บรรทัดนี้ลงบัญชีไหน</td></tr>
@@ -676,7 +697,7 @@
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
             <tbody>
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
-              <tr><td class="mono">doc_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทแบบภาษี เลือกได้เฉพาะ: ภ.ง.ด., ภ.พ.30</td></tr>
+              <tr><td class="mono">doc_type</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทแบบภาษี เลือกได้เฉพาะ: ภ.ง.ด.1 (หัก ณ ที่จ่ายเงินเดือน), ภ.ง.ด.3 (หัก ณ ที่จ่ายบุคคลธรรมดา), ภ.ง.ด.53 (หัก ณ ที่จ่ายนิติบุคคล), ภ.พ.30 (ภาษีมูลค่าเพิ่ม)</td></tr>
               <tr><td class="mono">period</td><td class="type">วันที่/ข้อความ</td><td>งวดภาษีที่เอกสารนี้เกี่ยวข้อง เช่น เดือน-ปี</td></tr>
               <tr><td class="mono">related_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice/ap_invoice)</td><td>ใบแจ้งหนี้ที่เอกสารภาษีนี้อ้างอิงถึง</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะการยื่น เช่น ร่าง/ยื่นแล้ว</td></tr>
@@ -695,7 +716,7 @@
             <tbody>
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">valuation_date</td><td class="type">วันที่ (date)</td><td>วันที่ประเมินมูลค่า</td></tr>
-              <tr><td class="mono">weight_or_age</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักหรืออายุ ณ วันประเมิน รับมาจากโมดูลปศุสัตว์/พืช</td></tr>
+              <tr><td class="mono">weight_or_age</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักเฉลี่ยต่อตัว ณ วันประเมิน ของ animal_group นั้น — ดึงจาก weight_record ล่าสุด (MAX(weigh_date)) ของโมดูลการเจริญเติบโตและผลผลิต ไม่ใช่ค่านิ่งที่มีให้ใช้ตรงๆ ต้อง query หาค่าล่าสุดเอง</td></tr>
               <tr><td class="mono">market_price_ref</td><td class="type">ตัวเลข (decimal)</td><td>ราคาตลาดอ้างอิง ณ วันประเมิน</td></tr>
               <tr><td class="mono">fair_value</td><td class="type">ตัวเลข (decimal)</td><td>มูลค่ายุติธรรมที่คำนวณได้จากน้ำหนัก/อายุ × ราคาตลาด</td></tr>
               <tr><td class="mono">cost_to_sell</td><td class="type">ตัวเลข (decimal)</td><td>ต้นทุนที่คาดว่าจะเกิดขึ้นตอนขายจริง เช่น ค่าขนส่ง ค่านายหน้า</td></tr>
@@ -703,6 +724,7 @@
             </tbody>
           </table>
         </div>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> เอนทิตีนี้ออกแบบมาสำหรับปศุสัตว์เป็นหลัก (weight_or_age = น้ำหนักเฉลี่ยต่อตัวจาก animal_group) — ฟาร์มพืชไม่มีค่า "น้ำหนัก/อายุปัจจุบัน" ที่อัปเดตต่อเนื่องแบบเดียวกัน มีแค่ yield_estimate.estimated_yield ที่เป็นตัวเลขประมาณผลผลิตทั้งรอบ ถ้าต้องประเมินมูลค่าพืชที่ยังไม่เก็บเกี่ยว (standing crop) ต้องออกแบบสูตรแยกจาก fair_value ด้านล่าง ไม่ใช้ weight_or_age ตรงๆ</p>
       </article>
 
       <article class="card entity-card">
@@ -752,6 +774,8 @@
           <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices</td><td>บันทึกใบแจ้งหนี้เจ้าหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices/{id}/payments</td><td>บันทึกจ่ายชำระ</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/profit-loss</td><td>งบกำไรขาดทุน (filter: cost_center_id, period)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/trial-balance</td><td>งบทดลอง — ยอดคงเหลือทุกบัญชี ณ วันที่ (filter: as_of_date)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/reports/balance-sheet</td><td>งบแสดงฐานะการเงิน (filter: cost_center_id, as_of_date)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/ar-aging</td><td>รายงานอายุลูกหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/ap-aging</td><td>รายงานอายุเจ้าหนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/periods/{period}/close</td><td>ปิดงวดบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -833,6 +857,21 @@
         <pre class="formula">validate: SUM(line.debit) == SUM(line.credit)
           WHERE line.journal_entry_id = X
 -&gt; ถ้าไม่เท่ากัน reject การบันทึก</pre>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ยอดคงเหลือบัญชี (Account Balance)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>ยอดคงเหลือของบัญชีไม่ได้เก็บเป็นฟิลด์ตรง ๆ ในฐานข้อมูล แต่คำนวณจาก journal_entry_line ทุกครั้งที่ต้องใช้ (ป้องกันปัญหา balance ไม่ sync กับรายการจริง) — นับเฉพาะ journal_entry ที่ status = posted เท่านั้น</p>
+        <pre class="formula">raw_balance(account_id) = SUM(line.debit) - SUM(line.credit)
+    WHERE line.account_id = account_id
+      AND line.journal_entry.status = 'posted'
+
+balance(account_id) =
+    ถ้า account_type อยู่ในกลุ่ม "Debit ทำให้ยอดเพิ่ม" (asset, biological_asset, expense)
+        -&gt; raw_balance(account_id)
+    ถ้า account_type อยู่ในกลุ่ม "Credit ทำให้ยอดเพิ่ม" (liability, equity, revenue)
+        -&gt; raw_balance(account_id) &#215; -1</pre>
+        <p class="formula-example"><b>ใช้ต่อ:</b> งบทดลอง (trial balance) และงบแสดงฐานะการเงิน (balance sheet) คือการเรียก balance() นี้วนทุกบัญชีใน chart_of_accounts ตามช่วงวันที่ที่ต้องการ ส่วน opening_cash ในสูตรพยากรณ์กระแสเงินสดด้านล่างก็คือ balance() ของบัญชีกลุ่ม "เงินสด/เงินฝากธนาคาร" ณ วันที่เริ่มพยากรณ์</p>
       </article>
 
       <article class="card">
