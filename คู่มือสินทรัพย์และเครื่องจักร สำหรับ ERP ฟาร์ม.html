@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -775,6 +776,116 @@ ratio &gt; threshold (เช่น 50%)
   SUM(booked_hours ในช่วง period)
   / total_available_hours_in_period</pre>
         <p class="formula-example"><b>ตัวอย่าง:</b> รถไถถูกจองใช้งานรวม 120 ชั่วโมงในเดือนที่มีชั่วโมงทำงานได้ทั้งหมด 200 ชั่วโมง = utilization 60%</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดสินทรัพย์ (Asset Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกดูภาพรวมสินทรัพย์ทั้งฟาร์มและสิ่งที่ต้องรีบทำ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวน asset แยกตาม status (active/under_maintenance/disposed)</span></li>
+          <li class="func-item"><span class="txt">การ์ดสรุปค่าเสื่อมราคารวมของงวดล่าสุด (SUM depreciation_entry.depreciation_amount)</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือน PM ใกล้ถึงกำหนด ดึงจาก GET /assets/maintenance-schedules/due-soon พร้อมลิงก์ไปบันทึกซ่อม</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง category และ default_cost_center_id ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนสินทรัพย์ (Asset Registry) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการสินทรัพย์/เครื่องจักรทั้งหมดของฟาร์ม พร้อมค้นหาและเพิ่มรายการใหม่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: asset_code, name, category, status, default_cost_center_id, purchase_date, purchase_cost</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: category, status, default_cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มสินทรัพย์ใหม่" เปิดฟอร์มคีย์ purchase_date, purchase_cost, useful_life_years, salvage_value (POST /assets)</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวเข้าหน้ารายละเอียดสินทรัพย์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดสินทรัพย์ (Asset Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ข้อมูลเชิงลึกของสินทรัพย์ 1 ตัว รวมประวัติซ่อมบำรุงและค่าเสื่อม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แท็บภาพรวม: purchase_cost, useful_life_years, salvage_value, book_value ล่าสุด, status</span></li>
+          <li class="func-item"><span class="txt">แท็บประวัติซ่อมบำรุง (GET /assets/{id}/maintenance-history): maintenance_date, maintenance_type, description, cost, performed_by</span></li>
+          <li class="func-item"><span class="txt">แท็บประวัติค่าเสื่อม: รายการ depreciation_entry ต่อ period พร้อม accumulated_depreciation, book_value</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "จำหน่ายสินทรัพย์" (POST /assets/{id}/dispose) เปลี่ยน status เป็น disposed</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แผนซ่อมบำรุงเชิงป้องกัน (Maintenance Schedules) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรอบซ่อมบำรุงล่วงหน้าของสินทรัพย์แต่ละตัว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: asset, interval_type, interval_value, last_done_date/last_done_usage_hours, next_due_date/next_due_usage_hours</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: asset, interval_type (time_based/usage_based)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างแผนใหม่" ฟอร์มเลือก asset_id, interval_type, interval_value (POST /assets/maintenance-schedules)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการใกล้ถึงกำหนด PM (Maintenance Due Soon) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการแผน PM ที่ใกล้หรือเลยกำหนดแล้ว สำหรับติดตามเชิงรุก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการดึงจาก GET /assets/maintenance-schedules/due-soon เรียงตาม next_due_date/next_due_usage_hours ใกล้สุดก่อน</span></li>
+          <li class="func-item"><span class="txt">ป้ายเตือนสีตามความเร่งด่วน (ใกล้ครบกำหนด/เลยกำหนดแล้ว)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการซ่อม" ต่อแถว เปิดฟอร์มบันทึกซ่อมพร้อม prefill asset_id และ maintenance_schedule_id</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการซ่อมบำรุง (Record Maintenance) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ฟอร์มบันทึกงานซ่อมบำรุงที่ทำจริง ทั้งตามแผนและซ่อมฉุกเฉิน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: asset_id, maintenance_schedule_id (ว่างได้ถ้าเป็น corrective), maintenance_type, maintenance_date, description, cost, performed_by</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึก" (POST /assets/maintenance-logs) อัปเดต last_done_date/last_done_usage_hours ของแผนที่ผูกไว้อัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานต้นทุนซ่อมบำรุง (Maintenance Cost Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปค่าใช้จ่ายซ่อมบำรุงสะสมแยกตามสินทรัพย์ สำหรับติดตามงบและวางแผน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางสรุปต้นทุนซ่อมสะสมแยกตามสินทรัพย์ (GET /assets/reports/maintenance-cost-by-asset)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, default_cost_center_id</span></li>
+          <li class="func-item"><span class="txt">กราฟแท่งเทียบต้นทุนซ่อมต่อสินทรัพย์ 10 อันดับสูงสุด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รันค่าเสื่อมราคาประจำงวด (Depreciation Run) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คำนวณและตรวจสอบค่าเสื่อมราคาก่อนส่งเข้าบัญชี</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่ม "รันค่าเสื่อมราคาประจำงวด" (POST /assets/depreciation-runs) คำนวณตามสูตร straight-line ให้ทุก asset ที่ status = active</span></li>
+          <li class="func-item"><span class="txt">ตารางผลลัพธ์: asset, period, depreciation_amount, accumulated_depreciation, book_value, cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ส่งเข้าบัญชี" (POST /assets/depreciation-entries/post) ยิง journal entry ไปโมดูลบัญชีพร้อม depreciation_amount และ cost_center_id</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตารางจองใช้เครื่องจักรร่วม (Equipment Booking Calendar) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>จองคิวใช้เครื่องจักรที่ต้องหมุนเวียนใช้หลายพื้นที่ ป้องกันการจองซ้อนเวลา</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">มุมมองปฏิทิน/ตารางแสดง booking_date, start_time, end_time ของแต่ละ asset แยกสีตาม status (requested/confirmed/in_use/completed/cancelled)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: asset_id, cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "จองคิวใหม่" (POST /assets/equipment-bookings) เลือก asset_id, cost_center_id, booking_date/start_time/end_time พร้อมเตือนถ้าจองซ้อนเวลา</span></li>
+          <li class="func-item"><span class="txt">ปุ่มยืนยัน/ยกเลิกการจองต่อแถว เปลี่ยน status</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์ต้นทุนซ่อมเทียบมูลค่าสินทรัพย์ (Repair vs Replace Analysis) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ช่วยตัดสินใจว่าสินทรัพย์ตัวไหนควรซ่อมต่อหรือซื้อใหม่ทดแทน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเทียบ total_maintenance_cost (SUM maintenance_log.cost) กับ book_value ปัจจุบันของแต่ละ asset</span></li>
+          <li class="func-item"><span class="txt">ธงเตือนสินทรัพย์ที่ maintenance_to_value_ratio เกิน threshold (เช่น 50%) แนะนำพิจารณาซื้อใหม่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ค่าเสื่อมและวางแผนงบลงทุนทดแทน (Depreciation Forecast &amp; Capex Planning) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>มองไปข้างหน้าว่าสินทรัพย์ตัวไหนจะหมดอายุใช้งาน/ใกล้มูลค่าซากเมื่อไหร่ เพื่อวางงบลงทุนทดแทนล่วงหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้นแนวโน้ม book_value ล่วงหน้าตาม useful_life_years คงเหลือของแต่ละ asset</span></li>
+          <li class="func-item"><span class="txt">ตารางรายการสินทรัพย์ที่ book_value ใกล้ salvage_value ภายใน 12 เดือนข้างหน้า สำหรับวางแผนงบลงทุนทดแทน</span></li>
+        </ul>
       </article>
     </div>
   </section>

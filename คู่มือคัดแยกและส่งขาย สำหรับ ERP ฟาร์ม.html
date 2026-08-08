@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -732,6 +733,124 @@
   SUM( dispatch_record.total_weight &#215; price_per_kg
        ของเกรดนั้น )
   ต่อทุกเกรดของฝูงนี้</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดคัดแยกและส่งขาย (Sorting &amp; Sales Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกดูภาพรวมสถานะการคัดเกรดและส่งออกของฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนสัตว์/ฝูงพร้อมคัดเกรด, จำนวน dispatch_record เดือนนี้, มูลค่ารวมจาก total_weight × price_per_kg</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือน: สัตว์ที่รอผล dispatch-eligibility หรือยังไม่ผ่านระยะหยุดยา (safe_sale_date)</span></li>
+          <li class="func-item"><span class="txt">กราฟสรุปจำนวนที่ส่งออกแยกตาม destination_type (slaughterhouse/live_market/direct_customer)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>มาตรฐานเกรด (Grading Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตั้งและจัดการเกณฑ์ตัดสินเกรดตามน้ำหนัก/ขนาดต่อชนิดสัตว์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: species, grade, min_weight, max_weight เรียงจากเกรดสูงสุดลงมา</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม species</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มมาตรฐานเกรด" เปิดฟอร์มคีย์ species, grade, min_weight, max_weight (เรียก POST /livestock/grading-standards)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการคัดเกรด (Sorting Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกผลชั่งน้ำหนักและเกรดที่ได้จริงต่อตัว/ฝูงก่อนส่งขาย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: animal_id/animal_group_id, sorting_date, weight_at_sorting, assigned_grade, sorted_by</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ sorting_date, species, assigned_grade</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกคัดเกรดใหม่" — คีย์ animal_id/animal_group_id + weight_at_sorting แล้วระบบคำนวณ assigned_grade อัตโนมัติจาก grading_standard_livestock ให้ดูพรีวิวก่อนบันทึก (POST /livestock/sorting-records)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบสิทธิ์ส่งออก (Dispatch Eligibility Check) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตรวจระยะหยุดยาก่อนอนุญาตให้บันทึกส่งขาย/ชำแหละ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ค้นหาสัตว์/ฝูงด้วย animal_id เพื่อเรียก GET /livestock/animals/{id}/dispatch-eligibility</span></li>
+          <li class="func-item"><span class="txt">แสดงผล ผ่าน/ไม่ผ่าน พร้อม safe_sale_date ถ้ายังไม่ปลอดภัย</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ไปบันทึกส่งออก" เปิดใช้งานเฉพาะเมื่อผลตรวจสอบเป็นผ่านแล้ว</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกส่งขาย/ชำแหละ (Dispatch Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการส่งสัตว์ออกจากฟาร์มจริง อ้างอิงผลคัดเกรดที่ทำไว้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: dispatch_date, destination_type, buyer_ref, quantity, total_weight</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ dispatch_date, destination_type</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกส่งออกใหม่" — เลือก sorting_record_id ที่ยังไม่ถูก dispatch, คีย์ destination_type/buyer_ref/quantity/total_weight โดยระบบเรียกตรวจ dispatch-eligibility ก่อนอนุญาต submit และอัปเดตสถานะสัตว์เป็น sold/culled อัตโนมัติ (POST /livestock/dispatch-records)</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียด 1 รายการ แสดงมูลค่ารวมจาก total_weight × price_per_kg ของเกรดนั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานปิดรอบผลิต (Production Closeout Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตรวจสอบว่าจำนวนสัตว์ในฝูงครบถ้วน ไม่มีตัวที่หายไปโดยไม่มีที่มาที่ไป</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางต่อ animal_group: initial_quantity เทียบกับ SUM(dispatch_record.quantity) + สัตว์ที่ตาย/คัดออก + current_quantity คงเหลือ</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ผลรวมไม่เท่ากับ initial_quantity เป็น flag ให้ตรวจสอบย้อนหลัง</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามรอบผลิต/ช่วงวันที่ (เรียก GET /livestock/reports/production-closeout)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สรุปมูลค่าตามเกรดที่ส่งออก (Grade Price Summary) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูว่าการคัดเกรดทำให้มูลค่ารวมดีขึ้นจริงเทียบกับขายรวมราคาเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางแยกตาม grade: total_weight รวม, มูลค่ารวม (total_weight × price_per_kg)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ dispatch_date, species</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ข้อมูลสรุป (เรียก GET /livestock/reports/grade-price-summary)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สต็อกพร้อมขายแยกตามเกรด (Sales-Ready Stock by Grade) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าอ่านอย่างเดียวสำหรับพนักงานขายดูว่ามีสัตว์เกรดไหนพร้อมขายบ้าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ sorting_record ที่ยังไม่ถูกอ้างอิงใน dispatch_record: assigned_grade, weight_at_sorting, sorting_date</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม species/assigned_grade</span></li>
+          <li class="func-item"><span class="txt">ไม่มีปุ่มแก้ไข/บันทึก — สิทธิ์พนักงานขายอ่านอย่างเดียว</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบเสนอราคาผู้รับซื้อ (Buyer Price Quotes) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกราคาที่ผู้รับซื้อแต่ละรายเสนอสำหรับสัตว์เกรดหนึ่ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: buyer_ref, species, grade, price_per_kg, quote_date, valid_until</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: species/grade, สถานะยังไม่หมดอายุ (valid_until &gt;= วันนี้)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มใบเสนอราคา" เปิดฟอร์มคีย์ buyer_ref/species/grade/price_per_kg/quote_date/valid_until (POST /livestock/buyer-price-quotes)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบราคาผู้รับซื้อ (Buyer Price Comparison) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบราคาผู้รับซื้อหลายรายสำหรับ species/grade เดียวกัน ก่อนตัดสินใจส่งขาย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือก species + grade แล้วแสดงตาราง buyer_price_quote ทุกรายที่ valid_until &gt;= วันนี้ เรียงราคาจากสูงไปต่ำ</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ price_per_kg สูงสุด (best_buyer) ตามกฎ Best Buyer Price Selection</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ไปบันทึกส่งออก" ส่งต่อ buyer_ref ที่เลือกไปเติมในฟอร์มบันทึกส่งขาย/ชำแหละ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์สาเหตุการสูญเสีย (Loss Analysis) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>วิเคราะห์สัดส่วนสัตว์ที่ตาย/คัดออกแยกตามช่วงอายุและสาเหตุ เทียบกับที่ส่งขายได้จริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟสัดส่วน: ส่งขายสำเร็จ (dispatch_record) เทียบสัตว์ที่ตาย/คัดออกจากทะเบียนสัตว์ ต่อ animal_group.initial_quantity</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามช่วงอายุ/รอบผลิต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ปริมาณพร้อมขาย (Sales-Ready Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>คาดการณ์ล่วงหน้าว่าจะมีสัตว์/ฝูงพร้อมคัดแยกส่งขายเมื่อไหร่ จากแนวโน้มการเติบโต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้นแนวโน้มน้ำหนักจากโมดูลการเจริญเติบโตและผลผลิต เทียบกับ min_weight ของแต่ละเกรด</span></li>
+          <li class="func-item"><span class="txt">ตารางประมาณวันที่คาดว่าจะถึงเกณฑ์เกรดที่ต้องการต่อฝูง</span></li>
+        </ul>
       </article>
     </div>
   </section>

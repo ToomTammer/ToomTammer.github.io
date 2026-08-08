@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -783,6 +784,129 @@ grade_multiplier ตัวอย่าง:
 
 final_unit_price = unit_price &#215; (1 - discount_pct)</pre>
         <p class="formula-example"><b>หมายเหตุ:</b> tier_threshold และ discount_pct ควรตั้งเป็นค่าปรับได้ต่อสินค้า ไม่ hardcode</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดขาย (Sales Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่พนักงานขาย/เจ้าของฟาร์มเปิดดูภาพรวมคำสั่งขายประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนใบสั่งขายตามสถานะ (draft/confirmed) และจำนวนใบที่รอส่งของ (pending-deliveries)</span></li>
+          <li class="func-item"><span class="txt">ตารางใบสั่งขายล่าสุด: so_no, customer, order_date, status</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลัด "สร้างใบสั่งขายใหม่" และ "ออกใบส่งของ"</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่ order_date ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฐานข้อมูลลูกค้า (Customer Management) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรายชื่อลูกค้าและเงื่อนไขการค้าขายทั้งหมด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: customer_code, name, customer_type, contact_phone, credit_limit, payment_terms_days, is_active (badge)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: customer_type, is_active</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไข: customer_code, name, customer_type (middleman/modern_trade/exporter/processor/other), contact_phone, contact_address, credit_limit, payment_terms_days</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ปิดใช้งาน" (is_active) พร้อมยืนยันก่อนกด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการใบสั่งขาย (Sales Order List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและติดตามใบสั่งขายทั้งหมดตามสถานะ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: so_no, customer, order_date, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: status, customer_id, ช่วงวันที่ order_date (date_from/date_to)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างใบสั่งขายใหม่" และคลิกแถวเพื่อเปิดหน้ารายละเอียด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สร้าง/แก้ไขใบสั่งขาย (Sales Order Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คีย์ใบสั่งขายใหม่พร้อมรายการสินค้าและคัดเกรด/ตั้งราคา</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือกลูกค้า (customer_id) และวันที่สั่งขาย (order_date)</span></li>
+          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (sales_order_line): item_id, grade, weight, moisture, quantity, unit_price พร้อม line_total คำนวณอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มบรรทัดสินค้า" / ลบบรรทัด</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกร่าง" และ "ยืนยันใบสั่งขาย" (confirm)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดใบสั่งขาย (Sales Order Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลเต็มของใบสั่งขาย 1 ใบ พร้อมสถานะและการดำเนินการต่อ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ข้อมูลหัวใบ: so_no, customer, order_date, status พร้อม timeline draft → confirmed → delivered → invoiced</span></li>
+          <li class="func-item"><span class="txt">ตารางรายการสินค้าทั้งหมด (grade, weight, moisture, quantity, unit_price, line_total)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ออกใบส่งของ" เมื่อ status = confirmed</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยกเลิกใบสั่งขาย" เมื่อยังไม่ส่งของ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ออกใบส่งของ/ชั่งน้ำหนักจริง (Delivery Note Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการส่งของจริงพร้อมน้ำหนักจริง และคำนวณยอดที่ต้องเรียกเก็บ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดงใบสั่งขายที่ผูกอยู่ (sales_order_id), delivery_date, delivered_by</span></li>
+          <li class="func-item"><span class="txt">ช่องกรอก actual_weight พร้อมเทียบกับ weight ที่ประมาณการไว้ (variance_qty)</span></li>
+          <li class="func-item"><span class="txt">แสดง total_amount ที่คำนวณจาก final_amount ทุกบรรทัด และ due_date = delivery_date + customer.payment_terms_days</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ปิดใบส่งของ" — เปลี่ยน sales_order.status เป็น invoiced และยิงสร้าง ar_invoice ที่โมดูลบัญชี</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติใบส่งของ (Delivery Notes History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูใบส่งของทั้งหมดที่ออกไปแล้ว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: dn_no, sales_order (so_no/customer), delivery_date, delivered_by, actual_weight, total_amount, due_date</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ delivery_date, customer</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อดูรายละเอียดใบส่งของและลิงก์กลับใบสั่งขายต้นทาง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบสั่งขายที่รอส่งของ (Pending Deliveries) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูใบสั่งขายที่ยืนยันแล้วแต่ยังไม่ได้ส่งของ ป้องกันตกหล่น</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: so_no, customer, order_date, จำนวนวันที่รอส่ง</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง customer_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ออกใบส่งของ" เปิดจากแถวไปหน้า Delivery Note Form ตรง ๆ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการขาย/ราคาต่อลูกค้า (Customer Sales History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูราคาขายและปริมาณย้อนหลังต่อลูกค้าก่อนต่อรองราคาครั้งใหม่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือกลูกค้า (customer_id) แล้วดึงรายการจาก /sales/reports/customer-sales-history</span></li>
+          <li class="func-item"><span class="txt">ตารางรายการ: order_date, item, grade, quantity, unit_price, line_total</span></li>
+          <li class="func-item"><span class="txt">กราฟแนวโน้มราคาต่อหน่วยตามวันที่ แยกสีตามเกรด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบวงเงินเครดิต (Credit Limit Check) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูสถานะวงเงินเครดิตคงเหลือของลูกค้าก่อนอนุมัติคำสั่งขายใหม่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: customer, credit_limit, outstanding_balance, ยอดคงเหลือที่ซื้อได้</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ outstanding_balance เกิน credit_limit</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลิงก์ไปหน้าลูกค้าเพื่อปรับ credit_limit</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติราคาขาย (Price History) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบราคาขายย้อนหลังต่อลูกค้า/สินค้า/เกรด ใช้ช่วยตั้งราคาครั้งใหม่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตัวกรอง customer_id, item_id</span></li>
+          <li class="func-item"><span class="txt">ตารางรายการ: grade, price, effective_date</span></li>
+          <li class="func-item"><span class="txt">แสดงราคาตลาดอ้างอิง (market_price_ref) เทียบราคาที่ขายจริงแบบ side-by-side</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>การจองผลผลิตล่วงหน้า (Forward Sales) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกและติดตามการจองซื้อผลผลิตล่วงหน้าก่อนเก็บเกี่ยว/จับขายจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ forward_sale: customer, cost_center (batch), agreed_price, estimated_quantity, deposit_amount</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างใหม่: เลือก customer_id, cost_center_id, agreed_price, estimated_quantity, deposit_amount</span></li>
+          <li class="func-item"><span class="txt">แสดงยอดคงเหลือที่ต้องเรียกเก็บตอนส่งของจริง (remaining_balance = agreed_price × actual_delivered_quantity - deposit_amount)</span></li>
+        </ul>
       </article>
     </div>
   </section>

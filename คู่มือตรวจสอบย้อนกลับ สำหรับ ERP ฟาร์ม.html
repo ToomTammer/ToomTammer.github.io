@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -737,6 +738,105 @@ sales_order/delivery_note อ้างอิง stock_lot นี้
 
 ถ้าไม่ครบ -&gt; flag เตือนว่าข้อมูลย้อนกลับไม่สมบูรณ์
   ก่อนอนุมัติขายเข้าโมเดิร์นเทรด/ส่งออก</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>รายการรหัสติดตาม (Trace Code List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกของโมดูล ใช้ค้นหารหัสติดตามที่มีอยู่ทั้งหมด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: trace_code, stock_lot_ref, generated_date, สถานะมีรูป QR แล้วหรือยัง</span></li>
+          <li class="func-item"><span class="txt">ช่องค้นหาด้วย trace_code หรือ stock_lot_ref</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ดูรายละเอียด" เปิดหน้ารายละเอียดรหัสติดตาม ต่อแถว</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดรหัสติดตามและฉลาก QR (Trace Code Detail &amp; QR Label) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลของรหัสติดตามหนึ่งรายการ พร้อมพิมพ์/ดาวน์โหลดฉลาก QR</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ส่วนหัว: trace_code, stock_lot_ref, generated_date</span></li>
+          <li class="func-item"><span class="txt">รูป QR จาก qr_image_ref พร้อมปุ่ม "พิมพ์ฉลาก" และ "ดาวน์โหลดรูป"</span></li>
+          <li class="func-item"><span class="txt">แท็บสลับไปหน้าประวัติย้อนกลับ (backward) และไปข้างหน้า (forward)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติย้อนกลับ (Backward Trace Timeline) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ไล่ trace_link ย้อนไปหาต้นทางและปัจจัยการผลิตที่ใช้กับ lot นี้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">Timeline ของ trace_link ที่ link_type = origin/input เรียงตามเวลา</span></li>
+          <li class="func-item"><span class="txt">แต่ละจุดแสดง source_module (crop/livestock/procurement/sales), source_entity, source_ref_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ตรวจสอบความสมบูรณ์" ลิงก์ไปหน้าตรวจสอบความสมบูรณ์ของห่วงโซ่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติไปข้างหน้า (Forward Trace / Customer Impact) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูว่า lot นี้ถูกขายไปให้ลูกค้ารายไหนบ้าง ใช้ประเมินผลกระทบก่อนเรียกคืน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง trace_link ที่ link_type = destination พร้อม sales_order/delivery_note และชื่อลูกค้า</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่ขาย</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เริ่มเรียกคืนสินค้าจาก lot นี้" (เฉพาะเจ้าของ/ผู้บริหาร) เปิดฟอร์มสร้าง recall_event</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบความสมบูรณ์ของห่วงโซ่ (Trace Chain Completeness) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เช็คว่ารหัสติดตามหนึ่งมีข้อมูลย้อนกลับครบก่อนอนุมัติขายเข้าโมเดิร์นเทรด/ส่งออก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">badge สถานะ is_trace_complete: ครบ/ไม่ครบ ต่อ trace_code</span></li>
+          <li class="func-item"><span class="txt">รายการสิ่งที่ขาด เช่น ไม่มี trace_link (origin), ไม่มี planting_plan/animal_group link</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติขายส่งออก" ถูก disable อัตโนมัติถ้าไม่ครบ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการเหตุการณ์เรียกคืนสินค้า (Recall Events List) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ภาพรวมกรณีเรียกคืนสินค้าทั้งหมด ใช้ติดตามความคืบหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: trace_code_id, reason, initiated_date, status พร้อม badge สี (investigating/in_progress/resolved)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะ status</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เริ่มเรียกคืนใหม่" เปิดหน้ารายละเอียดเหตุการณ์เรียกคืน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดเหตุการณ์เรียกคืนสินค้า (Recall Event Detail) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกเหตุผลการเรียกคืนและติดตามลูกค้าที่ได้รับผลกระทบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: trace_code_id, reason, initiated_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "คำนวณลูกค้าที่ได้รับผลกระทบ" เรียก forward trace เติม affected_customer_refs</span></li>
+          <li class="func-item"><span class="txt">ตารางรายชื่อ affected_customer_refs และปุ่มเปลี่ยน status เป็น in_progress/resolved</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานตรวจสอบย้อนกลับ (Traceability Reports) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>สร้างและเก็บรายงานสรุปประวัติของ lot ไว้ส่งผู้ตรวจประเมิน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: trace_code_id, generated_date, generated_by, ลิงก์ดาวน์โหลด file_ref</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างรายงานใหม่" เลือก trace_code แล้วสั่งสร้างไฟล์ PDF</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พอร์ทัลลูกค้าสแกน QR (Customer Trace Portal) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>หน้าสาธารณะที่ลูกค้าปลายทางเปิดดูได้เองหลังสแกน QR บนฉลาก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดงข้อมูลย่อจาก backward trace ของ trace_code นั้น (พันธุ์/สายพันธุ์, วันที่เก็บเกี่ยว, มาตรฐานที่ได้รับ)</span></li>
+          <li class="func-item"><span class="txt">เข้าถึงได้โดยไม่ต้อง login ผ่าน URL ที่ฝังอยู่ใน qr_image_ref</span></li>
+          <li class="func-item"><span class="txt">ซ่อนข้อมูลภายใน เช่น ต้นทุน ชื่อผู้จัดการพื้นที่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งค่าเชื่อมต่อ Blockchain (Blockchain Verification Settings) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ตั้งค่าการซิงก์ข้อมูล trace_link ไปยังระบบ blockchain/ภายนอกเพื่อยืนยันความถูกต้อง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มตั้งค่า endpoint/API key ของระบบภายนอก</span></li>
+          <li class="func-item"><span class="txt">สถานะซิงก์ล่าสุดต่อ trace_code (synced/pending/failed)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ซิงก์ใหม่" ต่อรายการที่ยัง pending/failed</span></li>
+        </ul>
       </article>
     </div>
   </section>

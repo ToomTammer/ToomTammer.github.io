@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -734,6 +735,135 @@
 ห้ามเปลี่ยนกลับจาก sold/culled/dead -&gt; alive
   ถ้าคีย์ผิด ต้องแก้ไขผ่านการ correction
   ที่มี log กำกับ ไม่ใช่เปลี่ยนสถานะตรง ๆ</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดทะเบียนสัตว์ (Livestock Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการฟาร์มเปิดดูภาพรวมจำนวนสัตว์และความเสี่ยงประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนสัตว์รายตัว (status = alive), จำนวนฝูงที่กำลังเลี้ยง, จำนวนโรงเรือนที่ใช้งาน</span></li>
+          <li class="func-item"><span class="txt">ตารางความหนาแน่นโรงเรือน: current_headcount เทียบ capacity แต่ละ housing_location พร้อมไฮไลต์ที่เกิน</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือนล่าสุด: การย้ายสัตว์วันนี้, สัตว์ที่เปลี่ยนสถานะเป็น dead/culled</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนสัตว์รายตัว (Animal Registry) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการและจัดการสัตว์ที่ติดตามเป็นรายตัวทั้งหมด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: ear_tag/microchip_no, breed, birth_date, source, animal_group_id, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: status (alive/sold/culled/dead), breed, animal_group_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ลงทะเบียนสัตว์ใหม่" เปิดฟอร์มคีย์ ear_tag/microchip_no, breed, birth_date, source, animal_group_id</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวไปหน้ารายละเอียดสัตว์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดสัตว์รายตัว (Animal Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลครบและประวัติของสัตว์ตัวเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ข้อมูลหลัก: ear_tag/microchip_no, breed, birth_date, current_age_days (คำนวณจาก birth_date), source, ฝูงที่สังกัด</span></li>
+          <li class="func-item"><span class="txt">ไทม์ไลน์ประวัติ: การย้าย (animal_movement) และการเปลี่ยนสถานะ ดึงจาก /livestock/animals/{id}/history</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "แก้ไขข้อมูล" (PATCH) และ "เปลี่ยนสถานะ" เปิดฟอร์มเลือกสถานะใหม่ + วันที่ + เหตุผล ตามลำดับที่อนุญาต (alive → sold/culled/dead เท่านั้น)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนฝูง/รุ่น (Animal Groups) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการและจัดการฝูง/รุ่นสัตว์ที่เลี้ยงรวมไม่แยกรายตัว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: group_code, species, initial_quantity, current_quantity, start_date, cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: species, ช่วงวันที่ start_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ลงทะเบียนฝูงใหม่" เปิดฟอร์มคีย์ group_code, species, initial_quantity, start_date — ระบบสร้าง cost_center (batch) ให้อัตโนมัติเมื่อบันทึก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดฝูง/รุ่น (Animal Group Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูสถานะและ KPI ของฝูงหนึ่งรุ่น</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ด KPI: current_quantity, current_age_days (today − start_date), mortality_rate_pct สะสม</span></li>
+          <li class="func-item"><span class="txt">ตารางสัตว์รายตัวที่ผูกกับฝูงนี้ (ถ้ามีแยกรายตัวบางส่วน) และลิงก์ cost_center_id ไปยังโมดูลบัญชี</span></li>
+          <li class="func-item"><span class="txt">ประวัติการย้ายและการเปลี่ยนสถานะของฝูง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>โรงเรือน/คอก (Housing Locations) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการสถานที่เลี้ยงสัตว์และดูความหนาแน่นการใช้งาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: location_code, name, capacity, cost_center_id, current_headcount (คำนวณจากสัตว์/ฝูงที่อยู่ปัจจุบัน) พร้อม % ความหนาแน่น</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างโรงเรือน/คอกใหม่" เปิดฟอร์มคีย์ location_code, name, capacity, cost_center_id (ถ้ามี)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการย้ายสัตว์ (Animal Movements) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกและดูประวัติการย้ายสัตว์/ฝูงระหว่างโรงเรือน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: animal_id/animal_group_id, from_location_id, to_location_id, movement_date, reason</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, housing_location ต้นทาง/ปลายทาง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการย้าย" เปิดฟอร์มเลือกสัตว์/ฝูง, ปลายทาง, วันที่, เหตุผล — เตือนทันทีถ้าย้ายเข้าแล้ว current_headcount เกิน capacity ของปลายทาง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานจำนวนสัตว์ตามโรงเรือน (Headcount by Location Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ภาพรวมจำนวนสัตว์คงเหลือแยกตามพื้นที่เลี้ยง สำหรับวางแผนพื้นที่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟแท่งจำนวนสัตว์คงเหลือต่อโรงเรือน เทียบ capacity ดึงจาก /livestock/reports/headcount-by-location</span></li>
+          <li class="func-item"><span class="txt">ตารางรายละเอียดต่อโรงเรือน พร้อมปุ่ม export</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ค้นหาและประวัติสัตว์/ฝูง (Search &amp; History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ค้นหาสัตว์หรือฝูงจากเบอร์หู/ไมโครชิป/รหัสฝูง แล้วดูประวัติรวมทันที</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ช่องค้นหาแบบ global ด้วย ear_tag, microchip_no, หรือ group_code</span></li>
+          <li class="func-item"><span class="txt">ผลลัพธ์แสดง preview สถานะปัจจุบันและลิงก์ไปหน้ารายละเอียด/ประวัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สแกนเบอร์หู/ไมโครชิป (RFID/Tag Scanner) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>หน้าจอมือถือสำหรับพนักงานภาคสนามสแกนหาสัตว์หน้างานโดยไม่ต้องพิมพ์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่มเปิดกล้อง/เชื่อม RFID reader อ่านค่าแล้วค้นหา microchip_no/ear_tag อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">แสดงผลตรงหน้ารายละเอียดสัตว์ พร้อมปุ่มลัดบันทึกการย้าย/เปลี่ยนสถานะ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>นำเข้าทะเบียนสัตว์แบบชุด (Bulk Import) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>นำเข้าข้อมูลสัตว์/ฝูงจำนวนมากตอนเริ่มใช้ระบบ ไม่ต้องคีย์ทีละตัว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่มอัปโหลดไฟล์ (CSV/Excel) + ตารางแมปคอลัมน์ไฟล์กับฟิลด์ animal/animal_group</span></li>
+          <li class="func-item"><span class="txt">ตารางพรีวิวพร้อมไฮไลต์แถวที่ข้อมูลผิดพลาด/ซ้ำก่อนยืนยันนำเข้าจริง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>การแจ้งเตือนตามอายุ (Age-based Alerts) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รายการแจ้งเตือนอัตโนมัติเมื่อสัตว์/ฝูงถึงช่วงอายุสำคัญ (current_age_days ถึงเกณฑ์)</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการแจ้งเตือน: สัตว์/ฝูง, current_age_days, เกณฑ์ที่ถึง, สถานะรับทราบแล้ว/ยังไม่รับทราบ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามชนิดสัตว์/ฝูง และปุ่ม "รับทราบ"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>QR Code/ป้ายดิจิทัล (Digital Tag) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>สร้างและพิมพ์ QR code ต่อตัว/ฝูง สำหรับใช้ในโมดูลตรวจสอบย้อนกลับ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือกสัตว์/ฝูงแล้วสร้าง QR code ที่อ้างอิง animal_id/animal_group_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่มพิมพ์ป้าย/ดาวน์โหลดรูป QR เป็นชุด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เชื่อมเซนเซอร์ติดตามสัตว์ (GPS Collar Integration) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ดูตำแหน่งสัตว์ที่ติดอุปกรณ์เซนเซอร์แบบเรียลไทม์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แผนที่ตำแหน่งล่าสุดของสัตว์ที่ผูกอุปกรณ์ GPS collar กับ animal_id</span></li>
+          <li class="func-item"><span class="txt">รายการสัตว์ที่สัญญาณขาดหาย/แบตเตอรี่อุปกรณ์ต่ำ</span></li>
+        </ul>
       </article>
     </div>
   </section>

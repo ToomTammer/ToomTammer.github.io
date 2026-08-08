@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -731,6 +732,122 @@ due_vaccines =
   (ค่าเริ่มต้นแนะนำ: 7 วัน)
 
 -&gt; flag เตือนผู้จัดการฟาร์ม/สัตวแพทย์</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดสุขภาพและวัคซีน (Health &amp; Vaccination Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่สัตวแพทย์/ผู้จัดการฟาร์มเปิดดูภาพรวมสุขภาพประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนวัคซีนที่ถึงกำหนดวันนี้ (due_vaccines), จำนวนวัคซีนล่าช้า (overdue_vaccines), จำนวนสัตว์/ฝูงที่ยังอยู่ในระยะหยุดยา</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือนวัคซีนล่าช้าที่ flag ถึงผู้จัดการฟาร์ม/สัตวแพทย์ (overdue &gt; grace_period_days)</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลัด "บันทึกฉีดวัคซีน" และ "บันทึกการรักษา" ไปยังฟอร์มโดยตรง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตารางวัคซีนมาตรฐาน (Vaccination Schedule Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการแผนวัคซีนมาตรฐานต่อชนิดสัตว์ที่ใช้เทียบกับอายุจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: species, vaccine_name, age_days_due, is_booster</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม species</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไขมาตรฐานวัคซีนใหม่ (POST /livestock/vaccination-schedule-standards)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการวัคซีนที่ถึงกำหนด (Vaccination Due List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ไล่ดูสัตว์/ฝูงที่ถึงกำหนดฉีดวัคซีนตามตารางมาตรฐาน แยกล่าช้าออกจากถึงกำหนดปกติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: animal_id/animal_group_id, vaccine_name, age_days_due เทียบ current_age_days, badge "ล่าช้า" ถ้าเกิน grace_period_days</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: species, animal_group, สวิตช์ "แสดงเฉพาะที่ล่าช้า"</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกฉีดวัคซีนนี้" ต่อแถว เปิดฟอร์มบันทึกฉีดวัคซีนแบบ pre-fill animal และ vaccine</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการฉีดวัคซีน (Vaccination Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและบันทึกประวัติการฉีดวัคซีนจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: vaccination_date, animal_id/animal_group_id, vaccine_item_id (ชื่อวัคซีน), administered_by</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, สัตว์/ฝูง, ชนิดวัคซีน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกฉีดวัคซีนใหม่" — ฟอร์มเลือกสัตว์/ฝูง, vaccine_item_id จากคลัง, administered_by, vaccination_date พร้อมแจ้งตัดสต็อกอัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการรักษา/ใช้ยา (Treatment Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกการรักษาโรค/ใช้ยา จุดสำคัญที่สุดด้านความปลอดภัยอาหารเพราะกำหนดระยะหยุดยา</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: treatment_date, animal_id/animal_group_id, medication_item_id, diagnosis, dosage, withdrawal_days, safe_sale_date พร้อม badge ถ้ายังอยู่ในระยะหยุดยา</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, สัตว์/ฝูง, diagnosis</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการรักษาใหม่" — ฟอร์มเลือก medication_item_id, กรอก diagnosis/dosage/treatment_date แล้วระบบคำนวณ safe_sale_date = treatment_date + withdrawal_days ให้อัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบสถานะระยะหยุดยา (Withdrawal Status Check) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จุดตรวจสอบก่อนอนุมัติขาย/ชำแหละ ใช้เป็น gate ให้โมดูลคัดแยกและส่งขายเรียกดู</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ช่องค้นหาสัตว์/ฝูง แสดงผล is_safe_to_sell พร้อม safe_sale_date ล่าสุดที่ยังไม่ผ่าน</span></li>
+          <li class="func-item"><span class="txt">รายการ treatment_record ที่เป็นสาเหตุให้ยังห้ามขาย พร้อมวันที่จะปลอดภัย</span></li>
+          <li class="func-item"><span class="txt">แสดงสถานะแบบ badge เขียว/แดง เชื่อมกับ GET /livestock/animals/{id}/withdrawal-status</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติสุขภาพรายตัว/ฝูง (Animal/Group Health History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูภาพรวมประวัติสุขภาพทั้งหมดของสัตว์หรือฝูงหนึ่งตัวในหน้าเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">Timeline รวมเหตุการณ์จาก vaccination_record, treatment_record และ health_symptom_log เรียงตามวันที่</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, ประเภทเหตุการณ์ (วัคซีน/รักษา/อาการ)</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละเหตุการณ์ลิงก์กลับไปหน้ารายละเอียดที่เกี่ยวข้อง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกอาการเบื้องต้น (Health Symptom Log) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกอาการผิดปกติที่พบก่อนตัดสินใจรักษา ใช้ติดตามและวิเคราะห์แนวโน้มโรค</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: observed_date, animal_id/animal_group_id, symptom_description, severity (badge mild/moderate/severe)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: severity, ช่วงวันที่, สัตว์/ฝูง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "แปลงเป็นการรักษา" สร้าง treatment_record ใหม่แล้วผูก treatment_record_id กลับมาที่รายการอาการนี้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานอัตราการเจ็บป่วย (Morbidity Rate Report) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ติดตามอัตราการเจ็บป่วยของฝูงเทียบเป็น KPI มาตรฐาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตัวเลือก animal_group และช่วงเวลาที่ต้องการดู</span></li>
+          <li class="func-item"><span class="txt">การ์ดแสดงค่า morbidity_rate_pct พร้อมกราฟแนวโน้มย้อนหลัง</span></li>
+          <li class="func-item"><span class="txt">ตารางรายการ treatment_record ที่ถูกนับในช่วงเวลานั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ส่งต่อสัตวแพทย์ภายนอก (External Vet Referral) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ติดตามเคสที่ซับซ้อนเกินกำลังทีมภายในและถูกส่งต่อให้สัตวแพทย์ภายนอก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการเคสที่ส่งต่อ: อ้างอิง treatment_record/health_symptom_log ต้นเรื่อง, ชื่อ/ช่องทางติดต่อสัตวแพทย์ภายนอก, สถานะ (รอนัด/กำลังรักษา/ปิดเคส)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะเคส</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ส่งต่อเคสใหม่" เลือกจากรายการอาการ/การรักษาที่รุนแรง (severity = severe)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์แนวโน้มโรคระบาด (Disease Trend Analysis) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ดูความสัมพันธ์ระหว่างความถี่การเจ็บป่วยกับสภาพแวดล้อมโรงเรือน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟความถี่ health_symptom_log/treatment_record เทียบช่วงเวลา แยกตามโรงเรือน/พื้นที่</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: โรงเรือน/พื้นที่, ช่วงเวลา, ชนิดสัตว์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ความเสี่ยงโรค (Disease Risk Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ประเมินความเสี่ยงล่วงหน้าของแต่ละฝูงจากข้อมูลสุขภาพย้อนหลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ animal_group พร้อมคะแนนความเสี่ยงและปัจจัยหลักที่ใช้คำนวณ</span></li>
+          <li class="func-item"><span class="txt">คลิกเข้าดูรายละเอียดย้อนไปหน้าประวัติสุขภาพของฝูงนั้น</span></li>
+        </ul>
       </article>
     </div>
   </section>

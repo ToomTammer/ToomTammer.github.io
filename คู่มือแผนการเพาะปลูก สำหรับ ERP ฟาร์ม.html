@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -742,6 +743,127 @@ in_progress -&gt; harvested
   (เมื่อมีบันทึกเก็บเกี่ยวจริงจากโมดูลเก็บเกี่ยว)
 
 ทุกสถานะ ยกเว้น harvested -&gt; cancelled ได้</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>ปฏิทินฤดูกาลเพาะปลูก (Planting Calendar) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มุมมองรวมทุกแผนปลูกทุกแปลง ใช้เป็นหน้าแรกดูภาพรวมฤดูกาล</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปฏิทิน/ไทม์ไลน์แสดงช่วง planned_planting_date ถึง expected_harvest_date ของทุก planting_plan</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: field_id, ช่วงวันที่, status</span></li>
+          <li class="func-item"><span class="txt">คลิกแถบแผนเพื่อเปิดหน้ารายละเอียดแผน (ดึงข้อมูลจาก GET /crop/reports/planting-calendar)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการแผนการเพาะปลูก (Planting Plans List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ค้นและดูแผนปลูกทั้งหมดแบบตาราง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: field_id/field_zone_id, ชื่อพันธุ์ (crop_variety), planned_planting_date, expected_harvest_date, status พร้อม badge สี</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: field_id, status, date_from/date_to (ตรงกับพารามิเตอร์ของ GET /crop/planting-plans)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างแผนใหม่" เปิดฟอร์มสร้างแผน คลิกแถวเข้าหน้ารายละเอียด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สร้าง/แก้ไขแผนการเพาะปลูก (Planting Plan Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ฟอร์มวางแผนปลูกใหม่หนึ่งรอบในแปลง/โซนหนึ่ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือก field_id/field_zone_id, crop_variety_id, planned_planting_date</span></li>
+          <li class="func-item"><span class="txt">expected_harvest_date คำนวณอัตโนมัติ (planned_planting_date + crop_variety.days_to_harvest) แสดงแบบ read-only</span></li>
+          <li class="func-item"><span class="txt">แสดงประมาณการตั้งต้น estimated_yield/estimated_cost ให้ตรวจสอบก่อนบันทึกเป็น draft (POST /crop/planting-plans)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดแผนการเพาะปลูก (Planting Plan Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูสถานะ ประวัติ และสั่งดำเนินการต่อแผนหนึ่งแผน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ข้อมูลแผน + cost_center_id ที่ผูกอยู่ พร้อม timeline สถานะ draft → approved → in_progress → harvested/cancelled</span></li>
+          <li class="func-item"><span class="txt">บล็อกเทียบประมาณการกับผลจริง: estimated_yield/cost, actual_yield/cost, yield_variance_pct, cost_variance_pct</span></li>
+          <li class="func-item"><span class="txt">ปุ่มตามสถานะ: "ตรวจสอบหมุนเวียนพืช", "อนุมัติ" (POST .../approve), "ปิดรอบ" (POST .../close), "ยกเลิก" (POST .../cancel)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบหมุนเวียนพืชก่อนอนุมัติ (Rotation Check) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>แสดงผลตรวจคำเตือนหมุนเวียนพืชก่อนอนุมัติแผนจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ recent_cycles ของ field/zone เดียวกัน เรียงล่าสุดตามจำนวน min_gap_cycles รอบ (GET .../rotation-check)</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์รอบที่ crop_family ตรงกับพันธุ์ใหม่ พร้อม flag เตือนความเสี่ยง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติทั้งที่มีคำเตือน" พร้อมช่องกรอกเหตุผล — เฉพาะเจ้าของฟาร์ม/ผู้บริหาร</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนพันธุ์พืช (Crop Varieties) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการข้อมูลอ้างอิงพันธุ์พืชที่ฟาร์มปลูก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: variety_code, name, crop_family, days_to_harvest, expected_yield_per_rai</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม crop_family</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มเพิ่ม/แก้ไขพันธุ์ (POST/PATCH /crop/varieties)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>กฎการหมุนเวียนพืช (Crop Rotation Rules) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตั้งกฎเว้นระยะปลูกพืชตระกูลเดียวกันซ้ำในแปลง/โซนเดียวกัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: crop_family, min_gap_cycles</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ตั้งกฎใหม่" (POST /crop/rotation-rules) — เฉพาะเจ้าของฟาร์ม/ผู้บริหาร</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ปิดรอบแผน/บันทึกผลจริง (Close Cycle) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>กรอกผลจริงหลังเก็บเกี่ยวเสร็จเพื่อปิดรอบแผน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มกรอก actual_yield, actual_cost ของ yield_estimate ที่ผูกกับแผนนี้</span></li>
+          <li class="func-item"><span class="txt">คำนวณ yield_variance_pct และ cost_variance_pct แสดงสดทันทีที่กรอก</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยืนยันปิดรอบ" เปลี่ยนสถานะแผนเป็น harvested (POST .../close)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานเทียบประมาณการกับผลจริง (Estimate vs Actual Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูความแม่นยำของประมาณการผลผลิต/ต้นทุนสะสมทุกรอบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง/กราฟเทียบ estimated_yield vs actual_yield และ estimated_cost vs actual_cost แยกตาม crop_variety</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, field_id, crop_variety_id (GET /crop/reports/estimate-vs-actual)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำแนะนำวันเริ่มปลูกจากพยากรณ์อากาศ (Planting Date Advisor) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แนะนำวันเริ่มปลูกที่เหมาะสมจากพยากรณ์ฝน/แล้ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือก field_id/field_zone_id + crop_variety_id แล้วแสดงช่วงวันแนะนำซ้อนกราฟพยากรณ์ฝน/แล้ง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ใช้วันนี้สร้างแผน" ส่งค่า planned_planting_date ต่อไปยังฟอร์มสร้างแผน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>จองสต็อกเมล็ดพันธุ์ (Seed Stock Reservation) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แจ้งจองสต็อกเมล็ดพันธุ์ล่วงหน้าตามแผนที่อนุมัติแล้ว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแผน status = approved ที่ยังไม่จองเมล็ดพันธุ์ พร้อมพันธุ์ (crop_variety_id) และปริมาณประมาณจากพื้นที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "จองสต็อก" ส่งคำขอไปคลังสินค้า หรือ "แจ้งจัดซื้อ" ถ้าสต็อกไม่พอ พร้อมสถานะการจอง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แผนหมุนเวียนพืชระยะยาว (Long-term Rotation Planning) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>วางแผนปลูกหลายรอบล่วงหน้าต่อแปลง/โซน ป้องกันชนกฎหมุนเวียนพืชในอนาคต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">มุมมองตารางเวลาหลายรอบต่อ field_id/field_zone_id แสดง crop_family ที่วางแผนไว้แต่ละรอบ</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์ช่วงที่จะชน min_gap_cycles ของ crop_rotation_rule ล่วงหน้า พร้อมปุ่มสร้างแผนร่างหลายรอบพร้อมกัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบพันธุ์พืชและพยากรณ์ผลตอบแทน (Variety Comparison &amp; Net Return Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>เทียบพันธุ์พืชหลายตัวเลือกจากข้อมูลย้อนหลังก่อนตัดสินใจปลูกจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเทียบพันธุ์ที่เลือก: expected_yield_per_rai, days_to_harvest, ต้นทุน/ผลผลิตเฉลี่ยจาก yield_estimate ย้อนหลัง</span></li>
+          <li class="func-item"><span class="txt">กราฟพยากรณ์ผลตอบแทนสุทธิต่อพันธุ์ พร้อมปุ่ม "เลือกพันธุ์นี้สร้างแผน" ส่งต่อไปฟอร์มสร้างแผน</span></li>
+        </ul>
       </article>
     </div>
   </section>

@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -743,6 +744,136 @@ fallow_days &gt; max_fallow_days
 new_crop_family == last_crop_family
   -&gt; flag เตือนความเสี่ยง แนะนำให้หมุนเวียนพืชต่างตระกูล</pre>
         <p class="formula-example"><b>หมายเหตุ:</b> เป็นการเตือนเบื้องต้นเท่านั้น การวางแผนหมุนเวียนพืชแบบเต็มรูปแบบอยู่ในโมดูล "แผนการเพาะปลูก"</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดภาพรวมพื้นที่ (Land Overview Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกสรุปสถานะการใช้พื้นที่ทั้งฟาร์มสำหรับเจ้าของ/ผู้จัดการแปลง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: พื้นที่รวม (SUM area_rai) และจำนวนแปลงแยกตาม status (active/fallow/inactive)</span></li>
+          <li class="func-item"><span class="txt">กราฟ utilization_rate จาก GET /crop/reports/land-utilization</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือนแปลงพักดินเกิน max_fallow_days พร้อมลิงก์ไปหน้ารายละเอียดแปลง</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลิงก์ด่วนไปทะเบียนแปลงและแผนที่ภาพรวมฟาร์ม</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนแปลง (Field Registry) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการแปลงทั้งหมดในฟาร์ม ใช้ค้นหา/กรอง และเป็นจุดเข้าไปหน้ารายละเอียด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: field_code, name, area_rai, status, default_cost_center_id จาก GET /crop/fields</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะ (active/fallow/inactive)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างแปลงใหม่" เปิดฟอร์มสร้างแปลง (POST /crop/fields)</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวเข้าหน้ารายละเอียดแปลง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฟอร์มสร้าง/แก้ไขแปลง พร้อมวาดขอบเขต GPS (Field Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกข้อมูลแปลงและวาดขอบเขตแปลงบนแผนที่แบบง่าย ๆ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟิลด์กรอก: field_code, name, area_rai, land_title_ref, default_cost_center_id, status</span></li>
+          <li class="func-item"><span class="txt">เครื่องมือวาดขอบเขตแปลง (GIS polygon) บันทึกเป็น gps_boundary (GeoJSON)</span></li>
+          <li class="func-item"><span class="txt">แสดงพื้นที่ที่คำนวณได้จากขอบเขต (area_sq_meters / 1600) เทียบกับ area_rai ที่กรอก เตือนถ้าไม่ตรงกัน</span></li>
+          <li class="func-item"><span class="txt">ปุ่มบันทึกเรียก POST /crop/fields หรือ PATCH /crop/fields/{id}</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>หน้ารายละเอียดแปลง (Field Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลครบของแปลงเดียว พร้อมแท็บย่อยไปยังโซน ประวัติ และข้อมูลดิน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ส่วนหัว: field_code, name, area_rai, status พร้อมแผนที่ย่อขอบเขตจาก GET /crop/fields/{id}/gps-boundary</span></li>
+          <li class="func-item"><span class="txt">แท็บ "โซนย่อย" ลิงก์ไปหน้าจัดการโซนย่อยของแปลงนี้</span></li>
+          <li class="func-item"><span class="txt">แท็บ "ประวัติการใช้ที่ดิน" ลิงก์ไปหน้าประวัติของแปลงนี้</span></li>
+          <li class="func-item"><span class="txt">แท็บ "ข้อมูลดิน" และ "เอกสารสิทธิ์ที่ดิน"</span><span class="phase-tag phase-2">Phase 2</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>จัดการโซนย่อย (Field Zone Management) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>แบ่งและจัดการโซนย่อยภายในแปลงหนึ่ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการโซน: zone_code, area_rai, cost_center_id จาก GET /crop/fields/{id}/zones</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างโซนใหม่ (POST /crop/fields/{id}/zones) พร้อม validate SUM(field_zone.area_rai) &lt;= field.area_rai</span></li>
+          <li class="func-item"><span class="txt">ปุ่มแก้ไขโซน (PATCH /crop/zones/{id})</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการใช้ที่ดิน (Land Use History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกและดูว่าแปลง/โซนนี้ปลูกพืชอะไรมาก่อนบ้าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: crop_type, planting_start_date, harvest_end_date, ref_cost_center_id, yield_result จาก GET /crop/fields/{id}/land-use-history</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มบันทึกประวัติใหม่ (POST /crop/land-use-history)</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ harvest_end_date ยังว่าง (กำลังปลูกอยู่ในรอบนี้)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานการใช้พื้นที่ (Land Utilization Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปพื้นที่ทั้งหมดแยกตามสถานะเพื่อวางแผนการใช้ที่ดิน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางสรุปพื้นที่ตาม status (active/fallow/inactive) พร้อม % ของพื้นที่รวม จาก GET /crop/reports/land-utilization</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามแปลง/ช่วงวันที่ที่สนใจ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export รายงานเป็นไฟล์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แผนที่ภาพรวมฟาร์มแบบ Interactive (Farm Overview Map) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูขอบเขตทุกแปลงพร้อมกันบนแผนที่เดียว ซูม/คลิกดูรายละเอียด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดง gps_boundary ของทุกแปลง/โซนพร้อมสีตาม status</span></li>
+          <li class="func-item"><span class="txt">คลิกที่แปลงเปิด popup สรุป field_code, area_rai, status พร้อมลิงก์ไปหน้ารายละเอียด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองซ้อนแผนที่: ตามสถานะ, ตามศูนย์ต้นทุน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ข้อมูลดิน (Soil Data) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกและดูผลตรวจดินของแปลง/โซน เพื่อประกอบการวางแผนปลูกและใส่ปุ๋ย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: soil_type, ph_level, organic_matter_pct, test_date จาก GET /crop/soil-data</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มบันทึกผลตรวจดินใหม่ (POST /crop/soil-data) ผูกกับ field_id หรือ field_zone_id</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เอกสารสิทธิ์ที่ดิน (Land Title Documents) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แนบและดูเอกสารสิทธิ์ที่ดินอ้างอิงของแต่ละแปลง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดง land_title_ref และไฟล์สแกนเอกสารที่แนบไว้</span></li>
+          <li class="func-item"><span class="txt">ปุ่มอัปโหลด/แทนที่ไฟล์เอกสาร</span></li>
+          <li class="func-item"><span class="txt">จำกัดสิทธิ์แก้ไขเฉพาะเจ้าของฟาร์ม/ผู้บริหาร ตามตารางสิทธิ์การเข้าถึง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ศูนย์แจ้งเตือนแปลง (Field Alerts) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รวมแจ้งเตือนที่เกี่ยวกับการใช้ที่ดินให้ผู้จัดการแปลงติดตามได้จากที่เดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแปลงที่ fallow_days &gt; max_fallow_days (พักดินนานเกินกำหนด)</span></li>
+          <li class="func-item"><span class="txt">รายการแปลงที่ new_crop_family == last_crop_family (ความเสี่ยงปลูกพืชตระกูลเดียวกันซ้ำ)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละรายการลิงก์ไปหน้ารายละเอียดแปลง/ประวัติการใช้ที่ดิน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>มุมมองอัปเดตหน้างาน สำหรับเจ้าหน้าที่เกษตร (Field Ops Quick Update) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าจอแบบย่อสำหรับพนักงานภาคสนามอัปเดตสถานะแปลงโดยไม่แก้ขอบเขต GPS หรือเอกสารสิทธิ์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแปลงในความรับผิดชอบพร้อม status ปัจจุบัน</span></li>
+          <li class="func-item"><span class="txt">ปุ่มแก้ไขเฉพาะ status (active/fallow/inactive) — ไม่มีปุ่มแก้ gps_boundary หรือ land_title_ref ตามสิทธิ์</span></li>
+          <li class="func-item"><span class="txt">ปุ่มบันทึกประวัติการใช้ที่ดินอย่างง่าย (crop_type, planting_start_date)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>มุมมองศูนย์ต้นทุนต่อแปลง สำหรับพนักงานบัญชี (Field Cost Center View) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มุมมองอ่านอย่างเดียวให้พนักงานบัญชีตรวจสอบการผูกศูนย์ต้นทุนกับแปลง/โซน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: field_code/zone_code คู่กับ default_cost_center_id/cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองแปลง/โซนที่ยังไม่ผูกศูนย์ต้นทุน (default_cost_center_id ว่าง)</span></li>
+          <li class="func-item"><span class="txt">ไม่มีปุ่มแก้ไข — read-only ตามตารางสิทธิ์การเข้าถึง</span></li>
+        </ul>
       </article>
     </div>
   </section>

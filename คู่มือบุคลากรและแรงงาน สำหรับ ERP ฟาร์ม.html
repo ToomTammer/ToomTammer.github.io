@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -801,6 +802,145 @@ tax_deduction = tax_annual / pay_periods_per_year</pre>
         <pre class="formula">net_pay = gross_pay
         - social_security_deduction
         - tax_deduction</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>ทะเบียนตำแหน่งงาน (Positions) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรายชื่อตำแหน่งงานทั้งหมดในฟาร์มก่อนผูกกับพนักงาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: title, department, is_active</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: department, is_active</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มตำแหน่งใหม่" — ฟอร์มคีย์ title, department</span></li>
+          <li class="func-item"><span class="txt">ปุ่มปิดใช้งานตำแหน่ง (is_active=false) พร้อมเตือนถ้ามี employee.position_id ผูกอยู่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนพนักงาน (Employee Directory) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและจัดการข้อมูลพนักงานทุกคน ทั้งประจำและรายวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: employee_code, name, position_id, employment_type, wage_type, is_active</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: position_id, employment_type, wage_type, is_active</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มพนักงานใหม่" — ฟอร์มคีย์ employee_code, name, position_id, employment_type, wage_type, base_wage, default_cost_center_id, social_security_no</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียดพนักงาน 1 คน พร้อมปุ่มแก้ไข/ปิดใช้งาน (PATCH /hr/employees/{id})</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกเวลาเข้า-ออกงาน (Attendance) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คีย์เวลาเข้า-ออกงานรายวันของพนักงาน ให้หัวหน้างาน/HR ใช้ประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: work_date, employee_id, cost_center_id, clock_in, clock_out, hours_worked, overtime_hours</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: employee_id, date_from, date_to, cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกเวลา" — ฟอร์มเลือกพนักงาน + คีย์ clock_in/clock_out หรือคำนวณ hours_worked/overtime_hours อัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกผลงานตามชิ้น/หน่วย (Piece Work Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คีย์ปริมาณผลงานจริงต่อคนต่อวัน สำหรับพนักงานที่จ้างแบบ piece_rate</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: work_date, employee_id, cost_center_id, task_type, quantity_completed, rate_per_unit</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: employee_id, cost_center_id, task_type, date_from, date_to</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกผลงาน" — ฟอร์มเลือกพนักงาน + cost_center + task_type + คีย์ quantity_completed (rate_per_unit ดึงจาก employee.base_wage ให้ แก้ไขได้)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบลาและอนุมัติ (Leave Requests) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>พนักงานยื่นใบลา หัวหน้างาน/HR อนุมัติหรือปฏิเสธ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: employee_id, leave_type, start_date, end_date, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: employee_id, leave_type, status</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยื่นใบลาใหม่" — ฟอร์มเลือก leave_type, start_date/end_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ/ปฏิเสธ" ในหน้ารายละเอียด (บันทึก approved_by, เปลี่ยน status)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานวันลาคงเหลือ (Leave Balance Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปวันลาที่ใช้ไปและคงเหลือของพนักงานแต่ละคน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: employee_id, name, leave_type, วันลาที่ใช้ไป, วันลาคงเหลือ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: employee_id, position_id, leave_type</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ส่งออกรายงาน" (CSV/Excel) สำหรับ HR ใช้ตรวจสอบทั้งฟาร์ม</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รอบเงินเดือน (Payroll Runs) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการรอบเงินเดือนทั้งหมด ใช้ติดตามสถานะแต่ละงวด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: period, status (draft/calculated/approved/paid/posted)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: status, period</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เริ่มรอบเงินเดือนใหม่" (POST /hr/payroll-runs) — คีย์ period</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดรอบเงินเดือน (Payroll Run Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและดำเนินการรอบเงินเดือนหนึ่งรอบ ทีละบรรทัดต่อพนักงาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางบรรทัด (payroll_run_line): employee_id, cost_center_id, gross_pay, social_security_deduction, tax_deduction, net_pay</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, employee_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "คำนวณ" (POST .../calculate), "อนุมัติ" (POST .../approve), "ปิดรอบและส่งเข้าบัญชี" (POST .../post) — ปุ่มแสดง/ซ่อนตาม status ปัจจุบัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สลิปเงินเดือนของฉัน (My Payslip) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้า self-service ให้พนักงานทั่วไปดูสลิปเงินเดือนและวันลาคงเหลือของตัวเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายละเอียด payroll_run_line ของตัวเองต่องวด: gross_pay, social_security_deduction, tax_deduction, net_pay</span></li>
+          <li class="func-item"><span class="txt">สรุปวันลาคงเหลือของตัวเอง (จาก /hr/reports/leave-balance กรองเฉพาะ employee_id ตัวเอง)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: period (เลือกดูงวดก่อนหน้า)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานต้นทุนแรงงานตามศูนย์ต้นทุน (Labor Cost by Cost Center) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปค่าแรงจริงที่เกิดขึ้นแยกตามพื้นที่/รุ่นเลี้ยง/รอบปลูก สำหรับเจ้าของฟาร์มและ HR</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: cost_center_id, ยอดรวม gross_pay, net_pay ต่องวด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, period, date_from, date_to</span></li>
+          <li class="func-item"><span class="txt">กราฟแท่งเทียบต้นทุนแรงงานระหว่างศูนย์ต้นทุน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>จัดตารางกะทำงาน (Shift Scheduling) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>จัดตารางกะทำงานล่วงหน้าให้พนักงานแต่ละคน/ทีม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปฏิทินรายสัปดาห์/รายเดือนแสดงกะของพนักงานแต่ละคน</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, employee_id, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างตารางกะ" (POST /hr/shift-schedules) — เลือกพนักงาน + วัน/เวลา</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เทียบค่าแรงจริงกับงบประมาณ (Labor Budget vs Actual) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบค่าแรงจริงต่อศูนย์ต้นทุนกับงบประมาณที่ตั้งไว้จากโมดูลบัญชีและการเงิน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: cost_center_id, งบประมาณค่าแรง, ค่าแรงจริง (gross_pay รวม), ส่วนต่าง %</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, period</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่เกินงบด้วยสี (ใช้ phase-tag style เดียวกับสถานะ)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์ประสิทธิภาพแรงงาน (Labor Productivity Analytics) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>วิเคราะห์ผลงานต่อคน/ต่อชั่วโมง จาก piece_work_record และ attendance</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟ quantity_completed ต่อ hours_worked แยกตาม employee_id, task_type</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, task_type, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">จัดอันดับพนักงานตามผลงานเฉลี่ยต่อชั่วโมง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ความต้องการแรงงาน (Labor Demand Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>คาดการณ์จำนวนแรงงานที่ต้องใช้ตามฤดูกาล/รอบผลิตล่วงหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟแนวโน้ม attendance/piece_work_record ย้อนหลังเทียบรอบผลิตที่จะมาถึง</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, ประเภทรอบผลิต</span></li>
+          <li class="func-item"><span class="txt">ตัวเลขแนะนำจำนวนแรงงานที่ควรเตรียมต่อ cost_center</span></li>
+        </ul>
       </article>
     </div>
   </section>

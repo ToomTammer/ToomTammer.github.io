@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -715,6 +716,125 @@
 
 previous_yield_per_rai = รอบก่อนหน้าล่าสุด
   ของ field/zone เดียวกัน ที่ crop_variety เดียวกัน</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดการเก็บเกี่ยว (Harvest Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการแปลง/เจ้าของฟาร์มเปิดดูภาพรวมการเก็บเกี่ยวประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: ผลผลิตรวมวันนี้/เดือนนี้ (SUM quantity_harvested), loss_rate_pct เฉลี่ย, จำนวน planting_plan ที่ยังไม่ปิด</span></li>
+          <li class="func-item"><span class="txt">ตารางการเก็บเกี่ยวล่าสุด: harvest_date, field/zone, quantity_harvested, unit, is_final_harvest</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่/field_id ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกเก็บเกี่ยวใหม่" ลิงก์ไปฟอร์มบันทึก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการบันทึกการเก็บเกี่ยว (Harvest Records List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและค้นหาประวัติการเก็บเกี่ยวทั้งหมด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: harvest_date, planting_plan_id, field_id/field_zone_id, quantity_harvested, unit, is_final_harvest, stock_lot_ref</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: planting_plan_id, field_id, date_from/date_to (ตรงกับพารามิเตอร์ของ GET /crop/harvest-records)</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวเปิดหน้ารายละเอียด, ปุ่ม "บันทึกเก็บเกี่ยวใหม่"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฟอร์มบันทึกการเก็บเกี่ยวใหม่ (New Harvest Record) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกเก็บเกี่ยวจริง โดยต้องผ่านการตรวจสอบ PHI ก่อนเสมอ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: planting_plan_id, field_id/field_zone_id, harvest_date, quantity_harvested, unit, checkbox is_final_harvest</span></li>
+          <li class="func-item"><span class="txt">เรียก is_safe_to_harvest ก่อน submit — ถ้าไม่ผ่าน แสดง error พร้อม safe_harvest_date และปิดปุ่มบันทึก</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึก" เรียก POST /crop/harvest-records</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดการเก็บเกี่ยว (Harvest Record Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลการเก็บเกี่ยวครั้งเดียว พร้อมความสูญเสียที่เกี่ยวข้องและปิดรอบแผน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ข้อมูลหลัก: harvest_date, quantity_harvested, unit, stock_lot_ref, is_final_harvest</span></li>
+          <li class="func-item"><span class="txt">ตารางความสูญเสียที่ผูกกับ record นี้ (loss_quantity, loss_reason) จาก GET /crop/harvest-records/{id}/losses</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกความสูญเสีย" เปิดฟอร์มย่อย, ปุ่ม "ปิดรอบแผน" แสดงเมื่อ is_final_harvest = true</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกความสูญเสียหลังเก็บเกี่ยว (Post-Harvest Loss) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกและดูของเสีย/ความเสียหายที่เกิดระหว่างเก็บเกี่ยวหรือขนย้าย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มบันทึก: loss_quantity, loss_reason (dropdown: pest_damage, transport_damage, quality_reject, other)</span></li>
+          <li class="func-item"><span class="txt">ตารางความสูญเสียของ harvest_record นี้ แยกยอดตาม loss_reason</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึก" เรียก POST /crop/harvest-records/{id}/losses</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ปิดรอบแผนการเพาะปลูก (Close Harvest) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ยืนยันปิดรอบแผน พร้อมเทียบผลจริงกับประมาณการก่อนกดปิดจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สรุปยอด SUM(quantity_harvested) ทั้งรอบ เทียบกับ yield_estimate เดิม</span></li>
+          <li class="func-item"><span class="txt">พรีวิวผลลัพธ์: planting_plan.status → harvested, land_use_history.yield_result ที่จะถูกอัปเดต</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยืนยันปิดรอบ" เรียก POST /crop/planting-plans/{id}/close-harvest</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานผลผลิตต่อไร่ (Yield per Rai Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูผลผลิตต่อไร่แยกตามแปลง/พันธุ์/ช่วงเวลา</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง/กราฟ yield_per_rai แยกตาม field_id, crop_variety_id</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: field_id, crop_variety_id, period (ตรงกับ GET /crop/reports/yield-per-rai)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ตาราง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานเปรียบเทียบผลผลิตย้อนหลัง (Yield Comparison) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เทียบผลผลิตรอบปัจจุบันกับรอบก่อนหน้าของแปลง/พันธุ์เดียวกัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟ/ตาราง yield_variance_pct ต่อ field/zone จาก GET /crop/reports/yield-comparison</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง field_id, crop_variety_id</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ yield_variance_pct ผิดปกติ (ติดลบมาก)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานอัตราสูญเสีย (Post-Harvest Loss Rate Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ติดตาม loss_rate_pct รายรอบ/แปลง ว่าสูงผิดปกติหรือไม่</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง loss_rate_pct แยกตาม planting_plan/field พร้อมสัดส่วนตาม loss_reason</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่/field_id</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ loss_rate_pct เกิน threshold ที่กำหนด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกแรงงานเก็บเกี่ยว (Harvest Labor Entry) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกปริมาณที่พนักงานแต่ละคนเก็บเกี่ยวได้ต่อครั้ง สำหรับคำนวณค่าแรงตามผลงาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายชื่อพนักงาน (employee_id) กับ quantity_collected ผูกกับ harvest_record_id</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มเพิ่มรายการต่อคน เรียก POST /crop/harvest-labor</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนถ้า SUM(quantity_collected) ไม่เท่ากับ quantity_harvested ของ record นั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานผลงานแรงงานเก็บเกี่ยว (Harvest Labor Report) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูผลงานสะสมของพนักงานแต่ละคนเพื่อส่งต่อคำนวณค่าแรง piece rate</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางสรุป quantity_collected รวมต่อ employee_id ตามช่วงวันที่ จาก GET /crop/harvest-labor</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองพนักงาน/ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ส่งต่อโมดูลบุคลากรและแรงงาน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รับผลผลิตเข้าคลัง (Warehouse Receiving View) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มุมมองอ่านอย่างเดียวสำหรับพนักงานคลังสินค้าตรวจรับผลผลิตที่เก็บเกี่ยวแล้ว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางการเก็บเกี่ยวที่มี stock_lot_ref แล้ว: harvest_date, quantity_harvested, unit, stock_lot_ref</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง field_id/ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ลิงก์ไปดู stock_lot ในโมดูลคลังสินค้า/สต็อก (อ่านอย่างเดียว)</span></li>
+        </ul>
       </article>
     </div>
   </section>

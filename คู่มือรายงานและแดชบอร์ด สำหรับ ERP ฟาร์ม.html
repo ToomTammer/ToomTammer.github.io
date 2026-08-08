@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -766,6 +767,120 @@ critical = เลยกำหนดแล้วจริง
            (ใบแจ้งหนี้เกิน 90 วัน, สต็อกหมดจริง)
 
 เรียงแสดงผล: critical ก่อน -&gt; warning -&gt; info</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดภาพรวมฟาร์ม (Overview Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ทุกบทบาทเปิดดู ประกอบจาก dashboard_widget ที่จัดวางไว้ตาม dashboard_layout ของผู้ใช้/บทบาทนั้น</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เรนเดอร์ widget ตามลำดับ position_order ของ dashboard_layout (ดึงจาก GET /reports/dashboard-layouts แล้ว fetch ข้อมูลตาม widget_type: kpi_card, line_chart, bar_chart, table)</span></li>
+          <li class="func-item"><span class="txt">การ์ดสรุป: กำไร-ขาดทุน, กระแสเงินสด, มูลค่าสต็อก, ยอดขาย — ข้อมูลมาจาก GET /reports/dashboard/overview</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่/ศูนย์ต้นทุน ใช้ร่วมกับทุก widget บนหน้านี้</span></li>
+          <li class="func-item"><span class="txt">badge บอกความสดของข้อมูลต่อ widget ตาม refresh_interval_minutes (cache invalidate ตามกฎ Data Freshness)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>งบกำไรขาดทุน (Profit &amp; Loss Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูงบกำไรขาดทุนตามศูนย์ต้นทุน/รอบเวลา — เป็นแค่หน้าแสดงผลที่ proxy เรียก accounting ตรง ๆ ไม่คำนวณเลขเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางงบกำไรขาดทุนจาก GET /reports/profit-loss (filter: cost_center_id, period)</span></li>
+          <li class="func-item"><span class="txt">ป้าย "ข้อมูลจากบัญชีและการเงิน (single source of truth)" เตือนว่าหน้านี้เป็น proxy อย่างเดียว ไม่มีการคำนวณซ้ำ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ส่งออก" เรียก POST /reports/{report_code}/export เลือกรูปแบบ PDF/Excel</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ต้นทุนแยกตามแหล่งที่มา (Cost Breakdown Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูต้นทุนรวมต่อศูนย์ต้นทุนแยกตามวัตถุดิบ/แรงงาน/ค่าเสื่อม — รวมค่าที่โมดูลต้นทางคำนวณเสร็จแล้วเท่านั้น</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางต้นทุนจาก GET /reports/cost-breakdown แยก 3 แถว: accounting.cogs_from_journal_entry, hr.payroll_run_line.gross_pay, asset.depreciation_entry.depreciation_amount ตามสูตร total_cost(cost_center, period)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: cost_center_id, period (ใช้ effective_cost_centers(user) กรองสิทธิ์ก่อนเสมอ)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ส่งออก" (PDF/Excel) และปุ่ม "เทียบรอบก่อนหน้า" เชื่อมไปหน้าเปรียบเทียบรอบต่อรอบ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คลังรายงาน (Report Catalog) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายชื่อรายงานทั้งหมดที่ผู้ใช้ปัจจุบันมีสิทธิ์ดู พร้อมช่องทางเปิด/ส่งออก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ report_definition: report_code, name, category (financial/inventory/sales/hr/asset/production) — ดึงจาก GET /reports/definitions ซึ่งกรอง required_role ให้แล้ว</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม category</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เปิดดู" ไปหน้ารายงานนั้น และปุ่ม "ส่งออก" เรียก POST /reports/{report_code}/export</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ห้องสมุด Widget (Widget Library) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการนิยาม widget ที่ใช้ประกอบแดชบอร์ด — เฉพาะเจ้าของ/ผู้บริหารที่จัดการนิยามรายงาน/แดชบอร์ดได้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ dashboard_widget: widget_type, title, report_definition_id ที่ผูกอยู่, refresh_interval_minutes</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไข widget: เลือก widget_type (kpi_card/line_chart/bar_chart/table), เลือก report_definition ที่ดึงข้อมูล, ตั้ง title และ refresh_interval_minutes</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>จัดวางแดชบอร์ด (Dashboard Layout Editor) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดตำแหน่ง widget บนแดชบอร์ดของตนเอง หรือของบทบาทที่ตนจัดการได้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">พื้นที่ลาก-วาง widget ที่เลือกจากห้องสมุด Widget แล้วเรียงเป็น position_order</span></li>
+          <li class="func-item"><span class="txt">โหลดเลย์เอาต์เดิมจาก GET /reports/dashboard-layouts ตาม user_id/role และบันทึกใหม่ด้วย POST /reports/dashboard-layouts</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่ม widget" / "ลบ widget" ออกจากเลย์เอาต์ปัจจุบัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>KPI ผู้บริหาร (Executive KPI Dashboard) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูตัวชี้วัดสรุประดับผู้บริหาร เช่น FCR เฉลี่ย ต้นทุนต่อหน่วย growth rate</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ด KPI จาก GET /reports/kpis (filter: metric, period)</span></li>
+          <li class="func-item"><span class="txt">ตัวเลือก metric ให้สลับดูได้ทีละตัวหรือหลายตัวพร้อมกัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบรอบต่อรอบ (Period-over-Period Comparison) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบตัวเลขรอบปัจจุบันกับรอบก่อนหน้าของศูนย์ต้นทุนเดียวกัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเทียบ current_period_value vs previous_period_value พร้อม variance และ variance_pct จาก GET /reports/comparison/period-over-period</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง cost_center_id + period ปัจจุบัน (ระบบเลือก previous_period ให้ตามกฎ — เดือนก่อนหน้า หรือรอบผลิตก่อนหน้าถ้าเป็น cost_center แบบ batch)</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่ variance_pct ผิดปกติ (บวก/ลบมาก) ด้วยสี</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ศูนย์การแจ้งเตือน (Notification Center) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รวมการแจ้งเตือนจากทุกโมดูลไว้ที่เดียว ไม่ใช่เจ้าของ logic การเตือน แค่รวมมาแสดง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการจาก GET /reports/notifications: source_module, message, severity, is_read เรียงลำดับ critical -&gt; warning -&gt; info</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม source_module (inventory/asset/accounting/sales/procurement) และ severity</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ทำเครื่องหมายว่าอ่านแล้ว" เรียก POST /reports/notifications/{id}/mark-read และคลิกแถวลิงก์ไปยัง source_ref_id ในโมดูลต้นทาง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งเวลาส่งรายงาน (Scheduled Reports) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ตั้งค่าส่งรายงานที่เลือกไว้ทางอีเมลตามรอบเวลาอัตโนมัติ — เฉพาะเจ้าของ/ผู้บริหาร</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ scheduled_report: report_definition ที่ส่ง, recipient_emails, schedule_cron, format (pdf/excel), last_sent_at — จาก GET /reports/scheduled-reports</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มตั้งเวลาใหม่: เลือกรายงานจาก report_definition, กรอก recipient_emails, ตั้ง schedule_cron, เลือก format แล้วบันทึกด้วย POST /reports/scheduled-reports</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบหลายฟาร์ม/นิติบุคคล (Multi-Farm Comparison) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>เทียบผลประกอบการข้ามฟาร์ม/นิติบุคคลในองค์กรเดียวกัน สำหรับเจ้าของ/ผู้บริหารที่ดูแลหลายฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเทียบ total_cost และงบกำไรขาดทุนรายฟาร์ม โดยรวม cost_center ระดับบนสุดของแต่ละฟาร์มเข้าด้วยกัน (ต่อยอดจาก /reports/profit-loss และ /reports/cost-breakdown เดิม)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกฟาร์ม/นิติบุคคลที่จะเทียบ + ช่วงเวลา</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตัวสร้างรายงานเอง (Custom Report Builder) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ให้ผู้ใช้สร้างนิยามรายงานของตัวเองได้จาก data source ที่ระบบอนุญาต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง report_definition ใหม่: report_code, name, category, เลือก data_source_query จาก view ที่อนุญาตตาม required_role ของผู้ใช้</span></li>
+          <li class="func-item"><span class="txt">พรีวิวผลลัพธ์ก่อนบันทึก แล้วเพิ่มเข้าคลังรายงานให้เลือกใช้เป็น widget หรือส่งออกได้เหมือนรายงานอื่น</span></li>
+        </ul>
       </article>
     </div>
   </section>

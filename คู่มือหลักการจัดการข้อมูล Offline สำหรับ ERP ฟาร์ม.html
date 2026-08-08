@@ -409,6 +409,7 @@
     <a href="#conflict">4. การจัดการข้อมูลขัดแย้งและไฟล์ (Conflict &amp; File Handling)</a>
     <a href="#checklist">5. Checklist สำหรับ Dev</a>
     <a href="#rules">6. กฎสำคัญที่ต้องยึด (Critical Rules)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="principles">
@@ -626,6 +627,66 @@ API ตอบกลับ server_id -&gt; อัปเดตกลับเข�
   -&gt; conflict ต้องถูก flag ให้คนตรวจสอบ ห้าม auto-overwrite
 ถ้า target_table เป็นบันทึกกิจกรรมทั่วไป (feeding, care_task)
   -&gt; ใช้ Last-Write-Wins เทียบด้วยเวลาเซิร์ฟเวอร์ได้</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">หน้าจอเชิงเทคนิคสำหรับแอดมิน/dev ตรวจสอบและควบคุมกลไก sync ไม่ใช่หน้าจอที่พนักงานภาคสนามใช้กรอกข้อมูลธุรกิจ (ซึ่ง spec ไว้ในโมดูลนั้น ๆ)</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>สถานะซิงค์รายเรคคอร์ด (Record Sync Status) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ให้พนักงานภาคสนามเห็นสถานะซิงค์ของข้อมูลที่ตนกรอกในเครื่องตัวเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการเรคคอร์ดของตัวเอง พร้อม badge sync_status (pending/synced/failed) และ created_at_local</span></li>
+          <li class="func-item"><span class="txt">แสดง synced_at เมื่อ sync สำเร็จแล้ว</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม sync_status</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ลองซิงค์อีกครั้ง" สำหรับรายการ failed — เข้าคิวใหม่ด้วย idempotency_key เดิม ไม่สร้างเรคคอร์ดซ้ำ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คิวงานรอซิงค์ (Sync Queue Monitor) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>มุมมองแอดมิน/dev สำหรับไล่ตรวจ sync_queue ทั้งระบบเมื่อพบปัญหาซิงค์ค้าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง sync_queue: target_table, target_local_uuid, operation, idempotency_key, queued_at เรียงจากเก่าไปใหม่ตาม queued_at</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม target_table และ operation (create/update/delete)</span></li>
+          <li class="func-item"><span class="txt">แสดง retry_count ต่อรายการ ไฮไลต์รายการที่ retry_count &gt; 10 (เข้าเกณฑ์ sync_status = failed)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บังคับส่งซ้ำ" ต่อรายการที่ค้างอยู่หน้าคิว เพื่อไม่ให้รายการถัดไปที่อ้างอิงถูกบล็อก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบและแก้ไข Conflict (Conflict Resolution) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ให้แอดมินตัดสินใจเลือกเวอร์ชันที่ถูกต้อง เมื่อข้อมูลอ่อนไหว (stock_movement, payment, journal_entry) ถูกแก้ซ้อนกันตอนออฟไลน์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ conflict ที่รอตรวจสอบ กรองตาม target_table</span></li>
+          <li class="func-item"><span class="txt">หน้าเปรียบเทียบสองเวอร์ชันแบบ side-by-side (เวอร์ชันจากเครื่อง vs เวอร์ชันบนเซิร์ฟเวอร์) พร้อม created_at_local ของแต่ละฝั่ง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เลือกเวอร์ชันนี้" ต่อฝั่ง พร้อมช่องบันทึกเหตุผลก่อนยืนยัน</span></li>
+          <li class="func-item"><span class="txt">badge แยกกลุ่มข้อมูลทั่วไป (auto Last-Write-Wins ไม่ต้องเข้าคิวนี้) กับกลุ่มอ่อนไหวที่ต้องรอคนตรวจ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ไฟล์รออัปโหลด (Pending File Uploads) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ตรวจสอบรูปภาพ/ไฟล์ที่ถ่ายในพื้นที่แต่ยังอัปโหลดขึ้น Azure Blob Storage ไม่สำเร็จ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการไฟล์ local พร้อม local path, เรคคอร์ดที่ผูกอยู่ (local_uuid), และสถานะอัปโหลด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะอัปโหลด (รอ/สำเร็จ/ล้มเหลว)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อัปโหลดอีกครั้ง" ต่อไฟล์ที่ล้มเหลว</span></li>
+          <li class="func-item"><span class="txt">แสดงป้าย "ยังลบไฟล์ local ไม่ได้" จนกว่าจะยืนยันอัปโหลดสำเร็จ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แจ้งเตือนแอดมิน (Sync &amp; Conflict Alerts) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ศูนย์รวมแจ้งเตือนอัตโนมัติเมื่อพบ conflict หรือรายการ sync ล้มเหลวซ้ำ ๆ ที่ต้องมีคนตรวจสอบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแจ้งเตือน แยกประเภท: conflict รอตรวจสอบ, เรคคอร์ด sync_status = failed ที่ retry_count เกินเกณฑ์</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามประเภทแจ้งเตือนและ target_table</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ไปหน้าตรวจสอบ" เชื่อมไปหน้า Conflict Resolution หรือ Sync Queue Monitor ตามประเภท</span></li>
+          <li class="func-item"><span class="txt">เครื่องหมาย "อ่านแล้ว/ยังไม่อ่าน" ต่อรายการแจ้งเตือน</span></li>
+        </ul>
       </article>
     </div>
   </section>

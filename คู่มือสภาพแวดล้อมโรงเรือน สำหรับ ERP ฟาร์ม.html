@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -729,6 +730,123 @@ THI &gt; threshold (เช่น 28 สำหรับไก่เนื้อ)
   SUM(ช่วงเวลาที่ environment_log
       อยู่นอกเกณฑ์มาตรฐาน)
   ในช่วงเวลาที่กำหนด</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดสภาพแวดล้อมโรงเรือน (Environment Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการฟาร์มเปิดดูภาพรวมสภาพแวดล้อมทุกโรงเรือนในที่เดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนโรงเรือนสถานะปกติ/ผิดปกติ, จำนวน environment_alert ที่ยังไม่รับทราบ</span></li>
+          <li class="func-item"><span class="txt">รายการโรงเรือนพร้อม badge สถานะ ตาม severity ล่าสุดจาก environment_alert</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามโรงเรือน/ช่วงเวลาที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละโรงเรือนลิงก์ไปหน้ารายละเอียดสภาพแวดล้อมโรงเรือน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายชื่อโรงเรือนและสถานะสภาพแวดล้อม (Housing Locations Environment List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตารางรวมค่าล่าสุดของทุกโรงเรือนเทียบเกณฑ์มาตรฐาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: housing_location, temperature ล่าสุด, humidity_pct ล่าสุด, occupancy_rate_pct เทียบ max_occupancy_pct</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: แสดงเฉพาะโรงเรือนที่สภาพแวดล้อมผิดปกติหรือความหนาแน่นเกินเกณฑ์</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อไปหน้ารายละเอียดของโรงเรือนนั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดสภาพแวดล้อมโรงเรือน (Housing Environment Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลเจาะจงต่อ 1 โรงเรือน ทั้งค่าปัจจุบันและย้อนหลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดค่าล่าสุด temperature/humidity_pct เทียบ temp_min/max, humidity_min/max ของ environment_standard ที่ตรง species และ age_days</span></li>
+          <li class="func-item"><span class="txt">กราฟเส้น temperature และ humidity_pct ย้อนหลังจาก environment_log</span></li>
+          <li class="func-item"><span class="txt">แถบแสดง occupancy_rate_pct เทียบ max_occupancy_pct</span></li>
+          <li class="func-item"><span class="txt">รายการ environment_alert ล่าสุดของโรงเรือนนี้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เกณฑ์มาตรฐานสภาพแวดล้อม (Environment Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการเกณฑ์อุณหภูมิ ความชื้น และความหนาแน่นตาม species และช่วงอายุ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: species, age_days_start/age_days_end, temp_min/temp_max, humidity_min/humidity_max, max_occupancy_pct</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไขเกณฑ์ใหม่ต่อ species และช่วงอายุ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม species</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกสภาพแวดล้อมด้วยตนเอง (Manual Environment Log Entry) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>กรอกค่าที่วัดได้เองสำหรับโรงเรือนที่ยังไม่มีเซนเซอร์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: เลือกโรงเรือน (housing_location_id), recorded_at, temperature, humidity_pct — บันทึก source เป็น manual อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">แสดงผลเทียบเกณฑ์มาตรฐานทันทีหลัง submit พร้อมเตือนถ้าเกินช่วง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติบันทึกสภาพแวดล้อม (Environment Log History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติ environment_log ทั้งที่กรอกเองและรับจากเซนเซอร์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: housing_location, recorded_at, temperature, humidity_pct, source พร้อม badge sensor/manual</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: โรงเรือน, ช่วงวันที่, source</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export รายการที่กรองไว้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>การแจ้งเตือนสภาพแวดล้อม (Environment Alerts) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ติดตามและจัดการการแจ้งเตือนที่เกิดจากค่าเกินเกณฑ์มาตรฐาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: housing_location, alert_type, severity พร้อม badge สี (warning/critical), triggered_at, message</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: severity, alert_type, โรงเรือน, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "รับทราบ/ปิดแจ้งเตือน" ต่อรายการ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานประวัติสภาพแวดล้อม (Environment History Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูแนวโน้มสภาพแวดล้อมย้อนหลังต่อโรงเรือนในช่วงเวลาที่เลือก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้น temperature/humidity_pct เทียบเกณฑ์มาตรฐานตามช่วงเวลาที่เลือก</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: โรงเรือน, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export PDF/Excel</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ควบคุมและประวัติระบายอากาศ (Ventilation Control &amp; Log) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>สั่งการและตรวจสอบประวัติการเปิด/ปิดพัดลมและม่านระบายอากาศ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่มควบคุมด่วนต่อโรงเรือนที่เลือก: fan_on, fan_off, curtain_open, curtain_close</span></li>
+          <li class="func-item"><span class="txt">ตารางประวัติ: action_time, action_type, triggered_by (manual/automatic)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: โรงเรือน, triggered_by, ช่วงวันที่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ติดตามความเสี่ยง Heat Stress (THI Monitor) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ประเมินความเสี่ยง heat stress ของแต่ละโรงเรือนจากดัชนี THI</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง/กราฟค่า THI ต่อโรงเรือน คำนวณจาก temperature และ humidity_pct ล่าสุด</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์โรงเรือนที่ THI เกิน threshold ตามชนิดสัตว์</span></li>
+          <li class="func-item"><span class="txt">หมายเหตุเตือนว่าค่า threshold ควรตรวจสอบกับสัตวแพทย์ก่อนตั้งค่าเริ่มต้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สถานะการเชื่อมต่อเซนเซอร์ (Sensor Connectivity Status) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ตรวจจับเซนเซอร์ที่ขาดการเชื่อมต่อเพื่อไม่ให้เข้าใจผิดว่าสภาพแวดล้อมปกติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: housing_location, เวลาข้อมูลล่าสุด (last recorded_at), นาทีที่เงียบไป, สถานะเชื่อมต่อ</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์แถวที่เกิน max_sensor_silence_minutes (เช่น 30 นาที)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สรุปคุณภาพการจัดการโรงเรือนย้อนหลัง (Housing Management Quality Summary) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ประเมินภาพรวมคุณภาพการจัดการสภาพแวดล้อมทั้งรอบการเลี้ยง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง time_out_of_range_hours ต่อโรงเรือนในช่วงเวลาที่เลือก เรียงจากมากไปน้อย</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงเวลา/รอบการเลี้ยง</span></li>
+        </ul>
       </article>
     </div>
   </section>

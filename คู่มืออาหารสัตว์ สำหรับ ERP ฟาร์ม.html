@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -726,6 +727,112 @@
 benchmark_fcr = FCR เฉลี่ยของฝูงก่อนหน้า
   ที่ใช้สูตรอาหารเดียวกัน หรือค่ามาตรฐานอุตสาหกรรม</pre>
         <p class="formula-example"><b>หมายเหตุ:</b> variance เป็นบวกแปลว่าใช้อาหารมากกว่าปกติเพื่อผลผลิตเท่าเดิม (แย่ลง) ควรตรวจสอบคุณภาพอาหาร/สุขภาพฝูงประกอบ</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดอาหารสัตว์ (Feed Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการฟาร์มเปิดดูภาพรวมการให้อาหารและ FCR ประจำวันของทุกฝูง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: fcr_value เฉลี่ยล่าสุด, ต้นทุนอาหารสะสมรวม (feed_cost_per_head), จำนวนฝูงที่ยังไม่บันทึกการให้อาหารวันนี้</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือน: ฝูงที่ current_age_days เกิน age_days_end ของสูตรที่ใช้อยู่ ต้องเปลี่ยนสูตร</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่/ฝูงที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สูตรอาหารตามช่วงอายุ (Feed Formulas) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการสูตรอาหารมาตรฐานตามชนิดสัตว์และช่วงอายุ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: species, stage_name, age_days_start–age_days_end, feed_item_id, daily_amount_per_head</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม species</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไขสูตร (บันทึกผ่าน POST/PATCH /livestock/feed-formulas)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดฝูง: สูตรอาหารปัจจุบัน (Animal Group Feed Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูว่าฝูงที่เลือกควรใช้สูตรอาหารอะไรตามอายุจริงตอนนี้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สูตรอาหารที่ควรใช้ตอนนี้ (GET /livestock/animal-groups/{id}/current-feed-formula) เทียบกับสูตรที่บันทึกใช้จริงล่าสุด</span></li>
+          <li class="func-item"><span class="txt">ค่า fcr_value ปัจจุบันของฝูง (GET /livestock/animal-groups/{id}/fcr)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการให้อาหาร" ลิงก์ไปฟอร์มบันทึก feeding_record ของฝูงนี้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการให้อาหารประจำวัน (Feeding Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จดบันทึกการให้อาหารจริงต่อฝูง/ตัว พร้อมแจ้งตัดสต็อกอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางประวัติ: feeding_date, animal_group_id/animal_id, feed_item_id, quantity_given, fed_by</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, ฝูง/สัตว์</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการให้อาหาร" — ฟอร์มเลือกฝูง/สัตว์ + ชนิดอาหาร + ปริมาณที่ให้จริง แล้วตัดสต็อกอัตโนมัติเมื่อ submit</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำนวณ FCR (FCR Calculation) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูผลคำนวณอัตราแลกเนื้อต่อฝูงในแต่ละช่วงเวลา/รอบผลิต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ fcr_calculation: period_start–period_end, total_feed_consumed, total_weight_gain, fcr_value</span></li>
+          <li class="func-item"><span class="txt">กราฟแนวโน้ม fcr_value ตามรอบที่ผ่านมาของฝูงที่เลือก</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ฝูง, ช่วงเวลา</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานต้นทุนอาหารตามฝูง (Feed Cost Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูต้นทุนอาหารสะสมต่อตัว/ฝูง ใช้เทียบประสิทธิภาพการเลี้ยงระหว่างฝูง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางแยกตามฝูง: feed_cost_per_head, total_feed_consumed (จาก GET /livestock/reports/feed-cost-by-group)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, ฝูง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export รายงาน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตารางให้อาหารตามแผน (Feeding Schedule) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>กำหนดเวลาให้อาหารล่วงหน้าต่อฝูง เพื่อเตือนพนักงานหน้างาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ feeding_schedule: feeding_time, feed_formula_id, status (scheduled/completed/skipped)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มตั้งตารางใหม่ผูกกับ animal_group_id + feed_formula_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่มเปลี่ยนสถานะเป็น completed/skipped รายมื้อ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบ FCR ระหว่างฝูง (FCR Comparison) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบ FCR ระหว่างฝูง/สูตรอาหารต่างกัน เพื่อหาสูตรที่มีประสิทธิภาพดีที่สุด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเทียบ fcr_value ของหลายฝูง พร้อม fcr_variance_pct เทียบ benchmark_fcr (จาก GET /livestock/reports/fcr-comparison)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกฝูงที่ต้องการเทียบ + ช่วงเวลา</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์ฝูงที่ variance เป็นบวก (ใช้อาหารมากกว่าปกติ แย่กว่าค่ามาตรฐาน)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แจ้งเตือนเปลี่ยนสูตรอาหารตามอายุ (Feed Formula Change Alerts) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เตือนล่วงหน้าเมื่อฝูงถึงช่วงอายุที่ควรเปลี่ยนสูตรอาหาร ป้องกันให้อาหารผิดสูตร</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการฝูงที่ current_age_days ใกล้หรือเกิน age_days_end ของสูตรที่ใช้อยู่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ไปเปลี่ยนสูตร" ลิงก์ไปหน้าสูตรอาหารพร้อมเลือกสูตรถัดไปที่ age_days_start ตรงกับอายุปัจจุบัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เชื่อมเครื่องให้อาหารอัตโนมัติ (IoT Feeder Integration) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ตรวจสอบข้อมูลปริมาณอาหารที่เครื่องให้อาหารอัตโนมัติบันทึกเข้ามาแทนคน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการอุปกรณ์ที่เชื่อมต่อต่อฝูง + สถานะออนไลน์/ออฟไลน์</span></li>
+          <li class="func-item"><span class="txt">ตาราง quantity_given ที่เครื่องบันทึกเข้า feeding_record อัตโนมัติ พร้อม flag ค่าที่คลาดเคลื่อนผิดปกติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ต้นทุนอาหารล่วงหน้า (Feed Cost Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>พยากรณ์ต้นทุนอาหารทั้งรอบเลี้ยงจากแผนการให้อาหารและราคาปัจจุบัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟพยากรณ์ต้นทุนสะสมตลอดรอบ โดยประมาณจาก daily_amount_per_head ของสูตรที่จะใช้ตามแผน</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกฝูง/รอบผลิต + สูตรอาหารที่จะใช้</span></li>
+        </ul>
       </article>
     </div>
   </section>

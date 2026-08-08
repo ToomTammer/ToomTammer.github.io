@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณและกฎทางธุรกิจ (Business Rules)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -763,6 +764,125 @@ refresh_token: อายุ 7-30 วัน
         <pre class="formula">รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร
   ผสมตัวเลขและตัวอักษรอย่างน้อย 1 ตัวแต่ละแบบ
   (ปรับความเข้มงวดเพิ่มได้ภายหลังผ่านการตั้งค่า Identity)</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>เข้าสู่ระบบ (Login) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ทุกคนต้องผ่านก่อนใช้งานระบบ ไม่ว่าจะเป็นเว็บ MVC หรือแอป Flutter</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม username/email + password พร้อมปุ่ม "เข้าสู่ระบบ" เรียก POST /auth/login เพื่อขอ access token + refresh token</span></li>
+          <li class="func-item"><span class="txt">ลิงก์ "ลืมรหัสผ่าน?" ไปหน้า Forgot Password</span></li>
+          <li class="func-item"><span class="txt">ข้อความแจ้งเตือนบัญชีถูกล็อกชั่วคราวเมื่อ lockout_end ยังไม่ผ่าน พร้อมนับเวลาที่เหลือ ไม่ต้องกรอกรหัสผ่านซ้ำจนกว่าจะหมดเวลา</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ลืมรหัสผ่าน (Forgot Password) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ขอลิงก์รีเซ็ตรหัสผ่านทางอีเมลเมื่อจำรหัสผ่านเดิมไม่ได้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มกรอก email เรียก POST /auth/forgot-password</span></li>
+          <li class="func-item"><span class="txt">ข้อความยืนยัน "ส่งลิงก์แล้วถ้ามีอีเมลนี้ในระบบ" — ไม่เปิดเผยว่ามี email นี้อยู่จริงหรือไม่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งรหัสผ่านใหม่ (Reset Password) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตั้งรหัสผ่านใหม่จากลิงก์ในอีเมล แล้วเพิกถอน refresh token เดิมทั้งหมดทันที</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มรหัสผ่านใหม่ + ยืนยันรหัสผ่าน ตรวจนโยบายอย่างน้อย 8 ตัวอักษร ผสมตัวเลข/ตัวอักษร เรียก POST /auth/reset-password</span></li>
+          <li class="func-item"><span class="txt">คำเตือนว่าอุปกรณ์ที่ login ค้างอยู่ทั้งหมด (RefreshToken ทุกแถวของบัญชีนี้) จะถูก revoke ทันทีหลังตั้งรหัสผ่านใหม่สำเร็จ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายชื่อผู้ใช้งาน (User List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เจ้าของฟาร์ม/ผู้บริหารดูและจัดการบัญชีผู้ใช้ทั้งหมดในระบบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการจาก GET /users — คอลัมน์ username, full_name_th, email, Role (ผ่าน UserRole), is_active</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม role_name และสถานะ is_active (ใช้งาน/ปิดใช้งาน)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างบัญชีใหม่" เปิดฟอร์มสร้างบัญชี (POST /users)</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวเข้าหน้ารายละเอียดบัญชีผู้ใช้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สร้าง/แก้ไขบัญชีผู้ใช้ (User Create/Edit Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>กรอกข้อมูลบัญชีใหม่ให้พนักงาน หรือแก้ไขบัญชีเดิม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟิลด์ username, email, full_name_th, phone_number</span></li>
+          <li class="func-item"><span class="txt">ดรอปดาวน์เลือก Role — บันทึกด้วย POST /users/{id}/assign-role</span></li>
+          <li class="func-item"><span class="txt">ปุ่มบันทึกเรียก POST /users (สร้างใหม่) หรือ PATCH /users/{id} (แก้ไข/ปิดใช้งาน)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดบัญชีผู้ใช้ (User Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลครบของบัญชีหนึ่งคนก่อนแก้ไขหรือปิดใช้งาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดง created_at, created_by, last_login_at, email_confirmed, is_active ปัจจุบัน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ปิดใช้งานบัญชี" พร้อม confirm dialog — PATCH is_active=false แล้วเพิกถอน RefreshToken ทุกตัวของบัญชีนี้</span></li>
+          <li class="func-item"><span class="txt">ลิงก์ไปหน้า "ประวัติการเข้าสู่ระบบ" ของบัญชีนี้ (Phase 2)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>โปรไฟล์ของฉัน (My Profile) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ผู้ใช้ทุกคนแก้ไขข้อมูลส่วนตัวและเปลี่ยนรหัสผ่านของตัวเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มแก้ไข full_name_th, phone_number, profile_image_url (อัปโหลดรูปเก็บใน Azure Blob Storage)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มเปลี่ยนรหัสผ่าน (รหัสเดิม + รหัสใหม่) — เปลี่ยนแล้ว security_stamp ต้องเปลี่ยนตามทันที</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บทบาทในระบบ (Roles) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูรายชื่อ 7 บทบาทที่กำหนดไว้และขอบเขตสิทธิ์ของแต่ละบทบาท ใช้อ้างอิงตอนมอบหมาย Role</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ Role พร้อม description อธิบายขอบเขตสิทธิ์ (role_name เป็น enum คงที่ แก้ไม่ได้จากหน้านี้)</span></li>
+          <li class="func-item"><span class="txt">จำนวนผู้ใช้ที่ถือแต่ละ Role อยู่ (นับจากตาราง UserRole)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการเข้าสู่ระบบ (Login History) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ตรวจสอบความปลอดภัยจากประวัติการ login ของบัญชีหนึ่งคน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางจาก GET /users/{id}/login-history — login_at, ip_address, device_info, is_success (badge เขียว/แดง)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่ และสวิตช์ดูเฉพาะรายการ login ที่ล้มเหลว (is_success = false)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ยืนยันตัวตนสองชั้น (2FA Setup) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ผู้ใช้เปิด/ปิดการยืนยันตัวตนสองชั้นของบัญชีตัวเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">สวิตช์เปิด/ปิด two_factor_enabled พร้อมฟอร์มยืนยัน phone_number ก่อนเปิดใช้งานจริง</span></li>
+          <li class="func-item"><span class="txt">ขั้นตอนกรอกรหัส OTP ที่ส่งไปยัง phone_number เพื่อยืนยันก่อนบันทึก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำขอสร้างบัญชีรออนุมัติ (Pending Signup Approval) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ผู้บริหารอนุมัติหรือปฏิเสธบัญชีที่พนักงานขอสร้างเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการคำขอพร้อมข้อมูลที่กรอกไว้: username, email, full_name_th</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ" (ตั้ง is_active=true แล้วเปิดฟอร์มมอบหมาย Role ต่อ) และปุ่ม "ปฏิเสธ"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เข้าสู่ระบบผ่าน SSO (SSO Login) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ทางเลือกเข้าสู่ระบบด้วยบัญชี Google/Microsoft แทนรหัสผ่านของระบบเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่ม "เข้าสู่ระบบด้วย Google" / "เข้าสู่ระบบด้วย Microsoft" บนหน้า Login เดิม</span></li>
+          <li class="func-item"><span class="txt">หน้าจับคู่บัญชี SSO เข้ากับ User ที่มีอยู่แล้วโดยเทียบจาก email</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>Session ที่ใช้งานอยู่ (Active Sessions) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ดูอุปกรณ์ที่ login ค้างอยู่ทั้งหมดของบัญชีตัวเอง และบังคับออกจากระบบระยะไกล</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ RefreshToken ที่ is_revoked=false — device_info, issued_at, expires_at</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ออกจากระบบอุปกรณ์นี้" ต่อแถว — ตั้ง is_revoked=true ทันที</span></li>
+        </ul>
       </article>
     </div>
   </section>

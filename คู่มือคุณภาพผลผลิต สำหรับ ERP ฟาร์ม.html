@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -730,6 +731,135 @@
 reject_rate_pct &gt; threshold (เช่น 15%)
   -&gt; flag เตือนให้ตรวจสอบสาเหตุ
      (ปุ๋ย/สารเคมี/สภาพอากาศ/ช่วงเก็บเกี่ยว)</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดคุณภาพผลผลิต (Quality Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่เจ้าของฟาร์ม/ผู้ตรวจสอบคุณภาพเปิดดูภาพรวมคุณภาพผลผลิตประจำรอบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุปสัดส่วนเกรด (grade_distribution) ต่อรอบผลิตล่าสุด และ reject_rate_pct พร้อมสถานะเตือนถ้าเกิน threshold</span></li>
+          <li class="func-item"><span class="txt">กราฟแนวโน้มสัดส่วนเกรดย้อนหลัง (จาก GET /crop/reports/grade-distribution)</span></li>
+          <li class="func-item"><span class="txt">รายการ quality_inspection ล่าสุด พร้อมลิงก์เข้าหน้ารายละเอียด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id, ช่วงวันที่ inspection_date</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>มาตรฐานเกรด (Grading Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการเกณฑ์มาตรฐานเกรดต่อชนิด/พันธุ์พืชที่ใช้ตัดสินเกรดผลผลิต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: crop_variety_id, grade, min_size/max_size, min_brix, max_moisture_pct, defect_tolerance_pct (GET /crop/grading-standards)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มมาตรฐานใหม่" เปิดฟอร์มตั้งเกณฑ์เกรด (POST /crop/grading-standards)</span></li>
+          <li class="func-item"><span class="txt">ปุ่มแก้ไขต่อแถว เปิดฟอร์มแก้เกณฑ์เดิม (PATCH /crop/grading-standards/{id})</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกผลตรวจสอบคุณภาพ (New Quality Inspection) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ฟอร์มให้ผู้ตรวจสอบคุณภาพกรอกค่าที่วัดได้จริงของ lot หนึ่ง แล้วให้ระบบตัดสินเกรดอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือก stock_lot_ref, inspection_date, inspected_by (ค่าเริ่มต้น = ผู้ใช้ที่ล็อกอิน)</span></li>
+          <li class="func-item"><span class="txt">ช่องกรอกค่าที่วัด: measured_size, measured_brix, measured_moisture_pct, defect_pct</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกและคำนวณเกรด" เรียก POST /crop/quality-inspections คำนวณ assigned_grade ตามสูตร Auto Grade Assignment</span></li>
+          <li class="func-item"><span class="txt">แสดง assigned_grade ที่ระบบตัดสินให้ทันทีหลังบันทึกสำเร็จ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการตรวจสอบคุณภาพ (Quality Inspection List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติการตรวจสอบคุณภาพทั้งหมด ค้นย้อนหลังได้ตาม lot หรือเกรด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: stock_lot_ref, inspection_date, inspected_by, assigned_grade (GET /crop/quality-inspections)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ inspection_date, assigned_grade, stock_lot_ref</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเข้าหน้ารายละเอียดการตรวจสอบ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดการตรวจสอบ &amp; แบ่งสต็อกตามเกรด (Inspection Detail &amp; Stock Split) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูค่าที่วัดได้เทียบกับเกณฑ์มาตรฐาน แล้วสั่งแบ่งสต็อกตามเกรดที่ตัดสินได้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดงค่าที่วัด (measured_size/measured_brix/measured_moisture_pct/defect_pct) เทียบเกณฑ์ grading_standard ที่ใช้ตัดสิน</span></li>
+          <li class="func-item"><span class="txt">ตาราง grade_stock_split ที่เกิดจากการตรวจนี้: grade, quantity, new_stock_lot_ref</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "แบ่งสต็อกตามเกรด" เรียก POST /crop/quality-inspections/{id}/split-stock แจ้งคลังสร้าง lot ใหม่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ราคาต่อเกรด (Grade Prices) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการราคารับซื้อ/ราคาแนะนำต่อเกรดของแต่ละพันธุ์พืช</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: crop_variety_id, grade, price_per_unit, effective_date (GET /crop/grade-prices)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id, grade</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ตั้งราคาใหม่" เปิดฟอร์มบันทึกราคา+วันที่มีผล (POST /crop/grade-prices)</span></li>
+          <li class="func-item"><span class="txt">แถบ "ราคาปัจจุบัน" ดึงราคาที่มีผล ณ วันนี้ต่อเกรด/พันธุ์ (GET /crop/grade-prices/current)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานสัดส่วน &amp; มูลค่าตามเกรด (Grade Distribution &amp; Value Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปสัดส่วนเกรดและมูลค่ารวมของรอบผลิต ใช้เทียบว่าคัดเกรดแล้วมูลค่าเพิ่มขึ้นจริงแค่ไหน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟวงกลม/แท่งสัดส่วนเกรดต่อรอบผลิต (สูตร Grade Distribution)</span></li>
+          <li class="func-item"><span class="txt">ตารางมูลค่ารวมตามเกรด = SUM(grade_stock_split.quantity × grade_price.price_per_unit) ต่อเกรด (สูตร Value by Grade)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: รอบผลิต/planting_plan, crop_variety_id, ช่วงวันที่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เตือนอัตราของเสียสูงผิดปกติ (Reject Rate Alert) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รายการแจ้งเตือนเมื่อสัดส่วนของเสีย/reject ของรอบผลิตใดสูงเกินเกณฑ์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ flag ที่ reject_rate_pct เกิน threshold (ค่าเริ่มต้น 15%) พร้อมรอบผลิต/พันธุ์ที่เกี่ยวข้อง</span></li>
+          <li class="func-item"><span class="txt">ช่องปรับค่า threshold ที่ใช้แจ้งเตือน</span></li>
+          <li class="func-item"><span class="txt">ลิงก์จากแต่ละแถวไปหน้าวิเคราะห์แนวโน้มคุณภาพเพื่อหาสาเหตุ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งค่าเชื่อมต่ออุปกรณ์วัดคุณภาพดิจิทัล (Device Integration Settings) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เชื่อมเครื่องวัด Brix/ความชื้นเข้ากับระบบ เพื่อลดการกรอกค่าด้วยมือ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มตั้งค่าการเชื่อมต่อเครื่องวัด (ชนิดอุปกรณ์, พอร์ต/API key)</span></li>
+          <li class="func-item"><span class="txt">สวิตช์เปิด/ปิดการเติมค่า measured_brix/measured_moisture_pct อัตโนมัติในหน้าบันทึกผลตรวจ</span></li>
+          <li class="func-item"><span class="txt">บันทึกสถานะการซิงค์ล่าสุดจากอุปกรณ์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบสต็อกเกรดก่อนยืนยันคำสั่งขาย (Grade Stock Availability) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ให้พนักงานขายเช็กว่ามีสต็อกเกรดที่ลูกค้าต้องการเพียงพอก่อนยืนยันคำสั่งขาย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางสต็อกคงเหลือแยกตามเกรด อ้างอิง new_stock_lot_ref จาก grade_stock_split</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id, grade</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยืนยันสต็อกพอสำหรับคำสั่งขาย" ส่งผลกลับให้โมดูลขายและลูกค้า</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์แนวโน้มคุณภาพเทียบปัจจัยการดูแล (Quality Trend Analysis) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูว่าค่าคุณภาพที่วัดได้เปลี่ยนแปลงตามการให้น้ำ/ปุ๋ยอย่างไรในแต่ละรอบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้นค่า measured_brix, measured_moisture_pct, defect_pct ย้อนหลัง เทียบเวลากับบันทึกการให้น้ำ/ปุ๋ย</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id, ช่วงเวลา</span></li>
+          <li class="func-item"><span class="txt">ตารางสรุปความสัมพันธ์เบื้องต้นระหว่างปัจจัยดูแลกับ assigned_grade</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ถ่ายภาพ/AI คัดเกรดอัตโนมัติ (AI Photo Grading) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ใช้ภาพถ่ายผลผลิตช่วยเสนอเกรดอัตโนมัติ ลดเวลาตรวจด้วยมือ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปุ่มถ่ายภาพ/อัปโหลดภาพผลผลิตต่อ lot</span></li>
+          <li class="func-item"><span class="txt">แสดงเกรดที่ AI เสนอเทียบกับ assigned_grade เดิม ให้ผู้ตรวจสอบยืนยันหรือแก้ไข</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์สัดส่วนเกรดล่วงหน้า (Grade Distribution Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>คาดการณ์สัดส่วนเกรดของรอบผลิตถัดไปจากข้อมูลการดูแลระหว่างรอบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟพยากรณ์สัดส่วนเกรดของรอบผลิตที่กำลังจะเก็บเกี่ยว</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: crop_variety_id, รอบผลิต/planting_plan ที่จะถึง</span></li>
+        </ul>
       </article>
     </div>
   </section>

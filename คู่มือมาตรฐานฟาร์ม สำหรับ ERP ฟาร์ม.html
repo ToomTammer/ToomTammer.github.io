@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -763,6 +764,122 @@
   ประเภทข้อมูลใน trace_link (source_module = crop/livestock)
   ของช่วงเวลาเดียวกัน
   -&gt; เสนอ evidence_ref อัตโนมัติให้ผู้ตรวจเลือกยืนยัน</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดมาตรฐานฟาร์ม (Standards Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกให้เจ้าของฟาร์มและเจ้าหน้าที่มาตรฐานเห็นภาพรวมสถานะการรักษามาตรฐานทั้งหมด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวน certification_standard ที่ใช้งาน, จำนวน certificate แยกตาม status (active/expiring_soon/expired)</span></li>
+          <li class="func-item"><span class="txt">รายการเตือน: certificate ที่ status = expiring_soon/expired, audit_finding ที่ corrective_status ≠ closed และเลย corrective_deadline</span></li>
+          <li class="func-item"><span class="txt">รายการ audit_record ที่ next_audit_due_date ใกล้ถึง เรียงจากใกล้สุด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: scope_type (crop/livestock/both), standard_name</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>มาตรฐานรับรอง (Certification Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการนิยามมาตรฐานที่ฟาร์มขอ/รักษา และเวอร์ชันเกณฑ์ที่ใช้อ้างอิง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: standard_name, version, issuing_body, scope_type, audit_cycle_months</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: scope_type, standard_name</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มมาตรฐานใหม่" เปิดฟอร์มบันทึก (POST /standards/certification-standards)</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเข้าหน้ารายละเอียด → ไปดูเช็กลิสต์ข้อกำหนดของมาตรฐานนั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เช็กลิสต์ข้อกำหนด (Standard Checklist Items) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายละเอียดข้อกำหนดย่อยของมาตรฐานหนึ่ง ใช้เป็นแม่แบบทุกครั้งที่เปิดรอบตรวจ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: item_code, requirement_text, evidence_type_required, is_critical (badge เน้นข้อวิกฤต)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: standard_id, is_critical</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มข้อกำหนด" เปิดฟอร์มผูกกับ standard_id (POST /standards/checklist-items)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รอบการตรวจประเมิน (Audit Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูรายการรอบตรวจประเมินทั้งภายในและภายนอกที่เคยเกิดและที่วางแผนไว้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: audit_date, audit_type (internal/external), auditor_name, overall_result (badge pass/conditional/fail), next_audit_due_date</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: standard_id, audit_type, overall_result, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างรอบตรวจใหม่" เปิดฟอร์มระบุ standard_id, audit_date, audit_type, auditor_name (POST /standards/audit-records)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกผลตรวจรายข้อ (Audit Findings Entry) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้ารายละเอียดของ 1 รอบตรวจ ใช้กรอกผลตรวจทีละข้อกำหนดจนครบเช็กลิสต์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ standard_checklist_item ทุกข้อของมาตรฐานนั้น พร้อมปุ่มเลือก result: comply / non_comply / not_applicable</span></li>
+          <li class="func-item"><span class="txt">ช่องกรอก evidence_ref, corrective_action, corrective_deadline ที่แสดงเมื่อ result = non_comply</span></li>
+          <li class="func-item"><span class="txt">แถบแสดง compliance_pct และ overall_result ที่คำนวณสดขณะกรอก (GET/POST /standards/audit-records/{id}/findings)</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนทันทีถ้าข้อที่ is_critical = true ถูกตั้งเป็น non_comply</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ติดตามข้อบกพร่องและการแก้ไข (Corrective Action Tracker) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รวมข้อบกพร่องจากทุกรอบตรวจไว้ที่เดียว เพื่อไล่ปิดงานไม่ให้ค้าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ audit_finding ที่ result = non_comply: corrective_action, corrective_deadline, corrective_status (badge open/in_progress/closed)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: corrective_status, เลยกำหนด (corrective_deadline &lt; วันนี้ และยัง ≠ closed), มาตรฐาน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อัปเดตสถานะ" เปลี่ยน corrective_status (PATCH /standards/audit-findings/{id})</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบรับรอง (Certificates) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เก็บใบรับรองที่ออกจริงทุกใบ พร้อมไฟล์แนบและวันหมดอายุ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: certificate_number, issued_date, expiry_date, status (badge active/expiring_soon/expired/revoked)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: standard_id, status</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกใบรับรองใหม่" เปิดฟอร์มระบุ standard_id, audit_record_id, certificate_number, issued_date, expiry_date และแนบไฟล์ file_ref (POST /standards/certificates)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบรับรองใกล้หมดอายุ (Expiring Certificates) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการเฝ้าเตือนเฉพาะใบรับรองที่ต้องรีบต่ออายุ แยกจากตารางรวมเพื่อไม่ให้พลาด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางกรองเฉพาะ status = expiring_soon/expired เรียงตาม expiry_date จากใกล้สุด (GET /standards/certificates/expiring)</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวลิงก์กลับไปหน้าใบรับรองเพื่อบันทึกใบต่ออายุ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แพ็กหลักฐาน (Evidence Pack) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รวบรวมหลักฐานจากตรวจสอบย้อนกลับ/โมดูลอื่นให้ผู้ตรวจดูก่อนกรอกผล ลดงานคีย์ซ้ำ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการหลักฐานที่ระบบดึงอัตโนมัติตาม evidence_type_required ของแต่ละ checklist_item (GET /standards/audit-records/{id}/evidence-pack)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยืนยันใช้เป็นหลักฐาน" เพื่อเซ็ต evidence_ref ในหน้าบันทึกผลตรวจ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์แนวโน้มผลตรวจ (Audit Trend Analytics) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูพัฒนาการ/ความเสื่อมของผลการรักษามาตรฐานย้อนหลัง เพื่อวางแผนป้องกันล่วงหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้น compliance_pct ของแต่ละรอบ audit_record ย้อนหลัง แยกตาม standard_id</span></li>
+          <li class="func-item"><span class="txt">ตารางเปรียบเทียบ overall_result และจำนวนข้อ non_comply ของแต่ละรอบตรวจ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พอร์ทัลผู้ตรวจประเมินภายนอก (External Auditor Portal) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ให้ผู้ตรวจภายนอกเข้าดูและกรอกผลได้เองเฉพาะรอบที่ได้รับมอบหมาย ลดงานประสานทางอีเมล</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ audit_record ที่ auditor_name ตรงกับผู้ตรวจที่ login เข้ามาเท่านั้น</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มกรอกผลตรวจแบบจำกัดสิทธิ์ (เห็นเฉพาะ checklist_item ของมาตรฐานที่ตรวจ) พร้อมช่องคอมเมนต์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เซ็นเอกสารรับรองดิจิทัล (Digital Certificate Signing) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ให้ผู้มีสิทธิ์เซ็นรับรองใบรับรองด้วยลายเซ็นดิจิทัลก่อนออกไฟล์ทางการ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">หน้ารายละเอียด certificate พร้อมปุ่ม "เซ็นและออกเอกสาร" แนบลายเซ็นดิจิทัลลงในไฟล์ file_ref</span></li>
+          <li class="func-item"><span class="txt">ประวัติการเซ็น: ผู้เซ็น, วันเวลาที่เซ็น</span></li>
+        </ul>
       </article>
     </div>
   </section>

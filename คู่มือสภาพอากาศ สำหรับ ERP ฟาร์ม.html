@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -736,6 +737,119 @@ AND expected_rainfall_mm &gt; min_effective_rain_mm
 
 -&gt; ต้องเรียก /crop/weather-forecast/sync ใหม่
    ก่อนแสดงผลให้ผู้ใช้</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดสภาพอากาศ (Weather Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการแปลง/เจ้าหน้าที่เกษตรเปิดดูภาพรวมอากาศประจำวันของทุกแปลง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุปต่อแปลง: temperature_min/max, rain_probability_pct, condition ของวันนี้/พรุ่งนี้ จาก weather_forecast</span></li>
+          <li class="func-item"><span class="txt">รายการคำเตือนที่ยัง active (weather_alert) พร้อม badge สีตาม severity (info/warning/critical)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกแปลง/โซน (field_id / field_zone_id)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "Sync พยากรณ์ล่าสุด" เรียก POST /crop/weather-forecast/sync</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>การเชื่อมต่อพื้นที่กับแหล่งข้อมูลอากาศ (Weather Station Links) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ผูกแปลง/โซนเข้ากับพิกัดและผู้ให้บริการที่ใช้สอบถามพยากรณ์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: field_id/field_zone_id, provider, latitude/longitude, external_location_id (GET /crop/weather-station-links)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างใหม่ (POST /crop/weather-station-links): เลือกแปลง, provider, ระบุพิกัดเองหรือใช้จุดกึ่งกลางขอบเขตแปลงอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ทดสอบเชื่อมต่อ" เรียก external API ก่อนบันทึก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์อากาศรายแปลง (Field Forecast Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูพยากรณ์ล่วงหน้าแบบละเอียดของแปลงหนึ่ง ๆ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง/กราฟรายวัน: forecast_date, temperature_min/max, rain_probability_pct, expected_rainfall_mm, condition (GET /crop/fields/{id}/weather-forecast)</span></li>
+          <li class="func-item"><span class="txt">ป้าย "ข้อมูลล้าสมัย" ถ้า today - forecast_generated_at เกิน max_forecast_age_hours</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "Sync พยากรณ์ใหม่" สำหรับแปลงนี้โดยเฉพาะ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกอากาศจริง (Actual Weather Log) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและกรอกข้อมูลอากาศจริงย้อนหลังต่อพื้นที่ ใช้แทนเซนเซอร์ถ้าไม่มี</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: record_date, rainfall_mm, temperature_avg, humidity_pct, source (sensor/manual/external_api) (GET /crop/weather-actual-logs)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, field_id/field_zone_id, source</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกอากาศจริงด้วยตนเอง" เปิดฟอร์ม (POST /crop/weather-actual-logs) ตั้ง source = manual</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำเตือนความเสี่ยงจากอากาศ (Weather Alerts) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและจัดการคำเตือนความเสี่ยงที่ระบบสร้างจากพยากรณ์หรือข้อมูลจริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: alert_type (heavy_rain/drought/storm/frost), severity, triggered_date, message (GET /crop/fields/{id}/weather-alerts)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: alert_type, severity, ช่วงวันที่, แปลง/โซน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างคำเตือนเอง" เปิดฟอร์ม (POST /crop/weather-alerts) สำหรับกรณี manual</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติปริมาณฝนสะสม (Rainfall History Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูแนวโน้มปริมาณฝนสะสมย้อนหลังต่อพื้นที่เพื่อวิเคราะห์เทียบผลผลิต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟปริมาณฝนสะสมรายเดือนต่อแปลง จาก weather_actual_log.rainfall_mm (GET /crop/reports/rainfall-history)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงเวลา + เลือกหลายแปลงเทียบกัน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ข้อมูลเป็น Excel/CSV</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำแนะนำเลื่อนการให้น้ำ (Irrigation Skip Recommendations) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการแปลงที่พยากรณ์เข้าเงื่อนไขควรเลื่อน/ข้ามการให้น้ำ ส่งต่อให้โมดูลการให้น้ำ ปุ๋ย และยา</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแปลงที่ rain_probability_pct (พรุ่งนี้) มากกว่า skip_irrigation_threshold_pct และ expected_rainfall_mm มากกว่า min_effective_rain_mm</span></li>
+          <li class="func-item"><span class="txt">สถานะว่าส่งคำแนะนำไปยังโมดูลการให้น้ำ ปุ๋ย และยา แล้วหรือยัง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งค่า Threshold การแจ้งเตือน (Alert Threshold Settings) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เจ้าของฟาร์ม/ผู้บริหารกำหนดเกณฑ์การสร้างคำเตือนและคำแนะนำอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มตั้งค่า: heavy_rain_threshold_mm, drought_threshold_mm, skip_irrigation_threshold_pct, min_effective_rain_mm</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มตั้งค่า max_forecast_age_hours สำหรับความสดของข้อมูลพยากรณ์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำแนะนำวันเริ่มปลูก (Planting Date Recommendation) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แนะนำช่วงวันเริ่มปลูกที่เหมาะสมตามพยากรณ์ฝน/แล้งล่วงหน้า ส่งต่อให้แผนการเพาะปลูก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ปฏิทินแสดงช่วงวันแนะนำต่อแปลง โดยอิงพยากรณ์ rain_probability_pct/expected_rainfall_mm ล่วงหน้า</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกแปลง + ปุ่ม "ส่งคำแนะนำไปแผนการเพาะปลูก"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำเตือนความเสี่ยงก่อนเก็บเกี่ยว (Pre-Harvest Weather Risk) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เตือนล่วงหน้าถ้าพยากรณ์ฝนตกหนัก/พายุตรงกับช่วงกำหนดเก็บเกี่ยว ส่งต่อให้โมดูลการเก็บเกี่ยว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแปลงที่มีกำหนดเก็บเกี่ยวใกล้ถึง พร้อมพยากรณ์ condition = storm/rain หรือ alert_type = storm/heavy_rain ที่ทับซ้อนช่วงเวลา</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "แจ้งเตือนโมดูลการเก็บเกี่ยว" ต่อรายการที่เลือก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานความสัมพันธ์อากาศกับผลผลิต (Weather-Yield Correlation Report) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>วิเคราะห์ความสัมพันธ์ระหว่างสภาพอากาศย้อนหลังกับผลผลิต/คุณภาพ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเทียบ rainfall_mm/temperature_avg สะสม กับผลผลิต/คุณภาพย้อนหลังต่อแปลง (GET /crop/reports/weather-yield-correlation)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงเวลา + เลือกแปลง/รอบผลิต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ผลกระทบผลผลิตระยะยาว (Long-term Yield Impact Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>คาดการณ์ผลกระทบต่อผลผลิตล่วงหน้าจากแนวโน้มอากาศระยะยาว โดยอิงผลวิเคราะห์ความสัมพันธ์ย้อนหลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตัวชี้วัดคาดการณ์ผลกระทบต่อแปลง/รอบผลิต พร้อมระดับความเชื่อมั่น</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองเลือกแปลง + ช่วงเวลาที่ต้องการคาดการณ์</span></li>
+        </ul>
       </article>
     </div>
   </section>

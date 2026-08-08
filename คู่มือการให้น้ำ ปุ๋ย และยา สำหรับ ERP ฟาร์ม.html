@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -733,6 +734,137 @@
   SUM(irrigation_log.water_volume_liters)
   ของ field เดียวกัน
   ในช่วง planting_start_date ถึง harvest_end_date</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดงานดูแลพืชประจำวัน (Care Task Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่เจ้าหน้าที่เกษตร/ผู้จัดการแปลงเปิดดูว่าวันนี้ต้องทำอะไร ที่ไหนเลยกำหนดแล้วบ้าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุปจำนวนงานแยกตาม task_type (irrigation/fertilizer/pesticide) และสถานะ pending/overdue/done ของวันนี้</span></li>
+          <li class="func-item"><span class="txt">ตารางงานที่ status = overdue พร้อมลิงก์ตรงไปหน้าบันทึกจริงตามประเภทงาน</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: planting_plan_id, แปลง/โซน, ช่วง scheduled_date</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการงานดูแลพืชตามแผน (Care Task List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและจัดการงาน care_task ทั้งหมดที่ดึงมาจากกำหนดการของแผนการเพาะปลูก</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: task_type, scheduled_date, planting_plan_id, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: status (pending/done/skipped/overdue), task_type, planting_plan_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกว่าทำแล้ว/ข้ามงาน" อัปเดตสถานะผ่าน PATCH /crop/care-tasks/{id}</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการให้น้ำ (Irrigation Log) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติและบันทึกการให้น้ำจริงของแต่ละแปลง/โซน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางประวัติ: field_id/field_zone_id, irrigation_date, water_volume_liters, method</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: แปลง/โซน, ช่วง irrigation_date, method (sprinkler/drip/flood/manual)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการให้น้ำใหม่" ผูกกับ care_task_id ถ้ามาจากแผน แล้ว POST /crop/irrigation-logs</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการให้ปุ๋ย (Fertilizer Application) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติและบันทึกการใส่ปุ๋ยจริง พร้อมตัดสต็อกอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางประวัติ: item_id (ชนิดปุ๋ย), application_date, quantity_used, application_method</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: แปลง/โซน, item_id, ช่วง application_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการให้ปุ๋ยใหม่" เลือก item_id จากคลังสินค้า กรอก quantity_used → POST /crop/fertilizer-applications (ตัดสต็อกอัตโนมัติ)</span></li>
+          <li class="func-item"><span class="txt">ลิงก์ไปหน้าเครื่องคำนวณปริมาณก่อนกรอกจริง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกการฉีดพ่นสารเคมี (Pesticide Application) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติและบันทึกการฉีดพ่นสารเคมีจริง จุดสำคัญที่สุดด้านความปลอดภัยอาหาร</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางประวัติ: item_id, target_pest, application_date, quantity_used, safe_harvest_date พร้อมไฮไลต์แถวที่ยังไม่ปลอดภัยเก็บเกี่ยว</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: แปลง/โซน, item_id, ช่วง application_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการฉีดพ่นใหม่" เลือก item_id (ดึง phi_days อัตโนมัติ) กรอก target_pest, quantity_used → POST /crop/pesticide-applications คำนวณ safe_harvest_date ให้ทันที</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เครื่องคำนวณปริมาณตามพื้นที่ (Dosage Calculator) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คำนวณปริมาณปุ๋ย/สารเคมีที่ต้องใช้ก่อนบันทึกจริงทุกครั้ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มเลือกแปลง/โซน (ดึง area_rai อัตโนมัติ) และกรอก dosage_rate_per_rai จากฉลากผลิตภัณฑ์</span></li>
+          <li class="func-item"><span class="txt">แสดงผล quantity_needed ที่คำนวณได้ พร้อมปุ่ม "ใช้ค่านี้บันทึก" ส่งต่อไปหน้าบันทึกการให้ปุ๋ย/ฉีดพ่น</span></li>
+          <li class="func-item"><span class="txt">เรียกข้อมูลผ่าน GET /crop/reports/dosage-calculator</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สถานะ PHI และวันที่ปลอดภัยเก็บเกี่ยว (PHI Status) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ตรวจสอบก่อนอนุมัติเก็บเกี่ยวว่าเลยระยะห้ามเก็บเกี่ยวหลังฉีดพ่นแล้วหรือยัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายแปลง: safe_harvest_date ล่าสุดจาก pesticide_application, จำนวนวันที่เหลือ, badge เตือนถ้า planting_plan.expected_harvest_date เร็วกว่า safe_harvest_date</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: แปลง/โซน, planting_plan_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ตรวจสอบก่อนเก็บเกี่ยว" เรียก is_safe_to_harvest ผ่าน GET /crop/fields/{id}/phi-status</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการดูแลพืชต่อแปลง (Care History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูภาพรวมทุกกิจกรรมดูแลพืชของแปลง/รอบผลิตหนึ่งในหน้าเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">Timeline รวม care_task, irrigation_log, fertilizer_application, pesticide_application เรียงตามวันที่</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: planting_plan_id, แปลง/โซน, ช่วงวันที่, task_type</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ประวัติเป็น PDF สำหรับตรวจสอบมาตรฐาน GAP เรียกผ่าน GET /crop/reports/care-history</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แจ้งเตือนกำหนดการดูแลพืช (Care Reminders) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>แจ้งเตือนอัตโนมัติเมื่อใกล้ถึงหรือเลยกำหนดงานดูแลพืช</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการแจ้งเตือนที่สร้างจาก care_task ที่ scheduled_date ใกล้ถึงหรือกลายเป็น status = overdue</span></li>
+          <li class="func-item"><span class="txt">ตั้งค่าช่องทางแจ้งเตือน (แอป/SMS) ต่อผู้ใช้/บทบาท</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ปรับกำหนดการให้น้ำตามพยากรณ์ฝน (Weather-adjusted Schedule) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เลื่อนกำหนดการให้น้ำอัตโนมัติเมื่อมีพยากรณ์ฝนตกจากโมดูลสภาพอากาศ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางเปรียบเทียบ scheduled_date เดิมของ care_task (task_type = irrigation) กับวันที่แนะนำใหม่ตามพยากรณ์ฝน</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เลื่อนกำหนดการ" อัปเดต care_task.scheduled_date อัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกหน้างานผ่านมือถือ + GPS (Mobile Field Entry) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ให้พนักงานภาคสนามบันทึกการให้น้ำ/ปุ๋ย/ฉีดพ่นจากหน้างานจริงพร้อมยืนยันตำแหน่ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มย่อบันทึก irrigation_log/fertilizer_application/pesticide_application พร้อมพิกัด GPS ยืนยันว่าอยู่ในแปลงจริง</span></li>
+          <li class="func-item"><span class="txt">ปุ่มถ่ายรูปหน้างานแนบกับบันทึกที่ POST ไป</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานปริมาณน้ำสะสมต่อรอบผลิต (Cumulative Water Usage Report) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ดูปริมาณน้ำรวมที่ใช้ไปของแต่ละรอบผลิต เทียบผลผลิตที่ได้ในภายหลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟ/ตาราง total_water_used = SUM(irrigation_log.water_volume_liters) ต่อ planting_plan ในช่วง planting_start_date ถึง harvest_end_date</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: planting_plan_id, ช่วงวันที่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แดชบอร์ดเซนเซอร์ความชื้นดินและให้น้ำอัตโนมัติ (Soil Sensor &amp; Auto-Irrigation Dashboard) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>เชื่อมเซนเซอร์ IoT ในแปลงเข้ากับระบบให้น้ำอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟค่าความชื้นดินตามเวลาต่อแปลง/โซนจากเซนเซอร์ IoT</span></li>
+          <li class="func-item"><span class="txt">สวิตช์เปิด/ปิดระบบให้น้ำอัตโนมัติ พร้อม log ที่ระบบสร้าง irrigation_log อัตโนมัติเมื่อความชื้นต่ำกว่าเกณฑ์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์ประสิทธิภาพการใช้ปุ๋ย/สารเคมีต่อผลผลิต (Input Efficiency Analysis) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>เทียบปริมาณปุ๋ย/สารเคมีที่ใช้กับผลผลิตที่ได้จริง เพื่อช่วยตัดสินใจปรับสูตรรอบถัดไป</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเปรียบเทียบ quantity_used ของ fertilizer_application/pesticide_application ต่อรอบผลิต กับผลผลิตจากโมดูลเก็บเกี่ยว</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: item_id, planting_plan_id, ช่วงเวลา</span></li>
+        </ul>
       </article>
     </div>
   </section>

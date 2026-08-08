@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -802,6 +803,141 @@ variance != 0
   / SUM( quantity_remaining )
   ต่อทุก lot ของ item/warehouse นั้น</pre>
         <p class="formula-example"><b>หมายเหตุ:</b> เลือกวิธีคิดต้นทุนได้ต่อสินค้าหรือทั้งระบบ แต่ควรคงที่ตลอดรอบบัญชี ไม่สลับไปมา เพื่อไม่ให้ต้นทุนขายเพี้ยน</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดคลังสินค้า (Inventory Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่พนักงานคลัง/เจ้าของฟาร์มเปิดดูภาพรวมสถานะสต็อกประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: มูลค่าสต็อกรวม (จาก stock-valuation), จำนวนสินค้าใกล้หมดอายุ, จำนวนสินค้าต่ำกว่าจุดสั่งซื้อซ้ำ</span></li>
+          <li class="func-item"><span class="txt">ตารางแจ้งเตือนด่วน รวมผลจาก /inventory/reports/expiring-soon และ /inventory/reports/below-reorder-point เรียงตามความเร่งด่วน</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองคลัง (warehouse_id) ที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลัดไปหน้า "รับสินค้าเข้าคลัง" และ "เบิกจ่ายสินค้า"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทะเบียนสินค้า (Item Master) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรายการสินค้า/วัตถุดิบทั้งหมดที่เก็บในคลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: item_code, name, category, unit, reorder_point, max_stock_level, shelf_life_days</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: category (feed/seed/fertilizer/medicine/equipment/other), ค้นหาด้วย item_code/name</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไขสินค้าครบทุกฟิลด์ พร้อมปุ่มปิดใช้งาน (is_active) พร้อมเตือนถ้ามี stock_lot ผูกอยู่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คลัง/จุดเก็บ (Warehouses) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรายชื่อคลัง/จุดเก็บสินค้าจริงของฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: warehouse_code, name, cost_center_id (ศูนย์ต้นทุนที่ผูกไว้)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไขคลัง พร้อม dropdown เลือก cost_center_id (ว่างได้)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ยอดคงเหลือสต็อก (Stock Levels) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูยอดคงเหลือสต็อกแบบเรียลไทม์สรุปต่อสินค้า/คลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง pivot item &#215; warehouse แสดง current_stock (SUM quantity_remaining) พร้อม badge เทียบ reorder_point</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: item_id, warehouse_id, category</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อดูรายละเอียดล็อตของ item/warehouse นั้นในหน้า "ล็อตสินค้า"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ล็อตสินค้า (Stock Lots) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูรายละเอียดล็อตแต่ละล็อตที่รับเข้ามา ใช้ตรวจสอบย้อนกลับและดูคิว FIFO</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: lot_no, item_id, warehouse_id, received_date, expiry_date, unit_cost, quantity_remaining, goods_receipt_ref</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: item_id, warehouse_id, expiry_before (ตรงกับพารามิเตอร์ GET /inventory/stock-lots)</span></li>
+          <li class="func-item"><span class="txt">เรียงตาม received_date (ASC) เพื่อให้เห็นลำดับ FIFO ที่จะถูกตัดก่อน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รับสินค้าเข้าคลัง (Goods Receipt) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกสินค้าที่รับเข้ามาใหม่เป็นล็อตใหม่ในคลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: item_id, warehouse_id, quantity, unit_cost, received_date, goods_receipt_ref (อ้างอิงใบรับสินค้าจากจัดซื้อ)</span></li>
+          <li class="func-item"><span class="txt">expiry_date คำนวณอัตโนมัติจาก received_date + item.shelf_life_days แต่แก้ไขเองได้</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกรับเข้า" — เรียก POST /inventory/stock-movements (movement_type = receipt) สร้าง stock_lot ใหม่</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เบิกจ่ายสินค้า (Stock Issue) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>เบิกสินค้าออกจากคลังสำหรับใช้งานประจำวัน (นอกเหนือจากที่โมดูลอื่นเบิกอัตโนมัติ)</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม: item_id, warehouse_id, quantity, movement_date, cost_center_id (บังคับกรอก — ค่าเริ่มต้นจาก warehouse.cost_center_id แต่ override ได้)</span></li>
+          <li class="func-item"><span class="txt">พรีวิว FIFO ก่อนยืนยัน: แสดงว่าจะตัดจาก lot ไหนบ้าง จำนวนเท่าไร และ cost_of_issue รวม</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยืนยันเบิกจ่าย" — เรียก POST /inventory/stock-movements (movement_type = issue) แจ้ง error ถ้า resolve cost_center_id ไม่ได้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการเคลื่อนไหวสต็อก (Stock Movement History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติทุกการเข้า-ออกของสต็อกแบบอ่านอย่างเดียว แก้ไขย้อนหลังไม่ได้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: movement_type, stock_lot_id (item/warehouse), quantity (+/-), movement_date, source_module, source_ref_id, cost_center_id</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: movement_type (receipt/issue/sale/transfer/adjustment), source_module, ช่วงวันที่, cost_center_id, warehouse_id</span></li>
+          <li class="func-item"><span class="txt">คลิก source_ref_id เพื่อลิงก์ไปเอกสารต้นทางในโมดูลอื่น (ถ้ามี)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานสินค้าใกล้หมดอายุ (Expiring Soon) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูล็อตที่กำลังจะหมดอายุเพื่อวางแผนใช้/ระบายก่อน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: item, lot_no, warehouse, expiry_date, days_to_expiry, quantity_remaining จาก GET /inventory/reports/expiring-soon</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง alert_threshold_days (ค่าเริ่มต้น 7-14 วัน) และ warehouse_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ตาราง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานต่ำกว่าจุดสั่งซื้อซ้ำ (Below Reorder Point) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูสินค้าที่สต็อกรวมต่ำกว่า reorder_point เพื่อส่งต่อให้จัดซื้อ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: item, current_stock, reorder_point, max_stock_level, suggested_order_qty จาก GET /inventory/reports/below-reorder-point</span></li>
+          <li class="func-item"><span class="txt">เจ้าหน้าที่จัดซื้อเข้าดูหน้านี้ได้แบบ read-only ตามสิทธิ์ในหัวข้อ 5</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานมูลค่าสต็อก (Stock Valuation) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปมูลค่าสต็อกคงเหลือ ณ วันที่ ส่งให้โมดูลบัญชีบันทึกสินทรัพย์</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: item, warehouse, quantity_remaining, unit_cost, stock_value จาก GET /inventory/reports/stock-valuation</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ณ วันที่ (as-of date), warehouse_id, category</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export PDF/CSV สำหรับส่งให้ทีมบัญชี</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจนับสต็อก (Stock Count) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกผลตรวจนับจริงเทียบกับยอดในระบบ และปรับยอดเมื่อพบส่วนต่าง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการรอบตรวจนับ: count_date, warehouse_id, counted_by, status (draft/completed/adjusted)</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียดรอบนับ: บรรทัด stock_count_line แสดง stock_lot_id, system_quantity, counted_quantity, variance ที่คำนวณอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ปรับยอด" เรียก POST /inventory/stock-counts/{id}/apply-adjustment — ถ้า |variance| เกิน threshold_pct ต้องรอผู้มีสิทธิ์อนุมัติก่อน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>โอนย้ายสินค้าระหว่างคลัง (Stock Transfer) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>โอนสินค้าจากคลังหนึ่งไปอีกคลังหนึ่ง เช่น จากโกดังกลางไปโรงเก็บประจำโรงเรือน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: from_warehouse_id, to_warehouse_id, transfer_date, status (draft/in_transit/completed)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างการโอน เลือกคลังต้นทาง/ปลายทาง, สินค้า/ล็อต, จำนวน — ยืนยันแล้วสร้าง POST /inventory/stock-transfers</span></li>
+          <li class="func-item"><span class="txt">ปุ่มเปลี่ยนสถานะตามลำดับ draft → in_transit → completed ซึ่งสร้าง stock_movement ประเภท transfer สองรายการ (ออก/เข้า)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์อัตราหมุนเวียนสต็อก (Inventory Turnover) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ดูว่าสินค้าไหนหมุนเร็ว/ช้า เพื่อปรับแผนสั่งซื้อและลดสต็อกจม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟอัตราหมุนเวียนต่อ item/category คำนวณจาก stock_movement (issue/sale) เทียบกับมูลค่าสต็อกเฉลี่ยในช่วงที่เลือก</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, category, warehouse_id</span></li>
+          <li class="func-item"><span class="txt">ตารางจัดอันดับสินค้าหมุนเร็วสุด/ช้าสุด (slow-moving) ในช่วงที่เลือก</span></li>
+        </ul>
       </article>
     </div>
   </section>

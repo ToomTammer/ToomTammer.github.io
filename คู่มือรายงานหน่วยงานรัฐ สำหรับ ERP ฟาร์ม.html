@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -732,6 +733,124 @@
   -&gt; report_data_snapshot ทุกแถวของฉบับนี้ถูกล็อกแก้ไขไม่ได้
      value_summary คงค่าที่ดึงมา ณ วันที่สร้างร่างเท่านั้น
      แม้ข้อมูลต้นทางจะถูกแก้ไขในภายหลังก็ไม่กระทบ</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดรายงานหน่วยงานรัฐ (Government Reporting Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่เจ้าหน้าที่มาตรฐานเปิดดูภาพรวมสถานะรายงานและกำหนดยื่นที่ใกล้ถึง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุปจำนวน report_submission ตามสถานะ: draft, submitted, acknowledged, rejected</span></li>
+          <li class="func-item"><span class="txt">รายการรายงานที่ใกล้ถึง next_due_date เรียงตามความเร่งด่วน</span></li>
+          <li class="func-item"><span class="txt">รายการ shipment ที่รอออกเอกสารประกอบการส่งออก</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม agency_name และ applicable_scope ที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เทมเพลตรายงาน (Report Templates) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการนิยามฟอร์มรายงานของแต่ละหน่วยงานและความถี่ที่ต้องยื่น</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: agency_name, form_name, form_code, frequency, applicable_scope</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม agency_name และ applicable_scope</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มเทมเพลตใหม่" เปิดฟอร์มกรอก agency_name, form_name, form_code, frequency, applicable_scope</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการร่างรายงาน (Report Submissions List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูรายงานทั้งหมดพร้อมสถานะ ตั้งแต่ร่างจนถึงผลตอบรับจากหน่วยงาน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: form_name (จาก template), period_start–period_end, generated_date, submitted_date, reference_number, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะ (draft/submitted/acknowledged/rejected), agency_name, ช่วงงวด</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างร่างรายงานใหม่"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สร้างร่างรายงานใหม่ (Create Report Draft) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รวบรวมข้อมูลจากโมดูลอื่นตามช่วงเวลาที่กำหนดเป็นร่างรายงานอัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มเลือก template_id, period_start, period_end</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างร่าง" เรียก generate_draft ดึงข้อมูลตาม applicable_scope มาบันทึกเป็น report_data_snapshot ทีละแถว</span></li>
+          <li class="func-item"><span class="txt">แถบสถานะความคืบหน้าขณะรวบรวมข้อมูลจากโมดูลต้นทาง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดร่างรายงาน (Report Submission Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดู แก้ไข ยื่น และติดตามผลตอบรับของรายงานฉบับหนึ่ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">หัวข้อสรุป: reference_number, status, period_start–period_end, generated_date</span></li>
+          <li class="func-item"><span class="txt">ตาราง report_data_snapshot ประกอบร่าง: source_module, source_entity, source_ref_id, value_summary</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "แก้ไขร่าง" (เฉพาะ status = draft) และปุ่ม "บันทึกว่ายื่นแล้ว" เปิดฟอร์มกรอก submitted_date + reference_number</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกผลตอบรับ" อัปเดต status เป็น acknowledged/rejected</span></li>
+          <li class="func-item"><span class="txt">ถ้า status = rejected แสดงลิงก์ไปยังฉบับที่ยื่นใหม่ (resubmission chain) และล็อกฉบับเดิมห้ามแก้ไข</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เอกสารประกอบการส่งออก (Export Documents List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูเอกสารทั้งหมดที่ออกไปแล้วต่อ shipment</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: shipment_ref, document_type, issued_date, issued_by</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม document_type และช่วงวันที่ issued_date</span></li>
+          <li class="func-item"><span class="txt">คลิกแต่ละแถวเปิดไฟล์เอกสารจาก file_ref</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ออกเอกสารประกอบการส่งออกใหม่ (Issue Export Document) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ออกเอกสารต่อ shipment หลังผ่านการตรวจสิทธิ์อัตโนมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มเลือก shipment_ref และ document_type (health_certificate/phytosanitary_certificate/certificate_of_origin)</span></li>
+          <li class="func-item"><span class="txt">ตรวจสิทธิ์อัตโนมัติ can_issue_export_document: certificate.status = active และ trace chain ครบ ถ้าไม่ผ่านแสดงสาเหตุที่ขาด</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ออกเอกสาร" สร้างไฟล์และบันทึก file_ref, issued_date, issued_by</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำขอออกเอกสารส่งออก (Export Document Request) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าสำหรับพนักงานขายขอให้ออกเอกสารประกอบการส่งออกของ shipment ตนเอง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือก shipment_ref ของตนเองจาก sales_order ที่เป็นการส่งออก</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ขอออกเอกสาร" ส่งต่อให้เจ้าหน้าที่มาตรฐานพิจารณา</span></li>
+          <li class="func-item"><span class="txt">ตารางสถานะคำขอของตน: shipment_ref, document_type, สถานะ (รออนุมัติ/ออกแล้ว)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>กำหนดยื่นรายงานที่ใกล้ถึง (Upcoming Submission Deadlines) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รวมรายงานที่ next_due_date ใกล้ถึงเพื่อเร่งยื่นก่อนเลยกำหนด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายงาน status = draft ที่ next_due_date ภายใน 7 วัน เรียงตามวันที่ใกล้สุด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตาม agency_name</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวลิงก์ตรงไปหน้ารายละเอียดร่างรายงาน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งรอบแจ้งเตือนอัตโนมัติ (Auto Reminder Schedule Settings) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>กำหนดระยะผ่อนผันและวันล่วงหน้าก่อนแจ้งเตือนต่อความถี่ของเทมเพลต</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มตั้งระยะผ่อนผันตามกฎหมายต่อ frequency (เช่น monthly → +15 วันหลังสิ้นเดือน)</span></li>
+          <li class="func-item"><span class="txt">ตั้งจำนวนวันล่วงหน้าก่อนแจ้งเตือน (ค่าเริ่มต้น 7 วัน) และรายชื่อผู้รับแจ้งเตือน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เทมเพลตเติมข้อมูลเอกสารส่งออกอัตโนมัติ (Export Document Auto-fill Mapping) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>กำหนดว่าเอกสารแต่ละประเภทดึงข้อมูลจากมาตรฐานฟาร์ม/ตรวจสอบย้อนกลับมาเติมอัตโนมัติจากฟิลด์ไหน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์ม map document_type กับฟิลด์ต้นทางจาก certificate และ trace_code</span></li>
+          <li class="func-item"><span class="txt">พรีวิวเอกสารที่เติมข้อมูลอัตโนมัติก่อนออกจริง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตั้งค่าการเชื่อมต่อระบบยื่นออนไลน์หน่วยงานรัฐ (Government API Integration Settings) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>เชื่อมต่อ API ยื่นรายงานตรงกับระบบออนไลน์ของหน่วยงานรัฐแทนการยื่นด้วยมือ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มตั้งค่า endpoint/credential ต่อ agency_name พร้อมปุ่ม "ทดสอบการเชื่อมต่อ"</span></li>
+          <li class="func-item"><span class="txt">log ประวัติการยื่นผ่าน API พร้อมผลลัพธ์และรหัสอ้างอิงที่ได้กลับมา</span></li>
+        </ul>
       </article>
     </div>
   </section>

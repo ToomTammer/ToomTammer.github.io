@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -729,6 +730,125 @@
 
 flag เตือนถ้า days_to_due &lt;= alert_lead_days
   (ค่าเริ่มต้นแนะนำ: 7 วัน)</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดผสมพันธุ์และตั้งท้อง (Breeding &amp; Pregnancy Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่เจ้าหน้าที่ผสมพันธุ์/สัตวบาลเปิดดูภาพรวมวงจรผสมพันธุ์ประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนตัวที่กำลังตั้งท้อง (pregnancy.status = ongoing), จำนวนที่ใกล้ครบกำหนดคลอด, อัตราตั้งท้องสำเร็จเดือนนี้</span></li>
+          <li class="func-item"><span class="txt">รายการแจ้งเตือนสั้น ๆ: ตัวที่ days_to_due &lt;= alert_lead_days</span></li>
+          <li class="func-item"><span class="txt">ทางลัดไปหน้า "บันทึกการผสมพันธุ์ใหม่" และปฏิทินผสมพันธุ์รวม</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการบันทึกการผสมพันธุ์ (Breeding Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและติดตามบันทึกการผสมพันธุ์ทุกครั้งของฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: dam_id, sire_id/sire_semen_ref, breeding_date, method, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: dam_id, status (pending/confirmed_pregnant/not_pregnant/failed), date_from–date_to</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการผสมพันธุ์ใหม่" เปิดฟอร์มสร้างรายการ</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่ออัปเดตผลตรวจ (PATCH /livestock/breeding-records/{id})</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฟอร์มบันทึกการผสมพันธุ์ใหม่ (New Breeding Record Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คีย์ข้อมูลการผสมพันธุ์แต่ละครั้งให้ครบก่อนส่งเข้าระบบ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือกแม่พันธุ์ (dam_id) จากทะเบียนสัตว์</span></li>
+          <li class="func-item"><span class="txt">สลับกรอกพ่อพันธุ์ของฟาร์ม (sire_id) หรือรหัสน้ำเชื้อภายนอก (sire_semen_ref) ตาม method</span></li>
+          <li class="func-item"><span class="txt">เลือก breeding_date และ method (natural/artificial_insemination)</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนความเสี่ยงเลือดชิด (inbreeding check) ก่อนกดยืนยันบันทึก <span class="phase-tag phase-3">Phase 3</span></span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการตั้งท้อง (Pregnancy List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ติดตามตัวที่ยืนยันตั้งท้องแล้วทั้งหมด จนถึงคลอดหรือแท้ง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: breeding_record_id (พร้อมชื่อ/รหัสแม่พันธุ์), confirmed_date, expected_due_date, status</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะ (ongoing/delivered/aborted) และช่วง expected_due_date</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกผลตรวจท้อง" สร้างรายการ pregnancy ใหม่จาก breeding_record ที่เลือก</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อดูหน้ารายละเอียดการตั้งท้อง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดการตั้งท้อง (Pregnancy Detail) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูข้อมูลครบของท้องนี้ก่อนตัดสินใจบันทึกการคลอด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ข้อมูลอ้างอิงจาก breeding_record: dam, sire/sire_semen_ref, breeding_date, method</span></li>
+          <li class="func-item"><span class="txt">นับถอยหลังวันครบกำหนดคลอด (expected_due_date) พร้อมสถานะ ongoing/delivered/aborted</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการคลอด" (POST /livestock/pregnancies/{id}/calving) หรือ "บันทึกแท้ง" เปลี่ยน status เป็น aborted</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฟอร์มบันทึกการคลอด (Calving Record Form) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>บันทึกผลคลอดจริงพร้อมข้อมูลลูกแต่ละตัวในครั้งเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กรอก calving_date, live_birth_count, stillbirth_count, complications (ถ้ามี)</span></li>
+          <li class="func-item"><span class="txt">รายการย่อยเพิ่มลูกแต่ละตัว (offspring_record): birth_weight, sex ต่อแถว</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกการคลอด" เรียก POST /livestock/pregnancies/{id}/calving สร้าง calving_record + offspring_record และทะเบียนสัตว์ใหม่ (new_animal_ref) ต่อลูกแต่ละตัวอัตโนมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ประวัติการคลอด (Calving Records History) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูผลคลอดย้อนหลังทั้งหมดพร้อมอัตราการเกิดรอด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: pregnancy_id, calving_date, live_birth_count, stillbirth_count, live_birth_rate_pct ที่คำนวณอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามช่วงวันที่คลอด</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวดูรายการ offspring_record และลิงก์ไปทะเบียนสัตว์ใหม่ (new_animal_ref) ของลูกแต่ละตัว</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ปฏิทินผสมพันธุ์/กำหนดคลอด (Breeding &amp; Due Date Calendar) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ภาพรวมกำหนดการผสมพันธุ์และคลอดทั้งฟาร์มในหน้าเดียว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">มุมมองปฏิทินรายเดือน แสดง breeding_date และ expected_due_date เป็นจุดกิจกรรมคนละสี</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่ ดึงจาก GET /livestock/reports/breeding-calendar</span></li>
+          <li class="func-item"><span class="txt">คลิกวันที่เพื่อดูรายการ breeding_record/pregnancy ของวันนั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สายเลือด/เชื้อสาย (Pedigree Viewer) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูสายเลือดย้อนหลังของสัตว์ตัวหนึ่ง ก่อนตัดสินใจคู่ผสมครั้งต่อไป</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แผนผังต้นไม้สายเลือด (pedigree tree) จาก GET /livestock/animals/{id}/pedigree</span></li>
+          <li class="func-item"><span class="txt">ไล่ดูย้อนหลังหลายชั่วอายุ (dam/sire ของ dam/sire) <span class="phase-tag phase-2">Phase 2</span></span></li>
+          <li class="func-item"><span class="txt">ช่องค้นหาสัตว์ตัวอื่นเพื่อสลับดูสายเลือด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานอัตราความสำเร็จการผสมพันธุ์ (Conception Rate Report) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ประเมินประสิทธิภาพพ่อพันธุ์หรือวิธีผสมที่ใช้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง/กราฟ conception_rate_pct แยกตาม sire_id และ method จาก GET /livestock/reports/conception-rate</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่และพ่อพันธุ์</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แจ้งเตือนใกล้ถึงกำหนดคลอด (Calving Due Soon Alerts) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รายการตัวที่ใกล้ครบกำหนดคลอด ให้ทีมงานเตรียมพร้อมล่วงหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">รายการ pregnancy ที่ days_to_due (= expected_due_date − วันนี้) ≤ alert_lead_days (ค่าเริ่มต้น 7 วัน)</span></li>
+          <li class="func-item"><span class="txt">ตั้งค่า alert_lead_days ได้ต่อฟาร์ม/ชนิดสัตว์</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อไปหน้ารายละเอียดการตั้งท้อง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ตรวจสอบเลือดชิดก่อนอนุมัติผสมพันธุ์ (Inbreeding Check) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ป้องกันปัญหาสุขภาพและคุณภาพสายพันธุ์ระยะยาวก่อนยืนยันคู่ผสม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">แสดงผล shared_ancestor_check(dam, sire) พร้อม flag เตือนถ้าพบบรรพบุรุษร่วมภายใน N ชั่วอายุจาก pedigree</span></li>
+          <li class="func-item"><span class="txt">แสดงเป็นกล่องเตือนแทรกในฟอร์มบันทึกการผสมพันธุ์ใหม่ ก่อนกดยืนยัน</span></li>
+        </ul>
       </article>
     </div>
   </section>

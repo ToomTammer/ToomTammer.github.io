@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -810,6 +811,118 @@ po.total_amount &gt; level2_limit
 po.total_amount &gt; available_budget
   -&gt; flag เตือนเกินงบ (ไม่บล็อกอัตโนมัติ
      เว้นแต่ policy ฟาร์มกำหนดให้บล็อก)</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดจัดซื้อ (Procurement Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่เจ้าของฟาร์ม/เจ้าหน้าที่จัดซื้อเปิดดูภาพรวมการสั่งซื้อประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวน PO สถานะ pending_approval, จำนวน PO ที่เลย expected_delivery_date แล้วยังไม่ received</span></li>
+          <li class="func-item"><span class="txt">ตารางย่อ PO ล่าสุด: po_no, vendor, total_amount, status พร้อม badge สีตามสถานะ</span></li>
+          <li class="func-item"><span class="txt">ปุ่มลัด "สร้างใบสั่งซื้อใหม่" และ "ดูใบขอซื้อที่รออนุมัติ"</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ฐานข้อมูลผู้ขาย (Vendor Master) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการรายชื่อผู้ขาย/ผู้จำหน่ายทั้งหมดที่ฟาร์มซื้อของด้วย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: vendor_code, name, category, contact_phone, is_active (GET /procurement/vendors)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: category (feed/fertilizer/seed/medicine/equipment/other), is_active</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้าง/แก้ไข: vendor_code, name, category, contact_phone, contact_address, payment_terms_days (POST/PATCH /procurement/vendors)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ปิดใช้งาน" ตั้ง is_active=false แทนการลบแถว</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายการใบสั่งซื้อ (Purchase Order List) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูและค้นหาใบสั่งซื้อทั้งหมดตามสถานะและผู้ขาย</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: po_no, vendor, order_date, expected_delivery_date, total_amount, status (GET /procurement/purchase-orders)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: status, vendor_id, date_from, date_to</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้างใบสั่งซื้อใหม่" และคลิกแถวเพื่อเปิดหน้ารายละเอียด PO</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียด/สร้างใบสั่งซื้อ (Purchase Order Detail &amp; Create) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดู สร้าง หรือแก้ไข PO พร้อมรายการสินค้าแต่ละบรรทัด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มหัว PO: เลือก vendor_id, pr_ref (ถ้ามาจาก PR), order_date, expected_delivery_date</span></li>
+          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (purchase_order_line): item, quantity_ordered, unit_price, line_total คำนวณอัตโนมัติ พร้อมปุ่มเพิ่ม/ลบบรรทัด</span></li>
+          <li class="func-item"><span class="txt">ยอดรวม total_amount แสดงแบบ real-time = SUM(line_total) ตามสูตรหัวข้อ 6</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "ยกเลิก PO" (เฉพาะสถานะยังไม่ได้รับสินค้า) เรียก POST /procurement/purchase-orders/{id}/cancel</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คิวอนุมัติใบสั่งซื้อ (PO Approval Queue) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>รายการ PO ที่รออนุมัติ กรองตามวงเงินที่ผู้ใช้ล็อกอินมีสิทธิ์อนุมัติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางกรอง status = pending_approval พร้อม total_amount และ cost_center</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ" ต่อแถว เรียก POST /procurement/purchase-orders/{id}/approve เฉพาะ PO ที่วงเงินอยู่ในสิทธิ์ตาม role (ดูตารางหัวข้อ 5)</span></li>
+          <li class="func-item"><span class="txt">ไฮไลต์ PO ที่ total_amount เกิน level2_limit ว่าต้องแนบใบเสนอราคาเปรียบเทียบก่อนอนุมัติ</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกรับสินค้า (Goods Receipt) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>พนักงานคลังบันทึกการรับสินค้าจริงเทียบกับ PO ที่สั่งไว้</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ค้นหา PO ด้วย po_no หรือ vendor แล้วดึง purchase_order_line มาให้กรอกทีละบรรทัด</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มกรอกต่อบรรทัด: quantity_received, quantity_rejected, reject_reason</span></li>
+          <li class="func-item"><span class="txt">ช่อง vendor_invoice_no / vendor_invoice_date ถ้าใบกำกับภาษีซื้อมาพร้อมของ</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกรับสินค้า" เรียก POST /procurement/purchase-orders/{id}/goods-receipts แสดง received_ratio ที่อัปเดตสถานะ PO ทันที และตารางประวัติการรับสินค้าทั้งหมด (GET /procurement/goods-receipts)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงาน PO ค้างส่งมอบ (Pending Deliveries Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ติดตาม PO ที่ยังไม่ได้รับสินค้าหรือเลยกำหนดส่งมอบแล้ว</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตาราง: po_no, vendor, expected_delivery_date, จำนวนวันที่เลยกำหนด, status ไฮไลต์แดงถ้าเลยกำหนด (GET /procurement/reports/pending-deliveries)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองช่วงวันที่และผู้ขาย</span></li>
+          <li class="func-item"><span class="txt">คลิกแถวเพื่อเปิดหน้ารายละเอียด PO นั้น</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบขอซื้อ (Purchase Requisitions) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ผู้จัดการฟาร์ม/แปลงขอซื้อภายในก่อนออกเป็น PO จริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: pr_no, requested_by, cost_center_id, needed_by_date, status (GET /procurement/requisitions)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างใบขอซื้อใหม่ (POST /procurement/requisitions)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ" แปลงเป็น PO อัตโนมัติ เรียก POST /procurement/requisitions/{id}/approve</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ใบเสนอราคาและเปรียบเทียบราคาผู้ขาย (Price Quotations &amp; Comparison) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>บันทึกราคาที่ผู้ขายแต่ละรายเสนอ และเปรียบเทียบก่อนออก PO จริง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ฟอร์มบันทึกใบเสนอราคา: vendor_id, item_id, quoted_price, quote_date, valid_until (POST /procurement/price-quotations)</span></li>
+          <li class="func-item"><span class="txt">ตารางเปรียบเทียบราคาต่อสินค้าระหว่างผู้ขาย ไฮไลต์ราคาต่ำสุดที่ valid_until ยังไม่หมดอายุ (GET /procurement/reports/vendor-price-comparison)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "สร้าง PO จากผู้ขายนี้" ส่งต่อไปหน้าสร้างใบสั่งซื้อพร้อม vendor_id ที่เลือก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>คำแนะนำสั่งซื้อจากจุดสั่งซื้อซ้ำ (Reorder Suggestions) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>รับรายการที่คลังสินค้าแจ้งว่าถึงจุดสั่งซื้อซ้ำ แล้วแปลงเป็น PR/PO ได้ทันที</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการที่ current_stock &lt;= reorder_point พร้อม suggested_order_qty (จาก POST /procurement/purchase-orders/from-reorder-point)</span></li>
+          <li class="func-item"><span class="txt">เลือกได้หลายรายการพร้อมกัน แล้วกดปุ่ม "สร้าง PO" รวมทีเดียว</span></li>
+          <li class="func-item"><span class="txt">แสดงที่มาของคำแนะนำ (คลังสินค้า/สต็อก หรือ ปศุสัตว์/พืชไร่-พืชสวน) ตามหัวข้อ 1</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>สัญญาซื้อวัตถุดิบล่วงหน้า (Forward Contracts) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>จัดการสัญญาล็อคราคาซื้อวัตถุดิบกับผู้ขายไว้ล่วงหน้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: vendor, item, locked_price, quantity_committed, contract_start / contract_end</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างสัญญาใหม่ (POST /procurement/forward-contracts)</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนอัตโนมัติตอนออก PO ถ้าสินค้า/ผู้ขายมีสัญญาที่ยังมีผล ให้ใช้ locked_price แทนราคาปกติ</span></li>
+        </ul>
       </article>
     </div>
   </section>

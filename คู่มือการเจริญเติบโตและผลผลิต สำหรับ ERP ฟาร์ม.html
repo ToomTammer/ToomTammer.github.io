@@ -449,6 +449,7 @@
     <a href="#api">4. API</a>
     <a href="#roles">5. สิทธิ์การเข้าถึง (Roles)</a>
     <a href="#formulas">6. สูตรคำนวณ (Formulas)</a>
+    <a href="#pages">7. หน้าจอที่ต้องมี (Screens)</a>
   </nav>
 
   <section class="block" id="scope">
@@ -723,6 +724,119 @@
   (target_weight - current_weight) / recent_adg
 
 recent_adg = ADG เฉลี่ยจากการชั่ง 2-3 ครั้งล่าสุด</pre>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="pages">
+    <div class="block-head">
+      <span class="eyebrow">Screens</span>
+      <h2>7. หน้าจอที่ต้องมี (Screens/Pages)</h2>
+      <p class="lede">รายชื่อหน้าจอที่ต้องมีจริงในโมดูลนี้ พร้อมส่วนประกอบหลักของแต่ละหน้า — ใช้เป็น checklist ออกแบบ UI ต่อได้ตรง ๆ ไม่ต้องนั่งไล่จากฟังก์ชัน/entity เอง</p>
+    </div>
+    <div class="card-grid">
+      <article class="card func-card">
+        <h3>แดชบอร์ดการเจริญเติบโตและผลผลิต (Growth &amp; Yield Dashboard) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกที่ผู้จัดการโรงเรือนเปิดดูภาพรวมการเติบโต/ผลผลิตประจำวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: ADG เฉลี่ยทุกฝูง, ผลผลิตรวมวันนี้ (milk/egg/meat), จำนวนแจ้งเตือนพร้อมขาย (pending)</span></li>
+          <li class="func-item"><span class="txt">กราฟย่อ weight_variance_pct ของฝูงที่เบี่ยงเบนจากเป้าหมายมากที่สุด</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, animal_group_id ที่ใช้ร่วมกับทุกวิดเจ็ต</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกน้ำหนัก (Weight Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติและบันทึกน้ำหนักที่ชั่งได้จริงของสัตว์/ฝูง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: weigh_date, animal_id/animal_group_id, weight_value, sample_size</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: animal_group_id, ช่วงวันที่ชั่ง</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกน้ำหนักใหม่" เปิดฟอร์มคีย์ weight_value + sample_size (ถ้าชั่งแทนทั้งฝูง) เรียก POST /livestock/weight-records</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>บันทึกผลผลิตรายวัน (Daily Yield Records) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูประวัติและบันทึกผลผลิต นม/ไข่/เนื้อ ที่เก็บได้รายวัน</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: record_date, animal_id/animal_group_id, yield_type, quantity, unit</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: yield_type (milk/egg/meat), animal_group_id, ช่วงวันที่</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "บันทึกผลผลิตใหม่" เปิดฟอร์มเลือก yield_type + คีย์ quantity/unit เรียก POST /livestock/daily-yield-records</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายละเอียดฝูง — การเติบโตเทียบเป้าหมาย (Group Growth vs Target) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูกราฟการเติบโตของฝูงเดียวเทียบเส้นเป้าหมายมาตรฐานตามช่วงอายุ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟเส้นคู่: น้ำหนักจริง (weight_record) vs target_weight ตาม age_days จาก GET /livestock/animal-groups/{id}/growth-vs-target</span></li>
+          <li class="func-item"><span class="txt">การ์ดแสดง weight_variance_pct ปัจจุบันและ ADG ล่าสุดจาก GET /livestock/animal-groups/{id}/adg</span></li>
+          <li class="func-item"><span class="txt">ตัวเลือกสลับดูผลผลิตรายวันของฝูงเดียวกันในกราฟแยก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เป้าหมายมาตรฐาน (Growth Target Standards) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>จัดการเกณฑ์น้ำหนัก/ผลผลิตมาตรฐานตามช่วงอายุของสัตว์แต่ละชนิด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: species, age_days, target_weight, target_daily_yield เรียง age_days</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: species</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มเป้าหมาย" เปิดฟอร์มคีย์ species/age_days/target_weight/target_daily_yield เรียก POST /livestock/growth-target-standards</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>แจ้งเตือนพร้อมขาย (Market Readiness Alerts) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ดูรายการฝูง/สัตว์ที่ถึงเกณฑ์น้ำหนักพร้อมส่งขายและติดตามสถานะ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายการ: triggered_date, animal_id/animal_group_id, current_weight vs target_weight, status พร้อม badge สีตามสถานะ (pending/acknowledged/sold)</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองตามสถานะและ animal_group_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "รับทราบ" เรียก POST /livestock/market-readiness-alerts/{id}/acknowledge เปลี่ยน status เป็น acknowledged</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>รายงานสรุปผลผลิต (Yield Summary Report) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>สรุปผลผลิตรวมแยกตามฝูงและช่วงเวลาสำหรับวางแผนขาย/ส่งต่อคลังสินค้า</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางสรุป total_yield ต่อ animal_group_id แยกตาม yield_type จาก GET /livestock/reports/yield-summary</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ (period), animal_group_id, yield_type</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม export ตาราง</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เปรียบเทียบระหว่างฝูง (Cross-Group Comparison) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>เทียบอัตราการเติบโต/ผลผลิตของหลายฝูงพร้อมกันเพื่อดูว่าฝูงไหนโตช้า/เร็วผิดปกติ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">เลือกหลาย animal_group_id แสดงกราฟ ADG และ weight_variance_pct เทียบกันเป็นแถว</span></li>
+          <li class="func-item"><span class="txt">ตารางจัดอันดับฝูงตาม total_yield ของช่วงเวลาที่เลือก</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>เชื่อมต่อเครื่องชั่ง/เซนเซอร์ (Scale &amp; Sensor Integration) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>ตั้งค่าอุปกรณ์ชั่งน้ำหนักอัตโนมัติให้ส่งผลตรงเข้า weight_record</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางอุปกรณ์ที่เชื่อมต่อ พร้อมสถานะออนไลน์/ออฟไลน์ และผูกกับ animal_group_id</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "เพิ่มอุปกรณ์" + log ค่าที่อุปกรณ์ส่งเข้ามาล่าสุดก่อนถูกสร้างเป็น weight_record</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์วันถึงเป้าหมาย (Target Date Forecast) <span class="phase-tag phase-2">Phase 2</span></h3>
+        <p>คาดการณ์ว่าฝูงจะถึงน้ำหนักเป้าหมายเมื่อไหร่ จากแนวโน้ม ADG ล่าสุด</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดต่อฝูง: current_weight, target_weight, days_to_target ที่คำนวณจาก recent_adg</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง animal_group_id เรียงตามฝูงที่ใกล้ถึงเป้าหมายที่สุด</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>วิเคราะห์ปัจจัยกระทบการเติบโต (Growth Factor Analysis) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>ดูความสัมพันธ์ระหว่างแนวโน้มน้ำหนัก/ผลผลิตกับปัจจัยด้านอาหาร สุขภาพ และสภาพแวดล้อม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟซ้อนทับ weight_record/daily_yield_record กับข้อมูลอาหารสัตว์และบันทึกสุขภาพของฝูงเดียวกัน</span></li>
+          <li class="func-item"><span class="txt">ตารางสรุปช่วงเวลาที่ weight_variance_pct ต่ำผิดปกติพร้อมปัจจัยที่เกิดขึ้นพร้อมกัน</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>พยากรณ์ผลผลิตล่วงหน้า (Yield Forecast) <span class="phase-tag phase-3">Phase 3</span></h3>
+        <p>คาดการณ์ผลผลิตรวมของฝูงในอนาคตจากข้อมูล daily_yield_record ย้อนหลัง</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">กราฟพยากรณ์ total_yield รายสัปดาห์/เดือนถัดไป แยกตาม yield_type</span></li>
+          <li class="func-item"><span class="txt">ตัวกรอง animal_group_id + ระยะเวลาที่ต้องการพยากรณ์</span></li>
+        </ul>
       </article>
     </div>
   </section>
