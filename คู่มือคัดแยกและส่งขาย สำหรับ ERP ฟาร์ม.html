@@ -623,17 +623,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/grading-standards</td><td>ดึงมาตรฐานเกรดปศุสัตว์ทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/grading-standards</td><td>ตั้งมาตรฐานเกรดใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/sorting-records</td><td>ดึงประวัติการคัดเกรด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/sorting-records</td><td>บันทึกการคัดเกรด พร้อมคำนวณ assigned_grade อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/dispatch-eligibility</td><td>ตรวจสอบสิทธิ์ส่งออก (เรียก withdrawal check จากโมดูลสุขภาพ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/dispatch-records</td><td>บันทึกการส่งขาย/ชำแหละ อัปเดตสถานะสัตว์อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/dispatch-records</td><td>ดึงประวัติการส่งขาย/ชำแหละ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/production-closeout</td><td>สรุปผลผลิตปิดรอบ (ขาย+ตาย+คัดออก เทียบจำนวนเริ่มต้น)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/grade-price-summary</td><td>สรุปมูลค่าตามเกรดที่ส่งออก</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/buyer-price-quotes</td><td>ดึงใบเสนอราคาผู้รับซื้อทั้งหมด</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/buyer-price-quotes</td><td>บันทึกใบเสนอราคาผู้รับซื้อ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/grading-standards</td><td>ดึงมาตรฐานเกรดปศุสัตว์ทั้งหมด — ดึงจาก grading_standard_livestock</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/grading-standards</td><td>ตั้งมาตรฐานเกรดใหม่ — บันทึกลง grading_standard_livestock (อ้างอิง species จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/sorting-records</td><td>ดึงประวัติการคัดเกรด — ดึงจาก sorting_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/sorting-records</td><td>บันทึกการคัดเกรด พร้อมคำนวณ assigned_grade อัตโนมัติ — บันทึกลง sorting_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์, weight_at_sorting จากโมดูลการเจริญเติบโตและผลผลิต) โดยเทียบกับ grading_standard_livestock เพื่อตัดสิน assigned_grade</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/dispatch-eligibility</td><td>ตรวจสอบสิทธิ์ส่งออก (เรียก withdrawal check จากโมดูลสุขภาพ) — ดึงจาก animal ในโมดูลทะเบียนสัตว์ (สถานะปัจจุบัน) และผลตรวจระยะหยุดยาจากโมดูลสุขภาพและวัคซีน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/dispatch-records</td><td>บันทึกการส่งขาย/ชำแหละ อัปเดตสถานะสัตว์อัตโนมัติ — บันทึกลง dispatch_record (อ้างอิง sorting_record_id จาก sorting_record) พร้อมอัปเดตสถานะสัตว์เป็น sold/culled ส่งต่อให้โมดูลทะเบียนสัตว์ และแจ้งตัดสต็อกสัตว์มีชีวิต/สร้างสต็อกซาก ส่งต่อให้โมดูลคลังสินค้า/สต็อก</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/dispatch-records</td><td>ดึงประวัติการส่งขาย/ชำแหละ — ดึงจาก dispatch_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/production-closeout</td><td>สรุปผลผลิตปิดรอบ (ขาย+ตาย+คัดออก เทียบจำนวนเริ่มต้น) — ดึงจาก dispatch_record (ยอดขาย/คัดออก) และข้อมูลจำนวนตาย/คงเหลือจาก animal ในโมดูลทะเบียนสัตว์ (โมดูลนี้ไม่ได้เก็บข้อมูลการตายเอง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/grade-price-summary</td><td>สรุปมูลค่าตามเกรดที่ส่งออก — ดึงจาก sorting_record (เกรดที่คัด), dispatch_record (ปริมาณ/น้ำหนักที่ส่งออกจริง) และ buyer_price_quote (ราคาต่อกิโลกรัมตามเกรด)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/buyer-price-quotes</td><td>ดึงใบเสนอราคาผู้รับซื้อทั้งหมด — ดึงจาก buyer_price_quote</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/buyer-price-quotes</td><td>บันทึกใบเสนอราคาผู้รับซื้อ — บันทึกลง buyer_price_quote</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

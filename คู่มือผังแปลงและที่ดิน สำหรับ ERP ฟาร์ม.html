@@ -627,18 +627,18 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields</td><td>ดึงรายการแปลงทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/fields</td><td>สร้างแปลงใหม่พร้อมขอบเขต GPS</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/crop/fields/{id}</td><td>แก้ไขข้อมูล/ขอบเขตแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/zones</td><td>ดึงโซนย่อยของแปลงหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/fields/{id}/zones</td><td>สร้างโซนย่อยใหม่ในแปลงนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/crop/zones/{id}</td><td>แก้ไขข้อมูลโซนย่อย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/land-use-history</td><td>ประวัติการใช้ที่ดินของแปลงหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/land-use-history</td><td>บันทึกประวัติการใช้ที่ดินใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/land-utilization</td><td>สรุปพื้นที่ทั้งหมดแยกตามสถานะการใช้งาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/gps-boundary</td><td>ดึงพิกัดขอบเขตสำหรับแสดงผลบนแผนที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/soil-data</td><td>ดึงข้อมูลดินของแปลง/โซน</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/soil-data</td><td>บันทึกผลตรวจดินใหม่</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields</td><td>ดึงรายการแปลงทั้งหมด — ดึงจาก field</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fields</td><td>สร้างแปลงใหม่พร้อมขอบเขต GPS — บันทึกลง field (อ้างอิง default_cost_center_id จากโมดูลบัญชีและการเงิน ถ้าผูกศูนย์ต้นทุนตั้งแต่สร้าง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/fields/{id}</td><td>แก้ไขข้อมูล/ขอบเขตแปลง — บันทึกลง field</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/zones</td><td>ดึงโซนย่อยของแปลงหนึ่ง — ดึงจาก field_zone</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fields/{id}/zones</td><td>สร้างโซนย่อยใหม่ในแปลงนี้ — บันทึกลง field_zone (อ้างอิง field_id ของแปลงแม่ และ cost_center_id จากโมดูลบัญชีและการเงิน ถ้าแยกศูนย์ต้นทุนระดับโซน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/zones/{id}</td><td>แก้ไขข้อมูลโซนย่อย — บันทึกลง field_zone</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/land-use-history</td><td>ประวัติการใช้ที่ดินของแปลงหนึ่ง — ดึงจาก land_use_history</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/land-use-history</td><td>บันทึกประวัติการใช้ที่ดินใหม่ — บันทึกลง land_use_history (อ้างอิง ref_cost_center_id จากโมดูลบัญชีและการเงิน ผูกกับรอบปลูกจริงจากโมดูลแผนการเพาะปลูก; yield_result อาจรับมาจากโมดูลการเก็บเกี่ยว)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/land-utilization</td><td>สรุปพื้นที่ทั้งหมดแยกตามสถานะการใช้งาน — ดึงจาก field, field_zone, land_use_history ผ่านสูตร utilization_rate (หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/gps-boundary</td><td>ดึงพิกัดขอบเขตสำหรับแสดงผลบนแผนที่ — ดึงจาก field (ฟิลด์ gps_boundary)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/soil-data</td><td>ดึงข้อมูลดินของแปลง/โซน — ดึงจาก soil_data</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/soil-data</td><td>บันทึกผลตรวจดินใหม่ — บันทึกลง soil_data (อ้างอิง field_id/field_zone_id ของแปลงหรือโซนที่ตรวจ)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

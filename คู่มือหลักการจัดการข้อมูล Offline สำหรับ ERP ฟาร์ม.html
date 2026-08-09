@@ -461,18 +461,18 @@
         <ul class="func-list">
           <li class="func-item"><span class="txt">SQLite local database เก็บข้อมูลทุกฟอร์มที่พนักงานกรอกในพื้นที่</span></li>
           <li class="func-item"><span class="txt">ตาราง sync_queue เก็บรายการที่รอส่งขึ้นเซิร์ฟเวอร์ ตามลำดับเวลาที่เกิด</span></li>
-          <li class="func-item"><span class="txt">ตรวจจับสถานะอินเทอร์เน็ต แล้วเริ่ม sync อัตโนมัติทันทีที่กลับมาออนไลน์</span></li>
-          <li class="func-item"><span class="txt">สร้าง client-generated UUID ให้ทุกเรคคอร์ดใหม่ที่สร้างตอนออฟไลน์</span></li>
-          <li class="func-item"><span class="txt">แสดงสถานะ pending/synced/failed ต่อเรคคอร์ดในหน้า UI</span></li>
+          <li class="func-item"><span class="txt">ตรวจจับสถานะอินเทอร์เน็ต แล้วเริ่ม sync อัตโนมัติทันทีที่กลับมาออนไลน์ — อ่านรายการที่รอส่งจาก sync_queue</span></li>
+          <li class="func-item"><span class="txt">สร้าง client-generated UUID ให้ทุกเรคคอร์ดใหม่ที่สร้างตอนออฟไลน์ — เขียนลง local_uuid (ฟิลด์เสริมทุกตาราง local)</span></li>
+          <li class="func-item"><span class="txt">แสดงสถานะ pending/synced/failed ต่อเรคคอร์ดในหน้า UI — อ่านจาก sync_status (ฟิลด์เสริมทุกตาราง local)</span></li>
         </ul>
       </article>
       <article class="card func-card">
         <h3>เพิ่มทีหลังได้</h3>
         <ul class="func-list">
-          <li class="func-item"><span class="txt">Background sync อัตโนมัติเป็นช่วง ๆ แม้แอปไม่ได้เปิดอยู่หน้าจอ</span><span class="phase-tag phase-2">Phase 2</span></li>
-          <li class="func-item"><span class="txt">Batch sync ส่งหลายเรคคอร์ดพร้อมกันในคำขอเดียวเพื่อลดรอบการเชื่อมต่อ</span><span class="phase-tag phase-2">Phase 2</span></li>
-          <li class="func-item"><span class="txt">ลบข้อมูลเก่าที่ซิงค์แล้วออกจากเครื่องเป็นระยะ เพื่อประหยัดพื้นที่</span><span class="phase-tag phase-2">Phase 2</span></li>
-          <li class="func-item"><span class="txt">แจ้งเตือนแอดมินอัตโนมัติเมื่อพบ conflict ที่ต้องตรวจสอบด้วยคน</span><span class="phase-tag phase-3">Phase 3</span></li>
+          <li class="func-item"><span class="txt">Background sync อัตโนมัติเป็นช่วง ๆ แม้แอปไม่ได้เปิดอยู่หน้าจอ — อ่าน/ส่งจาก sync_queue เหมือน sync ปกติ</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">Batch sync ส่งหลายเรคคอร์ดพร้อมกันในคำขอเดียวเพื่อลดรอบการเชื่อมต่อ — รวมหลายแถวจาก sync_queue ในคำขอเดียว</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">ลบข้อมูลเก่าที่ซิงค์แล้วออกจากเครื่องเป็นระยะ เพื่อประหยัดพื้นที่ — ลบเรคคอร์ดที่ sync_status = synced (ยังไม่มีฟิลด์กำหนดเกณฑ์อายุ/ระยะเวลาในสเปกนี้ ต้องเพิ่ม)</span><span class="phase-tag phase-2">Phase 2</span></li>
+          <li class="func-item"><span class="txt">แจ้งเตือนแอดมินอัตโนมัติเมื่อพบ conflict ที่ต้องตรวจสอบด้วยคน — ยังไม่มี entity เก็บรายการ conflict ในสเปกนี้ ต้องเพิ่ม</span><span class="phase-tag phase-3">Phase 3</span></li>
         </ul>
       </article>
     </div>
@@ -587,7 +587,7 @@
     <div class="card-grid">
       <article class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;"><h3>สร้าง ID แบบออฟไลน์ปลอดภัย</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>ห้ามใช้ auto-increment integer สำหรับเรคคอร์ดที่สร้างตอนออฟไลน์ เพราะสองเครื่องอาจสร้างเลขชนกัน</p>
+        <p>ห้ามใช้ auto-increment integer สำหรับเรคคอร์ดที่สร้างตอนออฟไลน์ เพราะสองเครื่องอาจสร้างเลขชนกัน — เขียนลง local_uuid ตอนสร้าง แล้วอัปเดต server_id หลัง sync สำเร็จ (ฟิลด์เสริมทุกตาราง local)</p>
         <pre class="formula">record.local_uuid = generate_uuid_v4()  // สร้างตอนกรอกฟอร์ม ไม่ใช่ตอน sync
 server_id = null  // จนกว่า sync ครั้งแรกสำเร็จ
 API ตอบกลับ server_id -&gt; อัปเดตกลับเข้า local record</pre>
@@ -595,7 +595,7 @@ API ตอบกลับ server_id -&gt; อัปเดตกลับเข�
 
       <article class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;"><h3>ป้องกันการ Sync ซ้ำ (Idempotency)</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>ทุก request sync ต้องส่ง idempotency_key เดิมซ้ำได้อย่างปลอดภัยถ้าต้อง retry</p>
+        <p>ทุก request sync ต้องส่ง idempotency_key เดิมซ้ำได้อย่างปลอดภัยถ้าต้อง retry — อ้างอิง idempotency_key จาก sync_queue</p>
         <pre class="formula">ที่ฝั่ง API:
   ถ้า idempotency_key นี้เคยประมวลผลสำเร็จแล้ว
     -&gt; ตอบผลลัพธ์เดิมกลับไปทันที ไม่สร้างเรคคอร์ดใหม่ซ้ำ
@@ -605,7 +605,7 @@ API ตอบกลับ server_id -&gt; อัปเดตกลับเข�
 
       <article class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;"><h3>ลำดับการส่ง Sync</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>ส่งตามลำดับเวลาที่เข้าคิว ไม่ใช่สุ่ม เพื่อรักษาลำดับเหตุการณ์ทางธุรกิจให้ถูกต้อง</p>
+        <p>ส่งตามลำดับเวลาที่เข้าคิว ไม่ใช่สุ่ม เพื่อรักษาลำดับเหตุการณ์ทางธุรกิจให้ถูกต้อง — ดึงจาก sync_queue เรียงตาม queued_at</p>
         <pre class="formula">sync_queue ORDER BY queued_at ASC
 ส่งทีละรายการ (หรือ batch ตามลำดับ) จนครบคิว
 ถ้ารายการใดล้มเหลว -&gt; หยุดที่รายการนั้น ไม่ข้ามไปส่งรายการถัดไปก่อน
@@ -614,7 +614,7 @@ API ตอบกลับ server_id -&gt; อัปเดตกลับเข�
 
       <article class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;"><h3>Retry แบบ Exponential Backoff</h3><span class="phase-tag phase-2">Phase 2</span></div>
-        <p>กันไม่ให้แอปยิง request รัว ๆ ตอนเน็ตแย่ ๆ จนแบตหมด/เปลืองดาต้าโดยไม่จำเป็น</p>
+        <p>กันไม่ให้แอปยิง request รัว ๆ ตอนเน็ตแย่ ๆ จนแบตหมด/เปลืองดาต้าโดยไม่จำเป็น — อ่าน/เขียน retry_count และ sync_status ของเรคคอร์ด (ฟิลด์เสริมทุกตาราง local)</p>
         <pre class="formula">retry_delay = min(2^retry_count วินาที, 5 นาที)
 ถ้า retry_count &gt; 10 ครั้งติดกัน
   -&gt; sync_status = failed, แจ้งเตือนผู้ใช้ให้ตรวจสอบเอง</pre>
@@ -622,7 +622,7 @@ API ตอบกลับ server_id -&gt; อัปเดตกลับเข�
 
       <article class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;"><h3>เกณฑ์เลือก Last-Write-Wins vs Manual Conflict</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>ตัดสินตอนออกแบบตาราง ไม่ใช่ตัดสินสด ๆ ตอน implement</p>
+        <p>ตัดสินตอนออกแบบตาราง ไม่ใช่ตัดสินสด ๆ ตอน implement — ตัดสินจากค่า target_table ใน sync_queue</p>
         <pre class="formula">ถ้า target_table อยู่ในกลุ่ม การเงิน/สต็อก/สุขภาพ-วัคซีน
   -&gt; conflict ต้องถูก flag ให้คนตรวจสอบ ห้าม auto-overwrite
 ถ้า target_table เป็นบันทึกกิจกรรมทั่วไป (feeding, care_task)

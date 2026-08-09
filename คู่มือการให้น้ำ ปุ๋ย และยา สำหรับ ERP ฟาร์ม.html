@@ -627,17 +627,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/crop/care-tasks</td><td>ดึงรายการงานตามแผน (filter: planting_plan_id, status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/crop/care-tasks/{id}</td><td>อัปเดตสถานะงาน (done/skipped)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/irrigation-logs</td><td>ดึงประวัติการให้น้ำ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/irrigation-logs</td><td>บันทึกการให้น้ำจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fertilizer-applications</td><td>ดึงประวัติการให้ปุ๋ย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/fertilizer-applications</td><td>บันทึกการให้ปุ๋ยจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/pesticide-applications</td><td>ดึงประวัติการฉีดพ่นสารเคมี</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/pesticide-applications</td><td>บันทึกการฉีดพ่นจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/phi-status</td><td>ตรวจสอบสถานะ PHI และวันที่ปลอดภัยเก็บเกี่ยวของแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/dosage-calculator</td><td>คำนวณปริมาณปุ๋ย/สารเคมีที่ต้องใช้ตามพื้นที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/care-history</td><td>ประวัติการดูแลพืชทั้งหมดต่อแปลง/รอบผลิต</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/care-tasks</td><td>ดึงรายการงานตามแผน (filter: planting_plan_id, status) — ดึงจาก care_task</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/care-tasks/{id}</td><td>อัปเดตสถานะงาน (done/skipped) — บันทึกลง care_task</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/irrigation-logs</td><td>ดึงประวัติการให้น้ำ — ดึงจาก irrigation_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/irrigation-logs</td><td>บันทึกการให้น้ำจริง — บันทึกลง irrigation_log (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลง, อ้างอิง care_task_id ถ้ามาจากงานตามแผน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fertilizer-applications</td><td>ดึงประวัติการให้ปุ๋ย — ดึงจาก fertilizer_application</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fertilizer-applications</td><td>บันทึกการให้ปุ๋ยจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง fertilizer_application (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลง, item_id จากโมดูลคลังสินค้า/สต็อก ซึ่งจะถูกตัดสต็อกด้วย)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/pesticide-applications</td><td>ดึงประวัติการฉีดพ่นสารเคมี — ดึงจาก pesticide_application</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/pesticide-applications</td><td>บันทึกการฉีดพ่นจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง pesticide_application (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลง, item_id จากโมดูลคลังสินค้า/สต็อก ที่มีค่า phi_days กำกับและจะถูกตัดสต็อกด้วย)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/phi-status</td><td>ตรวจสอบสถานะ PHI และวันที่ปลอดภัยเก็บเกี่ยวของแปลง — ดึงจาก pesticide_application (หา safe_harvest_date ล่าสุดของแปลงนี้) และ expected_harvest_date จาก planting_plan (โมดูลแผนการเพาะปลูก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/dosage-calculator</td><td>คำนวณปริมาณปุ๋ย/สารเคมีที่ต้องใช้ตามพื้นที่ — คำนวณจาก dosage_rate_per_rai ที่กรอกเข้ามา (จากฉลากผลิตภัณฑ์/มาตรฐาน ไม่มี entity เก็บค่านี้ในสเปกนี้ ต้องเพิ่มถ้าต้องการบันทึกมาตรฐานเอง) &#215; field_or_zone.area_rai จากโมดูลผังแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/care-history</td><td>ประวัติการดูแลพืชทั้งหมดต่อแปลง/รอบผลิต — ดึงจาก care_task, irrigation_log, fertilizer_application, pesticide_application</td><td><span class="phase-tag phase-1">1</span></td></tr>
         </tbody>
       </table>
     </div>

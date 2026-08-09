@@ -656,21 +656,21 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/sales/customers</td><td>ดึงรายชื่อลูกค้าทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/customers</td><td>สร้างลูกค้าใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/sales/customers/{id}</td><td>แก้ไข/ปิดใช้งานลูกค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/orders</td><td>ดึงใบสั่งขาย (filter: status, customer_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/orders</td><td>สร้างใบสั่งขายใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/orders/{id}</td><td>ดูรายละเอียดใบสั่งขายใบเดียว</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/confirm</td><td>ยืนยันใบสั่งขาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/cancel</td><td>ยกเลิกใบสั่งขายที่ยังไม่ส่งของ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/delivery-notes</td><td>ออกใบส่งของผูกกับใบสั่งขายนี้ — เมื่อปิดใบส่งของจะเปลี่ยน sales_order.status เป็น invoiced และยิงไปสร้าง ar_invoice ที่โมดูลบัญชีอัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/delivery-notes</td><td>ดึงประวัติการส่งของทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/reports/customer-sales-history</td><td>ประวัติการขาย/ราคาย้อนหลังต่อลูกค้า</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/reports/pending-deliveries</td><td>ใบสั่งขายที่ยืนยันแล้วแต่ยังไม่ส่งของ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/reports/credit-limit-check</td><td>ตรวจสอบวงเงินเครดิตคงเหลือต่อลูกค้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/sales/price-history</td><td>ดึงประวัติราคาขายต่อลูกค้า/สินค้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/sales/forward-sales</td><td>สร้างการจองผลผลิตล่วงหน้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/customers</td><td>ดึงรายชื่อลูกค้าทั้งหมด — ดึงจาก customer</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/customers</td><td>สร้างลูกค้าใหม่ — บันทึกลง customer</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/sales/customers/{id}</td><td>แก้ไข/ปิดใช้งานลูกค้า — บันทึกลง customer</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/orders</td><td>ดึงใบสั่งขาย (filter: status, customer_id, date_from, date_to) — ดึงจาก sales_order, sales_order_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/orders</td><td>สร้างใบสั่งขายใหม่ — บันทึกลง sales_order, sales_order_line (อ้างอิง customer_id จาก customer และ item_id จาก item ของโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/orders/{id}</td><td>ดูรายละเอียดใบสั่งขายใบเดียว — ดึงจาก sales_order, sales_order_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/confirm</td><td>ยืนยันใบสั่งขาย — บันทึกลง sales_order โดยเปลี่ยน status เป็น confirmed</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/cancel</td><td>ยกเลิกใบสั่งขายที่ยังไม่ส่งของ — บันทึกลง sales_order โดยเปลี่ยน status เป็น cancelled</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/orders/{id}/delivery-notes</td><td>ออกใบส่งของผูกกับใบสั่งขายนี้ — บันทึกลง delivery_note (อ้างอิง sales_order_id จาก sales_order) เมื่อปิดใบส่งของจะเปลี่ยน sales_order.status เป็น invoiced และยิงไปสร้าง ar_invoice ที่โมดูลบัญชีและการเงินอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (ส่ง total_amount, due_date, customer_id จาก delivery_note)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/delivery-notes</td><td>ดึงประวัติการส่งของทั้งหมด — ดึงจาก delivery_note</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/reports/customer-sales-history</td><td>ประวัติการขาย/ราคาย้อนหลังต่อลูกค้า — ดึงจาก sales_order, sales_order_line (filter customer_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/reports/pending-deliveries</td><td>ใบสั่งขายที่ยืนยันแล้วแต่ยังไม่ส่งของ — ดึงจาก sales_order (status = confirmed) เทียบกับ delivery_note ที่ยังไม่ถูกสร้าง</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/reports/credit-limit-check</td><td>ตรวจสอบวงเงินเครดิตคงเหลือต่อลูกค้า — ดึงจาก customer.credit_limit และยอดค้างชำระจาก ar_invoice ของโมดูลบัญชีและการเงิน</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/sales/price-history</td><td>ดึงประวัติราคาขายต่อลูกค้า/สินค้า — ดึงจาก price_history</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/sales/forward-sales</td><td>สร้างการจองผลผลิตล่วงหน้า — บันทึกลง forward_sale (อ้างอิง customer_id จาก customer และ cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

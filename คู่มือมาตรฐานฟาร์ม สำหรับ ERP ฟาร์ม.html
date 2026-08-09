@@ -645,16 +645,16 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/standards/certification-standards</td><td>ดึงมาตรฐานทั้งหมดที่ฟาร์มใช้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/standards/certification-standards</td><td>เพิ่มมาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/standards/checklist-items</td><td>เพิ่มข้อกำหนดในเช็กลิสต์ของมาตรฐาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records</td><td>สร้างรอบตรวจประเมินใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/findings</td><td>ดึงผลตรวจรายข้อของรอบ audit นี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records/{id}/findings</td><td>บันทึกผลตรวจรายข้อ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/standards/audit-findings/{id}</td><td>อัปเดตสถานะการแก้ไขข้อบกพร่อง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/standards/certificates/expiring</td><td>ดึงใบรับรองที่ใกล้หมดอายุ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/standards/certificates</td><td>บันทึกใบรับรองที่ได้รับ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/evidence-pack</td><td>รวบรวมหลักฐานจากตรวจสอบย้อนกลับ/โมดูลอื่นอัตโนมัติ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/certification-standards</td><td>ดึงมาตรฐานทั้งหมดที่ฟาร์มใช้ — ดึงจาก certification_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/certification-standards</td><td>เพิ่มมาตรฐานใหม่ — บันทึกลง certification_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/checklist-items</td><td>เพิ่มข้อกำหนดในเช็กลิสต์ของมาตรฐาน — บันทึกลง standard_checklist_item (อ้างอิง certification_standard)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records</td><td>สร้างรอบตรวจประเมินใหม่ — บันทึกลง audit_record (อ้างอิง certification_standard)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/findings</td><td>ดึงผลตรวจรายข้อของรอบ audit นี้ — ดึงจาก audit_finding, standard_checklist_item</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/audit-records/{id}/findings</td><td>บันทึกผลตรวจรายข้อ — บันทึกลง audit_finding (อ้างอิง audit_record, standard_checklist_item; ฟิลด์ evidence_ref อ้างอิง trace_code จากโมดูลตรวจสอบย้อนกลับ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/standards/audit-findings/{id}</td><td>อัปเดตสถานะการแก้ไขข้อบกพร่อง — บันทึกลง audit_finding (ฟิลด์ corrective_status, corrective_deadline)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/certificates/expiring</td><td>ดึงใบรับรองที่ใกล้หมดอายุ — ดึงจาก certificate (filter status = expiring_soon/expired ตามสูตร days_remaining ในหัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/standards/certificates</td><td>บันทึกใบรับรองที่ได้รับ — บันทึกลง certificate (อ้างอิง certification_standard, audit_record)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/standards/audit-records/{id}/evidence-pack</td><td>รวบรวมหลักฐานจากตรวจสอบย้อนกลับ/โมดูลอื่นอัตโนมัติ — ดึงจาก audit_finding (evidence_ref) ประกอบกับข้อมูลจากโมดูลตรวจสอบย้อนกลับ (trace_code/trace_link), การให้น้ำ ปุ๋ย และยา (pesticide_application/ผล PHI check), สุขภาพและวัคซีน (vaccination_record/treatment_record/ผล withdrawal check)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

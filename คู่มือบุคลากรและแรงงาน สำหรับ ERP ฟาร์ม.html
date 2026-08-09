@@ -671,24 +671,24 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/hr/positions</td><td>ดึงรายชื่อตำแหน่งงานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/positions</td><td>สร้างตำแหน่งงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด (filter: position_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/employees</td><td>สร้างพนักงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/hr/employees/{id}</td><td>แก้ไข/ปิดใช้งานพนักงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/piece-work-records</td><td>บันทึกผลงานตามชิ้น/หน่วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/piece-work-records</td><td>ดึงประวัติผลงานตามชิ้น/หน่วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/reports/leave-balance</td><td>วันลาคงเหลือต่อพนักงาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs</td><td>เริ่มรอบเงินเดือนใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/calculate</td><td>คำนวณเงินเดือนทุกคนในรอบนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/approve</td><td>อนุมัติรอบเงินเดือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/post</td><td>ปิดรอบและส่งข้อมูลเข้าบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/reports/labor-cost-by-cost-center</td><td>ต้นทุนแรงงานแยกตามศูนย์ต้นทุน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/shift-schedules</td><td>จัดตารางกะทำงานล่วงหน้า</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/positions</td><td>ดึงรายชื่อตำแหน่งงานทั้งหมด — ดึงจาก position</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/positions</td><td>สร้างตำแหน่งงานใหม่ — บันทึกลง position</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด (filter: position_id) — ดึงจาก employee, position</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/employees</td><td>สร้างพนักงานใหม่ — บันทึกลง employee (อ้างอิง position_id จาก position, default_cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/hr/employees/{id}</td><td>แก้ไข/ปิดใช้งานพนักงาน — บันทึกลง employee</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน — บันทึกลง attendance (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to) — ดึงจาก attendance</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/piece-work-records</td><td>บันทึกผลงานตามชิ้น/หน่วย — บันทึกลง piece_work_record (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน, รับ quantity_completed จากโมดูลทะเบียนสัตว์หรือการเก็บเกี่ยว)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/piece-work-records</td><td>ดึงประวัติผลงานตามชิ้น/หน่วย — ดึงจาก piece_work_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา — บันทึกลง leave_request (อ้างอิง employee_id จาก employee)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา — บันทึกลง leave_request (อ้างอิง approved_by จาก user ของโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/reports/leave-balance</td><td>วันลาคงเหลือต่อพนักงาน — ดึงจาก leave_request เพื่อคำนวณวันลาที่ใช้ไป (ยังไม่มี entity เก็บสิทธิ์วันลา/โควตาต่อปีต่อพนักงานในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs</td><td>เริ่มรอบเงินเดือนใหม่ — บันทึกลง payroll_run</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/calculate</td><td>คำนวณเงินเดือนทุกคนในรอบนี้ — บันทึกลง payroll_run_line โดยดึงจาก employee (base_wage, wage_type), attendance (overtime_hours), piece_work_record (quantity_completed, rate_per_unit), leave_request (unpaid leave) — cost_center_id เป็น snapshot จาก employee.default_cost_center_id (อ้างอิง cost_center จากโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/approve</td><td>อนุมัติรอบเงินเดือน — บันทึกลง payroll_run</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/post</td><td>ปิดรอบและส่งข้อมูลเข้าบัญชี — บันทึกลง payroll_run และส่งข้อมูลไปสร้าง journal entry ที่โมดูลบัญชีและการเงิน ผ่าน /accounting/journal-entries/from-source (อ้างอิง cost_center_id จาก payroll_run_line)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/reports/labor-cost-by-cost-center</td><td>ต้นทุนแรงงานแยกตามศูนย์ต้นทุน — ดึงจาก payroll_run_line (อ้างอิง cost_center จากโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/shift-schedules</td><td>จัดตารางกะทำงานล่วงหน้า — บันทึกลง shift_schedule (ยังไม่มี entity นี้ในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

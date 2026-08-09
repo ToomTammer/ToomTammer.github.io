@@ -621,17 +621,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/feed-formulas</td><td>ดึงสูตรอาหารทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/feed-formulas</td><td>ตั้งสูตรอาหารใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/feed-formulas/{id}</td><td>แก้ไขสูตรอาหาร</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/current-feed-formula</td><td>สูตรอาหารที่ควรใช้ตอนนี้ตามอายุจริงของฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/feeding-records</td><td>ดึงประวัติการให้อาหาร</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/feeding-records</td><td>บันทึกการให้อาหารจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/fcr</td><td>คำนวณ FCR ปัจจุบันของฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/feed-cost-by-group</td><td>ต้นทุนอาหารสะสมแยกตามฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/fcr-comparison</td><td>เปรียบเทียบ FCR ระหว่างฝูง/สูตรอาหาร</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/feeding-schedules</td><td>ดึงตารางให้อาหารตามแผน</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/feeding-schedules</td><td>ตั้งตารางให้อาหารใหม่</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/feed-formulas</td><td>ดึงสูตรอาหารทั้งหมด — ดึงจาก feed_formula</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/feed-formulas</td><td>ตั้งสูตรอาหารใหม่ — บันทึกลง feed_formula (อ้างอิง species จากโมดูลทะเบียนสัตว์ และ feed_item_id จากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/feed-formulas/{id}</td><td>แก้ไขสูตรอาหาร — บันทึกลง feed_formula</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/current-feed-formula</td><td>สูตรอาหารที่ควรใช้ตอนนี้ตามอายุจริงของฝูง — ดึงจาก feed_formula (จับคู่ตาม age_days_start/age_days_end) โดยใช้อายุของฝูงจาก animal_group (อ้างอิง birth_date จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/feeding-records</td><td>ดึงประวัติการให้อาหาร — ดึงจาก feeding_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/feeding-records</td><td>บันทึกการให้อาหารจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง feeding_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ feed_item_id จากโมดูลคลังสินค้า ซึ่งจะถูกตัดสต็อกพร้อมกัน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/fcr</td><td>คำนวณ FCR ปัจจุบันของฝูง — ดึงจาก fcr_calculation ถ้ามีรอบคำนวณล่าสุดแล้ว หรือคำนวณสดจาก feeding_record (total_feed_consumed) รวมกับน้ำหนักที่เพิ่มขึ้นจากโมดูลการเจริญเติบโตและผลผลิต (total_weight_gain)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/feed-cost-by-group</td><td>ต้นทุนอาหารสะสมแยกตามฝูง — ดึงจาก feeding_record (ปริมาณที่ใช้จริงต่อฝูง) คูณต้นทุนต่อหน่วยของ feed_item_id จากโมดูลคลังสินค้า (สเปกนี้ยังไม่มี entity เก็บต้นทุนต่อหน่วยของอาหารสัตว์เอง ต้องอ้างอิงจากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/fcr-comparison</td><td>เปรียบเทียบ FCR ระหว่างฝูง/สูตรอาหาร — ดึงจาก fcr_calculation เทียบระหว่างฝูงได้ตรง ๆ แต่การเทียบตามสูตรอาหารที่ใช้จริงยังไม่มี field เชื่อม fcr_calculation กับ feed_formula ในสเปกนี้ ต้องเพิ่ม (เช่น feed_formula_id)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/feeding-schedules</td><td>ดึงตารางให้อาหารตามแผน — ดึงจาก feeding_schedule</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/feeding-schedules</td><td>ตั้งตารางให้อาหารใหม่ — บันทึกลง feeding_schedule (อ้างอิง animal_group_id จากโมดูลทะเบียนสัตว์ และ feed_formula_id จาก feed_formula ในโมดูลนี้)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

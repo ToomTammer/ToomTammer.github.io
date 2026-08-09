@@ -621,17 +621,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-standards</td><td>ดึงเกณฑ์มาตรฐานสภาพแวดล้อมทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-standards</td><td>ตั้งเกณฑ์มาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-logs</td><td>ดึงประวัติสภาพแวดล้อมของโรงเรือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-logs</td><td>บันทึกข้อมูลสภาพแวดล้อมด้วยตนเอง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-logs/sync</td><td>Internal endpoint รับข้อมูลจากเซนเซอร์ IoT</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations/{id}/environment-status</td><td>สถานะสภาพแวดล้อมปัจจุบันเทียบเกณฑ์มาตรฐาน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations/{id}/stocking-density</td><td>ความหนาแน่นปัจจุบันเทียบเกณฑ์สวัสดิภาพสัตว์</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-alerts</td><td>ดึงรายการแจ้งเตือนสภาพแวดล้อมผิดปกติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/environment-history</td><td>ประวัติสภาพแวดล้อมย้อนหลังต่อโรงเรือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/ventilation-control-logs</td><td>ดึงประวัติการควบคุมระบายอากาศ</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/ventilation-control-logs</td><td>บันทึก/สั่งการควบคุมระบายอากาศ</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-standards</td><td>ดึงเกณฑ์มาตรฐานสภาพแวดล้อมทั้งหมด — ดึงจาก environment_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-standards</td><td>ตั้งเกณฑ์มาตรฐานใหม่ — บันทึกลง environment_standard (อ้างอิง species จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-logs</td><td>ดึงประวัติสภาพแวดล้อมของโรงเรือน — ดึงจาก environment_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-logs</td><td>บันทึกข้อมูลสภาพแวดล้อมด้วยตนเอง — บันทึกลง environment_log (อ้างอิง housing_location_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/environment-logs/sync</td><td>Internal endpoint รับข้อมูลจากเซนเซอร์ IoT — บันทึกลง environment_log (source=sensor, อ้างอิง housing_location_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations/{id}/environment-status</td><td>สถานะสภาพแวดล้อมปัจจุบันเทียบเกณฑ์มาตรฐาน — ดึงจาก environment_log (ค่าล่าสุด), environment_standard (เทียบตาม species/age_days ของสัตว์ในโรงเรือนนั้น อ้างอิงจากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations/{id}/stocking-density</td><td>ความหนาแน่นปัจจุบันเทียบเกณฑ์สวัสดิภาพสัตว์ — ดึงจาก environment_standard (max_occupancy_pct) และ current_quantity/housing_location.capacity (อ้างอิงจากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/environment-alerts</td><td>ดึงรายการแจ้งเตือนสภาพแวดล้อมผิดปกติ — ดึงจาก environment_alert</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/environment-history</td><td>ประวัติสภาพแวดล้อมย้อนหลังต่อโรงเรือน — ดึงจาก environment_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/ventilation-control-logs</td><td>ดึงประวัติการควบคุมระบายอากาศ — ดึงจาก ventilation_control_log</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/ventilation-control-logs</td><td>บันทึก/สั่งการควบคุมระบายอากาศ — บันทึกลง ventilation_control_log (อ้างอิง housing_location_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

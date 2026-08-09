@@ -623,18 +623,18 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/vaccination-schedule-standards</td><td>ดึงตารางวัคซีนมาตรฐานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/vaccination-schedule-standards</td><td>ตั้งตารางวัคซีนมาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/vaccination-due</td><td>วัคซีนที่ถึงกำหนดของสัตว์ตัวหนึ่ง (เทียบอายุจริงกับตารางมาตรฐาน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/vaccination-records</td><td>ดึงประวัติการฉีดวัคซีน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/vaccination-records</td><td>บันทึกการฉีดวัคซีนจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/treatment-records</td><td>ดึงประวัติการรักษา/ใช้ยา</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/treatment-records</td><td>บันทึกการรักษาจริง (ตัดสต็อกอัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/withdrawal-status</td><td>ตรวจสอบสถานะระยะหยุดยาและวันที่ขายได้ปลอดภัย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/health-history</td><td>ประวัติสุขภาพรวมของสัตว์ตัวหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/health-symptom-logs</td><td>ดึงบันทึกอาการเบื้องต้น</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/health-symptom-logs</td><td>บันทึกอาการผิดปกติที่พบ</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/morbidity-rate</td><td>อัตราการเจ็บป่วยต่อฝูง</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/vaccination-schedule-standards</td><td>ดึงตารางวัคซีนมาตรฐานทั้งหมด — ดึงจาก vaccination_schedule_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/vaccination-schedule-standards</td><td>ตั้งตารางวัคซีนมาตรฐานใหม่ — บันทึกลง vaccination_schedule_standard (อ้างอิง species จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/vaccination-due</td><td>วัคซีนที่ถึงกำหนดของสัตว์ตัวหนึ่ง (เทียบอายุจริงกับตารางมาตรฐาน) — ดึงจาก vaccination_schedule_standard, vaccination_record (อ้างอิง birth_date/อายุปัจจุบันของสัตว์จากโมดูลทะเบียนสัตว์ ผ่านสูตร due_vaccines หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/vaccination-records</td><td>ดึงประวัติการฉีดวัคซีน — ดึงจาก vaccination_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/vaccination-records</td><td>บันทึกการฉีดวัคซีนจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง vaccination_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ vaccine_item_id จากโมดูลคลังสินค้าเพื่อตัดสต็อก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/treatment-records</td><td>ดึงประวัติการรักษา/ใช้ยา — ดึงจาก treatment_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/treatment-records</td><td>บันทึกการรักษาจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง treatment_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ medication_item_id จากโมดูลคลังสินค้าเพื่อตัดสต็อกและดึง withdrawal_days มาตรฐาน; คำนวณ safe_sale_date อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/withdrawal-status</td><td>ตรวจสอบสถานะระยะหยุดยาและวันที่ขายได้ปลอดภัย — ดึงจาก treatment_record ผ่านสูตร is_safe_to_sell/safe_sale_date (หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/health-history</td><td>ประวัติสุขภาพรวมของสัตว์ตัวหนึ่ง — ดึงจาก vaccination_record, treatment_record, health_symptom_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/health-symptom-logs</td><td>ดึงบันทึกอาการเบื้องต้น — ดึงจาก health_symptom_log</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/health-symptom-logs</td><td>บันทึกอาการผิดปกติที่พบ — บันทึกลง health_symptom_log (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ treatment_record_id ถ้านำไปสู่การรักษาแล้ว)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/morbidity-rate</td><td>อัตราการเจ็บป่วยต่อฝูง — ดึงจาก treatment_record และ current_quantity ของฝูงจากโมดูลทะเบียนสัตว์ ผ่านสูตร morbidity_rate_pct (หัวข้อ 6)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

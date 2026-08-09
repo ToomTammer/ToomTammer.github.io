@@ -642,16 +642,16 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method post">POST</td><td class="mono">/auth/login</td><td>ตรวจรหัสผ่านผ่าน Identity แล้วออก access token + refresh token กลับไป</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/refresh-token</td><td>ใช้ refresh token ที่ยังไม่หมดอายุ/ไม่ถูกเพิกถอน ขอ access token ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/logout</td><td>เพิกถอน (revoke) refresh token ของอุปกรณ์นี้ทันที</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/forgot-password</td><td>ขอลิงก์รีเซ็ตรหัสผ่านทางอีเมล</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/auth/reset-password</td><td>ตั้งรหัสผ่านใหม่จากลิงก์ที่ได้รับ แล้วเพิกถอน refresh token เดิมทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/users</td><td>ดึงรายชื่อผู้ใช้ทั้งหมด (เฉพาะเจ้าของ/ผู้บริหาร)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/users</td><td>สร้างบัญชีผู้ใช้ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/users/{id}</td><td>แก้ไขข้อมูล/ปิดใช้งานบัญชี — ปิดใช้งานแล้วเพิกถอน refresh token ทั้งหมดของบัญชีนั้นด้วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/users/{id}/assign-role</td><td>กำหนด/เปลี่ยน Role ของบัญชี</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/users/{id}/login-history</td><td>ดูประวัติการ login ของบัญชีนี้</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/login</td><td>ตรวจรหัสผ่านผ่าน Identity แล้วออก access token + refresh token กลับไป — ตรวจสอบจาก User (username/email, password_hash) แล้วบันทึกลง RefreshToken</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/refresh-token</td><td>ใช้ refresh token ที่ยังไม่หมดอายุ/ไม่ถูกเพิกถอน ขอ access token ใหม่ — ตรวจสอบจาก RefreshToken (token_hash, is_revoked, expires_at) และดึง Role ที่เกี่ยวข้องจาก User/UserRole เพื่อออก access token ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/logout</td><td>เพิกถอน (revoke) refresh token ของอุปกรณ์นี้ทันที — บันทึกลง RefreshToken (ตั้ง is_revoked = true)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/forgot-password</td><td>ขอลิงก์รีเซ็ตรหัสผ่านทางอีเมล — ดึงจาก User (ตรวจสอบว่ามีอีเมลนี้อยู่จริง) ส่วนตัวลิงก์/reset token ที่ส่งออกไปยังไม่มี entity เก็บในสเปกนี้ (ยังไม่มี entity นี้ในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/auth/reset-password</td><td>ตั้งรหัสผ่านใหม่จากลิงก์ที่ได้รับ แล้วเพิกถอน refresh token เดิมทั้งหมด — ตรวจสอบ reset token จากลิงก์ (ยังไม่มี entity นี้ในสเปกนี้ ต้องเพิ่ม ดู /auth/forgot-password) แล้วบันทึกลง User (password_hash, security_stamp ใหม่) และบันทึกลง RefreshToken (เพิกถอนทั้งหมดของบัญชีนั้น)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/users</td><td>ดึงรายชื่อผู้ใช้ทั้งหมด (เฉพาะเจ้าของ/ผู้บริหาร) — ดึงจาก User และ Role ผ่าน UserRole เพื่อแสดงบทบาทของแต่ละคน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/users</td><td>สร้างบัญชีผู้ใช้ใหม่ — บันทึกลง User (อ้างอิง created_by จาก User ผู้สร้างบัญชีนี้เอง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/users/{id}</td><td>แก้ไขข้อมูล/ปิดใช้งานบัญชี — ปิดใช้งานแล้วเพิกถอน refresh token ทั้งหมดของบัญชีนั้นด้วย — บันทึกลง User (เช่น is_active) และถ้าปิดใช้งานให้บันทึกลง RefreshToken (เพิกถอน is_revoked ทั้งหมดของ user_id นั้น)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/users/{id}/assign-role</td><td>กำหนด/เปลี่ยน Role ของบัญชี — บันทึกลง UserRole (อ้างอิง user_id จาก User และ role_id จาก Role)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/users/{id}/login-history</td><td>ดูประวัติการ login ของบัญชีนี้ — ดึงจาก LoginAuditLog</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

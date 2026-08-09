@@ -622,17 +622,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/weight-records</td><td>ดึงประวัติการชั่งน้ำหนัก</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/weight-records</td><td>บันทึกน้ำหนักที่ชั่งได้จริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/adg</td><td>คำนวณอัตราการเติบโตต่อวันของฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/daily-yield-records</td><td>ดึงประวัติผลผลิตรายวัน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/daily-yield-records</td><td>บันทึกผลผลิตรายวันจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/growth-target-standards</td><td>ดึงเป้าหมายมาตรฐานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/growth-target-standards</td><td>ตั้งเป้าหมายมาตรฐานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/growth-vs-target</td><td>เทียบน้ำหนัก/ผลผลิตจริงกับเป้าหมาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/market-readiness-alerts</td><td>ดึงรายการแจ้งเตือนพร้อมขาย</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/market-readiness-alerts/{id}/acknowledge</td><td>รับทราบการแจ้งเตือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/yield-summary</td><td>สรุปผลผลิตรวมต่อฝูง/ช่วงเวลา</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/weight-records</td><td>ดึงประวัติการชั่งน้ำหนัก — ดึงจาก weight_record (ค่า weight_value จากตารางนี้ยังถูกส่งต่อให้โมดูลบัญชีและการเงินใช้ประเมินมูลค่าสินทรัพย์ชีวภาพผ่าน POST /accounting/biological-assets/valuations)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/weight-records</td><td>บันทึกน้ำหนักที่ชั่งได้จริง — บันทึกลง weight_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/adg</td><td>คำนวณอัตราการเติบโตต่อวันของฝูง — ดึงจาก weight_record ผ่านสูตร ADG (หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/daily-yield-records</td><td>ดึงประวัติผลผลิตรายวัน — ดึงจาก daily_yield_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/daily-yield-records</td><td>บันทึกผลผลิตรายวันจริง — บันทึกลง daily_yield_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/growth-target-standards</td><td>ดึงเป้าหมายมาตรฐานทั้งหมด — ดึงจาก growth_target_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/growth-target-standards</td><td>ตั้งเป้าหมายมาตรฐานใหม่ — บันทึกลง growth_target_standard (อ้างอิง species จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups/{id}/growth-vs-target</td><td>เทียบน้ำหนัก/ผลผลิตจริงกับเป้าหมาย — ดึงจาก weight_record, daily_yield_record, growth_target_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/market-readiness-alerts</td><td>ดึงรายการแจ้งเตือนพร้อมขาย — ดึงจาก market_readiness_alert</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/market-readiness-alerts/{id}/acknowledge</td><td>รับทราบการแจ้งเตือน — บันทึกลง market_readiness_alert (อัปเดต status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/yield-summary</td><td>สรุปผลผลิตรวมต่อฝูง/ช่วงเวลา — ดึงจาก daily_yield_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
         </tbody>
       </table>
     </div>

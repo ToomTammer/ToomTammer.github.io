@@ -624,16 +624,16 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-templates</td><td>ดึงเทมเพลตรายงานทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-templates</td><td>เพิ่มเทมเพลตรายงานใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions</td><td>สร้างร่างรายงานโดยดึงข้อมูลจากโมดูลอื่นตามงวด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions</td><td>ดึงรายการรายงานทั้งหมดพร้อมสถานะ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}</td><td>แก้ไขร่างรายงานก่อนยื่นจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions/{id}/submit</td><td>บันทึกว่ายื่นรายงานแล้วพร้อมเลขอ้างอิง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}/status</td><td>อัปเดตผลตอบรับจากหน่วยงาน (acknowledged/rejected)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions/{id}/data-snapshot</td><td>ดูข้อมูลอ้างอิงที่ใช้ประกอบรายงานฉบับนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/gov-reports/export-documents</td><td>ออกเอกสารประกอบการส่งออกต่อ shipment</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions/upcoming</td><td>ดึงรายงานที่ใกล้ถึงกำหนดยื่นตามรอบความถี่</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-templates</td><td>ดึงเทมเพลตรายงานทั้งหมด — ดึงจาก report_template</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-templates</td><td>เพิ่มเทมเพลตรายงานใหม่ — บันทึกลง report_template</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions</td><td>สร้างร่างรายงานโดยดึงข้อมูลจากโมดูลอื่นตามงวด — บันทึกลง report_submission, report_data_snapshot (อ้างอิง template_id จาก report_template แล้วดึงข้อมูลตาม applicable_scope จาก animal_movement/animal_group ของโมดูลทะเบียนสัตว์, dispatch_record ของโมดูลคัดแยกและส่งขาย, harvest_record ของโมดูลการเก็บเกี่ยว, sales_order ของโมดูลขายและลูกค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions</td><td>ดึงรายการรายงานทั้งหมดพร้อมสถานะ — ดึงจาก report_submission (อ้างอิง template_id จาก report_template)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}</td><td>แก้ไขร่างรายงานก่อนยื่นจริง — บันทึกลง report_submission</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions/{id}/submit</td><td>บันทึกว่ายื่นรายงานแล้วพร้อมเลขอ้างอิง — บันทึกลง report_submission (อัปเดต submitted_date, reference_number, status เป็น submitted, submitted_by อ้างอิง user)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}/status</td><td>อัปเดตผลตอบรับจากหน่วยงาน (acknowledged/rejected) — บันทึกลง report_submission (อัปเดตฟิลด์ status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions/{id}/data-snapshot</td><td>ดูข้อมูลอ้างอิงที่ใช้ประกอบรายงานฉบับนี้ — ดึงจาก report_data_snapshot (ผูกกับ report_submission)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/gov-reports/export-documents</td><td>ออกเอกสารประกอบการส่งออกต่อ shipment — บันทึกลง export_document (อ้างอิง shipment_ref จาก sales_order ของโมดูลขายและลูกค้า, ตรวจสิทธิ์ผ่าน certificate.status จากโมดูลมาตรฐานฟาร์ม และ trace_code จากโมดูลตรวจสอบย้อนกลับ, issued_by อ้างอิง user)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions/upcoming</td><td>ดึงรายงานที่ใกล้ถึงกำหนดยื่นตามรอบความถี่ — ดึงจาก report_submission, report_template (คำนวณ next_due_date จาก template.frequency กับ submission.period_end)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

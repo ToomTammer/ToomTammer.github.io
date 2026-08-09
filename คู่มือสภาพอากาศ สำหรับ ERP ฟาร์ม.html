@@ -627,16 +627,16 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/crop/weather-station-links</td><td>ดึงการเชื่อมต่อพื้นที่กับแหล่งข้อมูลอากาศทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/weather-station-links</td><td>เชื่อมแปลง/โซนกับพิกัดพยากรณ์ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/weather-forecast</td><td>ดึงพยากรณ์อากาศล่วงหน้าของแปลงนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/weather-forecast/sync</td><td>Internal endpoint ดึงพยากรณ์ล่าสุดจาก external API มาแคช</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/weather-actual-logs</td><td>ดึงประวัติอากาศจริงต่อพื้นที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/weather-actual-logs</td><td>บันทึกข้อมูลอากาศจริงด้วยตนเอง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/weather-alerts</td><td>ดึงคำเตือนความเสี่ยงจากอากาศของแปลงนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/weather-alerts</td><td>สร้างคำเตือนใหม่ (อัตโนมัติจากพยากรณ์ หรือ manual)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/rainfall-history</td><td>ประวัติปริมาณฝนสะสมย้อนหลังต่อพื้นที่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/weather-yield-correlation</td><td>ความสัมพันธ์ระหว่างสภาพอากาศกับผลผลิตย้อนหลัง</td><td><span class="phase-tag phase-3">3</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/weather-station-links</td><td>ดึงการเชื่อมต่อพื้นที่กับแหล่งข้อมูลอากาศทั้งหมด — ดึงจาก weather_station_link</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/weather-station-links</td><td>เชื่อมแปลง/โซนกับพิกัดพยากรณ์ใหม่ — บันทึกลง weather_station_link (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลงและที่ดิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/weather-forecast</td><td>ดึงพยากรณ์อากาศล่วงหน้าของแปลงนี้ — ดึงจาก weather_forecast, weather_station_link</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/weather-forecast/sync</td><td>Internal endpoint ดึงพยากรณ์ล่าสุดจาก external API มาแคช — บันทึกลง weather_forecast โดยดึงข้อมูลจาก external API ตามพิกัดที่กำหนดไว้ใน weather_station_link</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/weather-actual-logs</td><td>ดึงประวัติอากาศจริงต่อพื้นที่ — ดึงจาก weather_actual_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/weather-actual-logs</td><td>บันทึกข้อมูลอากาศจริงด้วยตนเอง — บันทึกลง weather_actual_log (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลงและที่ดิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/weather-alerts</td><td>ดึงคำเตือนความเสี่ยงจากอากาศของแปลงนี้ — ดึงจาก weather_alert</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/weather-alerts</td><td>สร้างคำเตือนใหม่ (อัตโนมัติจากพยากรณ์ หรือ manual) — บันทึกลง weather_alert (อ้างอิง weather_forecast หรือ weather_actual_log ที่ทำให้เกิดการเตือนนี้)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/rainfall-history</td><td>ประวัติปริมาณฝนสะสมย้อนหลังต่อพื้นที่ — ดึงจาก weather_actual_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/weather-yield-correlation</td><td>ความสัมพันธ์ระหว่างสภาพอากาศกับผลผลิตย้อนหลัง — ดึงจาก weather_actual_log, weather_forecast (ข้อมูลอากาศ) และข้อมูลผลผลิต/คุณภาพจากโมดูลการเจริญเติบโตและผลผลิต (ยังไม่มี entity เชื่อมโยงข้อมูลผลผลิตข้ามโมดูลในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-3">3</span></td></tr>
         </tbody>
       </table>
     </div>

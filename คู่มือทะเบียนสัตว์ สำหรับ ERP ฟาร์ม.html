@@ -624,17 +624,17 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals</td><td>ดึงทะเบียนสัตว์รายตัวทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/animals</td><td>ลงทะเบียนสัตว์รายตัวใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/animals/{id}</td><td>แก้ไขข้อมูลสัตว์</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/animals/{id}/status</td><td>เปลี่ยนสถานะสัตว์ (alive/sold/culled/dead)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups</td><td>ดึงทะเบียนฝูง/รุ่นทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-groups</td><td>ลงทะเบียนฝูง/รุ่นใหม่ (สร้าง cost_center อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations</td><td>ดึงรายชื่อโรงเรือน/คอกทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/housing-locations</td><td>สร้างโรงเรือน/คอกใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-movements</td><td>บันทึกการย้ายสัตว์/ฝูง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/history</td><td>ประวัติรวมของสัตว์ตัวหนึ่ง (ย้าย/สถานะ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/headcount-by-location</td><td>จำนวนสัตว์คงเหลือแยกตามโรงเรือน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals</td><td>ดึงทะเบียนสัตว์รายตัวทั้งหมด — ดึงจาก animal</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animals</td><td>ลงทะเบียนสัตว์รายตัวใหม่ — บันทึกลง animal (อ้างอิง animal_group_id ถ้าอยู่รวมฝูง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/animals/{id}</td><td>แก้ไขข้อมูลสัตว์ — บันทึกลง animal</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animals/{id}/status</td><td>เปลี่ยนสถานะสัตว์ (alive/sold/culled/dead) — บันทึกลง animal (ฟิลด์ status) พร้อมปรับปรุง animal_group.current_quantity อัตโนมัติถ้าสัตว์ตัวนี้อยู่ในฝูง (ตามสูตรอัปเดตจำนวนคงเหลือ หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animal-groups</td><td>ดึงทะเบียนฝูง/รุ่นทั้งหมด — ดึงจาก animal_group</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-groups</td><td>ลงทะเบียนฝูง/รุ่นใหม่ (สร้าง cost_center อัตโนมัติ) — บันทึกลง animal_group และสร้าง cost_center ใหม่ในโมดูลบัญชีและการเงิน (cost_center.ref_batch_id/ref_batch_type ชี้กลับมาที่ animal_group นี้ แล้วเก็บผลลัพธ์ไว้ที่ animal_group.cost_center_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/housing-locations</td><td>ดึงรายชื่อโรงเรือน/คอกทั้งหมด — ดึงจาก housing_location</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/housing-locations</td><td>สร้างโรงเรือน/คอกใหม่ — บันทึกลง housing_location (อ้างอิง cost_center_id จากโมดูลบัญชีและการเงิน ถ้าแยกต้นทุนตามโรงเรือน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/animal-movements</td><td>บันทึกการย้ายสัตว์/ฝูง — บันทึกลง animal_movement (อ้างอิง animal_id/animal_group_id จาก animal/animal_group และ from_location_id/to_location_id จาก housing_location)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/history</td><td>ประวัติรวมของสัตว์ตัวหนึ่ง (ย้าย/สถานะ) — ดึงจาก animal, animal_movement</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/headcount-by-location</td><td>จำนวนสัตว์คงเหลือแยกตามโรงเรือน — ดึงจาก animal, animal_group, housing_location</td><td><span class="phase-tag phase-1">1</span></td></tr>
         </tbody>
       </table>
     </div>

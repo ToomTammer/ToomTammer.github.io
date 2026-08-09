@@ -620,16 +620,16 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/breeding-records</td><td>ดึงประวัติการผสมพันธุ์ (filter: dam_id, status, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/breeding-records</td><td>บันทึกการผสมพันธุ์ใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/breeding-records/{id}</td><td>อัปเดตผลตรวจ (confirmed_pregnant/not_pregnant/failed)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/pregnancies</td><td>ดึงรายการตั้งท้องทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/pregnancies</td><td>สร้างรายการติดตามการตั้งท้อง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/pregnancies/{id}/calving</td><td>บันทึกการคลอด สร้าง offspring_record และทะเบียนสัตว์ใหม่อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/calving-records</td><td>ดึงประวัติการคลอดทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/pedigree</td><td>ดูสายเลือดย้อนหลังของสัตว์ตัวหนึ่ง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/breeding-calendar</td><td>ปฏิทินผสมพันธุ์/กำหนดคลอดรวมทั้งฟาร์ม</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/conception-rate</td><td>อัตราความสำเร็จการผสมพันธุ์ต่อพ่อพันธุ์/วิธีผสม</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/breeding-records</td><td>ดึงประวัติการผสมพันธุ์ (filter: dam_id, status, date_from, date_to) — ดึงจาก breeding_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/breeding-records</td><td>บันทึกการผสมพันธุ์ใหม่ — บันทึกลง breeding_record (อ้างอิง dam_id, sire_id จากโมดูลทะเบียนสัตว์)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/livestock/breeding-records/{id}</td><td>อัปเดตผลตรวจ (confirmed_pregnant/not_pregnant/failed) — บันทึกลง breeding_record (อัปเดตฟิลด์ status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/pregnancies</td><td>ดึงรายการตั้งท้องทั้งหมด — ดึงจาก pregnancy, breeding_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/pregnancies</td><td>สร้างรายการติดตามการตั้งท้อง — บันทึกลง pregnancy (อ้างอิง breeding_record_id จาก breeding_record)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/pregnancies/{id}/calving</td><td>บันทึกการคลอด สร้าง offspring_record และทะเบียนสัตว์ใหม่อัตโนมัติ — บันทึกลง calving_record (อ้างอิง pregnancy_id จาก pregnancy), offspring_record (อ้างอิง calving_record_id) และเรียกโมดูลทะเบียนสัตว์ให้สร้าง animal ใหม่ต่อลูกแต่ละตัว แล้วเก็บอ้างอิงกลับไว้ที่ offspring_record.new_animal_ref</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/calving-records</td><td>ดึงประวัติการคลอดทั้งหมด — ดึงจาก calving_record, offspring_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/pedigree</td><td>ดูสายเลือดย้อนหลังของสัตว์ตัวหนึ่ง — ดึงจาก offspring_record (หา breeding_record ต้นทางของสัตว์ตัวนี้ผ่าน new_animal_ref), breeding_record (ไล่ dam_id/sire_id ย้อนหลายชั่วอายุ) และชื่อ/รหัสสัตว์จากโมดูลทะเบียนสัตว์</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/breeding-calendar</td><td>ปฏิทินผสมพันธุ์/กำหนดคลอดรวมทั้งฟาร์ม — ดึงจาก breeding_record (breeding_date), pregnancy (expected_due_date)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/livestock/reports/conception-rate</td><td>อัตราความสำเร็จการผสมพันธุ์ต่อพ่อพันธุ์/วิธีผสม — ดึงจาก breeding_record ตามสูตร conception_rate_pct (หัวข้อ 6)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

@@ -605,15 +605,15 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records</td><td>ดึงประวัติการเก็บเกี่ยว (filter: planting_plan_id, field_id, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records</td><td>บันทึกการเก็บเกี่ยวใหม่ (ตรวจสอบ PHI ก่อน ถ้าไม่ผ่านให้ reject)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>บันทึกความสูญเสียของการเก็บเกี่ยวครั้งนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>ดึงรายการความสูญเสียของการเก็บเกี่ยวครั้งนี้</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/close-harvest</td><td>ปิดรอบแผน อัปเดตผลจริงและสร้าง stock_lot อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-per-rai</td><td>ผลผลิตต่อไร่ (filter: field_id, crop_variety_id, period)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-comparison</td><td>เปรียบเทียบผลผลิตรอบปัจจุบันกับย้อนหลัง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-labor</td><td>ดึงข้อมูลแรงงานที่เก็บเกี่ยวต่อครั้ง</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-labor</td><td>บันทึกปริมาณที่พนักงานแต่ละคนเก็บได้</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records</td><td>ดึงประวัติการเก็บเกี่ยว (filter: planting_plan_id, field_id, date_from, date_to) — ดึงจาก harvest_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records</td><td>บันทึกการเก็บเกี่ยวใหม่ (ตรวจสอบ PHI ก่อน ถ้าไม่ผ่านให้ reject) — บันทึกลง harvest_record (อ้างอิง planting_plan_id จากโมดูลแผนการเพาะปลูก, field_id/field_zone_id จากโมดูลผังแปลงและที่ดิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>บันทึกความสูญเสียของการเก็บเกี่ยวครั้งนี้ — บันทึกลง harvest_loss (อ้างอิง harvest_record_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-records/{id}/losses</td><td>ดึงรายการความสูญเสียของการเก็บเกี่ยวครั้งนี้ — ดึงจาก harvest_loss</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/close-harvest</td><td>ปิดรอบแผน อัปเดตผลจริงและสร้าง stock_lot อัตโนมัติ — ดึงจาก harvest_record (SUM quantity_harvested ของรอบนี้) แล้วบันทึกลง planting_plan.status และ yield_estimate.actual_yield (อ้างอิงจากโมดูลแผนการเพาะปลูก), land_use_history.yield_result (อ้างอิงจากโมดูลผังแปลงและที่ดิน) และสร้าง stock_lot ใหม่ (อ้างอิงจากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-per-rai</td><td>ผลผลิตต่อไร่ (filter: field_id, crop_variety_id, period) — ดึงจาก harvest_record (SUM quantity_harvested) และ field/field_zone.area_rai (อ้างอิงจากโมดูลผังแปลงและที่ดิน), crop_variety_id (อ้างอิงจากโมดูลแผนการเพาะปลูก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/yield-comparison</td><td>เปรียบเทียบผลผลิตรอบปัจจุบันกับย้อนหลัง — ดึงจาก harvest_record ของรอบปัจจุบันและรอบก่อนหน้าที่ field/field_zone และ crop_variety เดียวกัน (อ้างอิง field_zone จากโมดูลผังแปลงและที่ดิน, crop_variety จากโมดูลแผนการเพาะปลูก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/harvest-labor</td><td>ดึงข้อมูลแรงงานที่เก็บเกี่ยวต่อครั้ง — ดึงจาก harvest_labor</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/harvest-labor</td><td>บันทึกปริมาณที่พนักงานแต่ละคนเก็บได้ — บันทึกลง harvest_labor (อ้างอิง harvest_record_id, employee_id จากโมดูลบุคลากรและแรงงาน)</td><td><span class="phase-tag phase-2">2</span></td></tr>
         </tbody>
       </table>
     </div>

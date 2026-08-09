@@ -623,19 +623,19 @@
           <tr><th>Method</th><th>Endpoint</th><th>คำอธิบาย</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td class="method get">GET</td><td class="mono">/crop/varieties</td><td>ดึงทะเบียนพันธุ์พืชทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/varieties</td><td>เพิ่มพันธุ์พืชใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/crop/varieties/{id}</td><td>แก้ไขข้อมูลพันธุ์พืช</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/planting-plans</td><td>ดึงแผนการเพาะปลูก (filter: field_id, status, date_from, date_to)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans</td><td>สร้างแผนการเพาะปลูกใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/planting-plans/{id}/rotation-check</td><td>ตรวจสอบคำเตือนหมุนเวียนพืชก่อนอนุมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/approve</td><td>อนุมัติแผน สร้าง cost_center (batch) อัตโนมัติ</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/close</td><td>ปิดรอบแผนเมื่อเก็บเกี่ยวเสร็จ พร้อมบันทึกผลจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/cancel</td><td>ยกเลิกแผนที่ยังไม่เก็บเกี่ยว</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/planting-calendar</td><td>ปฏิทินฤดูกาลเพาะปลูกรวมทุกแปลง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/reports/estimate-vs-actual</td><td>เทียบผลผลิต/ต้นทุนประมาณการกับผลจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/crop/rotation-rules</td><td>ดึงกฎการหมุนเวียนพืชทั้งหมด</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/rotation-rules</td><td>ตั้งกฎการหมุนเวียนพืชใหม่</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/varieties</td><td>ดึงทะเบียนพันธุ์พืชทั้งหมด — ดึงจาก crop_variety</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/varieties</td><td>เพิ่มพันธุ์พืชใหม่ — บันทึกลง crop_variety</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/varieties/{id}</td><td>แก้ไขข้อมูลพันธุ์พืช — บันทึกลง crop_variety</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/planting-plans</td><td>ดึงแผนการเพาะปลูก (filter: field_id, status, date_from, date_to) — ดึงจาก planting_plan, crop_variety (อ้างอิง field_id/field_zone_id จากโมดูลผังแปลงและที่ดิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans</td><td>สร้างแผนการเพาะปลูกใหม่ — บันทึกลง planting_plan, yield_estimate (อ้างอิง crop_variety_id ในไฟล์นี้ และ field_id/field_zone_id จากโมดูลผังแปลงและที่ดิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/planting-plans/{id}/rotation-check</td><td>ตรวจสอบคำเตือนหมุนเวียนพืชก่อนอนุมัติ — ดึงจาก planting_plan, crop_rotation_rule และ land_use_history จากโมดูลผังแปลงและที่ดิน (ตาม field_id/field_zone_id ของแผนนี้)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/approve</td><td>อนุมัติแผน สร้าง cost_center (batch) อัตโนมัติ — บันทึกลง planting_plan (status=approved, cost_center_id) และสร้าง cost_center ในโมดูลบัญชีและการเงิน (อ้างอิง ref_batch_id/ref_batch_type ชี้กลับมาที่ planting_plan นี้)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/close</td><td>ปิดรอบแผนเมื่อเก็บเกี่ยวเสร็จ พร้อมบันทึกผลจริง — บันทึกลง planting_plan (status=harvested), yield_estimate (actual_yield, actual_cost) โดยรับผลเก็บเกี่ยวจริงจากโมดูลการเก็บเกี่ยว</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/planting-plans/{id}/cancel</td><td>ยกเลิกแผนที่ยังไม่เก็บเกี่ยว — บันทึกลง planting_plan (status=cancelled)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/planting-calendar</td><td>ปฏิทินฤดูกาลเพาะปลูกรวมทุกแปลง — ดึงจาก planting_plan, crop_variety</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/reports/estimate-vs-actual</td><td>เทียบผลผลิต/ต้นทุนประมาณการกับผลจริง — ดึงจาก yield_estimate, planting_plan, crop_variety</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/crop/rotation-rules</td><td>ดึงกฎการหมุนเวียนพืชทั้งหมด — ดึงจาก crop_rotation_rule</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/rotation-rules</td><td>ตั้งกฎการหมุนเวียนพืชใหม่ — บันทึกลง crop_rotation_rule</td><td><span class="phase-tag phase-1">1</span></td></tr>
         </tbody>
       </table>
     </div>
