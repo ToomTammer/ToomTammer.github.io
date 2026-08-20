@@ -551,6 +551,7 @@
               <tr><td class="mono">land_title_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่เอกสารสิทธิ์ที่ดินอ้างอิง เช่น เลขโฉนด</td></tr>
               <tr><td class="mono">default_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ศูนย์ต้นทุนหลักที่ผูกกับแปลงนี้</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: active, fallow (พักดิน), inactive</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น สำเนาโฉนด/สัญญาเช่าที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -628,8 +629,8 @@
         </thead>
         <tbody>
           <tr><td class="method get">GET</td><td class="mono">/crop/fields</td><td>ดึงรายการแปลงทั้งหมด — ดึงจาก field</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/fields</td><td>สร้างแปลงใหม่พร้อมขอบเขต GPS — บันทึกลง field (อ้างอิง default_cost_center_id จากโมดูลบัญชีและการเงิน ถ้าผูกศูนย์ต้นทุนตั้งแต่สร้าง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method patch">PATCH</td><td class="mono">/crop/fields/{id}</td><td>แก้ไขข้อมูล/ขอบเขตแปลง — บันทึกลง field</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/fields</td><td>สร้างแปลงใหม่พร้อมขอบเขต GPS — บันทึกลง field (อ้างอิง default_cost_center_id จากโมดูลบัญชีและการเงิน ถ้าผูกศูนย์ต้นทุนตั้งแต่สร้าง) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/crop/fields/{id}</td><td>แก้ไขข้อมูล/ขอบเขตแปลง — บันทึกลง field (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/crop/fields/{id}/zones</td><td>ดึงโซนย่อยของแปลงหนึ่ง — ดึงจาก field_zone</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/crop/fields/{id}/zones</td><td>สร้างโซนย่อยใหม่ในแปลงนี้ — บันทึกลง field_zone (อ้างอิง field_id ของแปลงแม่ และ cost_center_id จากโมดูลบัญชีและการเงิน ถ้าแยกศูนย์ต้นทุนระดับโซน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/crop/zones/{id}</td><td>แก้ไขข้อมูลโซนย่อย — บันทึกลง field_zone</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -783,6 +784,7 @@ new_crop_family == last_crop_family
           <li class="func-item"><span class="txt">เครื่องมือวาดขอบเขตแปลง (GIS polygon) บันทึกเป็น gps_boundary (GeoJSON)</span></li>
           <li class="func-item"><span class="txt">แสดงพื้นที่ที่คำนวณได้จากขอบเขต (area_sq_meters / 1600) เทียบกับ area_rai ที่กรอก เตือนถ้าไม่ตรงกัน</span></li>
           <li class="func-item"><span class="txt">ปุ่มบันทึกเรียก POST /crop/fields หรือ PATCH /crop/fields/{id}</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น สำเนาโฉนด/สัญญาเช่า</span></li>
         </ul>
       </article>
       <article class="card func-card">

@@ -622,6 +622,7 @@
               <tr><td class="mono">(line) po_line_id</td><td class="type">เลขอ้างอิง (FK → purchase_order_line)</td><td>รับสินค้าบรรทัดไหนของ PO</td></tr>
               <tr><td class="mono">(line) quantity_received / quantity_rejected</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่รับผ่าน และจำนวนที่ตีกลับ</td></tr>
               <tr><td class="mono">(line) reject_reason</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เหตุผลที่ตีกลับ เช่น ของเสีย น้ำหนักไม่ครบ</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบกำกับภาษี/ใบส่งของจากผู้ขายที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -685,7 +686,7 @@
           <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders/{id}</td><td>ดูรายละเอียด PO ใบเดียว — ดึงจาก purchase_order, purchase_order_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/approve</td><td>อนุมัติ PO — บันทึกลง purchase_order (status → approved, คำนวณ total_amount ตามสูตรหัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/cancel</td><td>ยกเลิก PO ที่ยังไม่ได้รับสินค้า — บันทึกลง purchase_order (status → cancelled)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้ — บันทึกลง goods_receipt, goods_receipt_line (อ้างอิง purchase_order_line ผ่าน po_line_id) — ถ้า received_ratio ครบ (status = received) จะยิงไปสร้าง ap_invoice + journal entry ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = procurement) โดยส่ง vendor_invoice_no/date และ purchase_order_ref ไปให้ ap_invoice ที่โมดูลบัญชีและการเงิน</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้ — บันทึกลง goods_receipt, goods_receipt_line (อ้างอิง purchase_order_line ผ่าน po_line_id) — ถ้า received_ratio ครบ (status = received) จะยิงไปสร้าง ap_invoice + journal entry ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = procurement) โดยส่ง vendor_invoice_no/date และ purchase_order_ref ไปให้ ap_invoice ที่โมดูลบัญชีและการเงิน (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/goods-receipts</td><td>ดึงประวัติการรับสินค้าทั้งหมด — ดึงจาก goods_receipt, goods_receipt_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/reports/pending-deliveries</td><td>รายงาน PO ที่ยังไม่ได้รับสินค้าหรือเลยกำหนดส่งมอบ — ดึงจาก purchase_order, purchase_order_line, goods_receipt_line (เทียบ quantity_ordered กับ quantity_received และ expected_delivery_date)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/requisitions</td><td>ดึงใบขอซื้อทั้งหมด — ดึงจาก purchase_requisition</td><td><span class="phase-tag phase-2">2</span></td></tr>
@@ -877,6 +878,7 @@ po.total_amount &gt; available_budget
           <li class="func-item"><span class="txt">ฟอร์มกรอกต่อบรรทัด: quantity_received, quantity_rejected, reject_reason</span></li>
           <li class="func-item"><span class="txt">ช่อง vendor_invoice_no / vendor_invoice_date ถ้าใบกำกับภาษีซื้อมาพร้อมของ</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกรับสินค้า" เรียก POST /procurement/purchase-orders/{id}/goods-receipts แสดง received_ratio ที่อัปเดตสถานะ PO ทันที และตารางประวัติการรับสินค้าทั้งหมด (GET /procurement/goods-receipts)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบกำกับภาษี/ใบส่งของจากผู้ขาย</span></li>
         </ul>
       </article>
       <article class="card func-card">

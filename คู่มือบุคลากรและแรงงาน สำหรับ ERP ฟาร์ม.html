@@ -629,6 +629,7 @@
               <tr><td class="mono">start_date / end_date</td><td class="type">วันที่ (date)</td><td>ช่วงวันที่ลา</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: pending, approved, rejected</td></tr>
               <tr><td class="mono">approved_by</td><td class="type">เลขอ้างอิง (FK → user, ว่างได้)</td><td>ใครเป็นคนอนุมัติ</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบรับรองแพทย์สำหรับการลาป่วยที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -680,7 +681,7 @@
           <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to) — ดึงจาก attendance</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/piece-work-records</td><td>บันทึกผลงานตามชิ้น/หน่วย — บันทึกลง piece_work_record (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน, รับ quantity_completed จากโมดูลทะเบียนสัตว์หรือการเก็บเกี่ยว)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/hr/piece-work-records</td><td>ดึงประวัติผลงานตามชิ้น/หน่วย — ดึงจาก piece_work_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา — บันทึกลง leave_request (อ้างอิง employee_id จาก employee)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา — บันทึกลง leave_request (อ้างอิง employee_id จาก employee) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา — บันทึกลง leave_request (อ้างอิง approved_by จาก user ของโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/hr/reports/leave-balance</td><td>วันลาคงเหลือต่อพนักงาน — ดึงจาก leave_request เพื่อคำนวณวันลาที่ใช้ไป (ยังไม่มี entity เก็บสิทธิ์วันลา/โควตาต่อปีต่อพนักงานในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs</td><td>เริ่มรอบเงินเดือนใหม่ — บันทึกลง payroll_run</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -858,6 +859,7 @@ tax_deduction = tax_annual / pay_periods_per_year</pre>
           <li class="func-item"><span class="txt">ตารางรายการ: employee_id, leave_type, start_date, end_date, status พร้อม badge สีตามสถานะ</span></li>
           <li class="func-item"><span class="txt">ตัวกรอง: employee_id, leave_type, status</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ยื่นใบลาใหม่" — ฟอร์มเลือก leave_type, start_date/end_date</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบรับรองแพทย์</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ/ปฏิเสธ" ในหน้ารายละเอียด (บันทึก approved_by, เปลี่ยน status)</span></li>
         </ul>
       </article>

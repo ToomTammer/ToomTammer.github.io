@@ -566,6 +566,7 @@
               <tr><td class="mono">measured_size / measured_brix / measured_moisture_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>ค่าที่วัดได้จริง แล้วแต่ว่าพืชชนิดนั้นวัดค่าไหนบ้าง</td></tr>
               <tr><td class="mono">defect_pct</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>สัดส่วนตำหนิที่พบจริง</td></tr>
               <tr><td class="mono">assigned_grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดที่ตัดสินได้จากผลวัดเทียบ grading_standard</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ผลแล็บ/รูปถ่ายการตรวจสอบ) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -625,7 +626,7 @@
           <tr><td class="method post">POST</td><td class="mono">/crop/grading-standards</td><td>ตั้งมาตรฐานเกรดใหม่ — บันทึกลง grading_standard (อ้างอิง crop_variety_id จากโมดูลแผนการเพาะปลูก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/crop/grading-standards/{id}</td><td>แก้ไขเกณฑ์มาตรฐานเกรด — บันทึกลง grading_standard</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/crop/quality-inspections</td><td>ดึงประวัติการตรวจสอบคุณภาพ — ดึงจาก quality_inspection</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/crop/quality-inspections</td><td>บันทึกผลตรวจ พร้อมคำนวณ assigned_grade อัตโนมัติ — บันทึกลง quality_inspection (อ้างอิง stock_lot_ref จากโมดูลคลังสินค้า ซึ่งต้นทางมาจาก harvest_record ในโมดูลการเก็บเกี่ยว, inspected_by อ้างอิง user จากโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง; คำนวณ assigned_grade โดยเทียบค่าที่วัดได้กับ grading_standard)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/crop/quality-inspections</td><td>บันทึกผลตรวจ พร้อมคำนวณ assigned_grade อัตโนมัติ — บันทึกลง quality_inspection (อ้างอิง stock_lot_ref จากโมดูลคลังสินค้า ซึ่งต้นทางมาจาก harvest_record ในโมดูลการเก็บเกี่ยว, inspected_by อ้างอิง user จากโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง; คำนวณ assigned_grade โดยเทียบค่าที่วัดได้กับ grading_standard) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/crop/quality-inspections/{id}/split-stock</td><td>แบ่งสต็อกตามเกรด แจ้งคลังสร้าง lot ใหม่ — บันทึกลง grade_stock_split (อ้างอิง quality_inspection_id) แล้วส่งคำสั่งสร้าง stock_lot ใหม่ไปยังโมดูลคลังสินค้า พร้อมบันทึก new_stock_lot_ref กลับมาที่ grade_stock_split</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/crop/reports/grade-distribution</td><td>สัดส่วนเกรดต่อรอบผลิต — ดึงจาก grade_stock_split (group by grade) แล้วไล่ผ่าน quality_inspection.stock_lot_ref → stock_lot ในโมดูลคลังสินค้า → harvest_record → planting_plan_id จากโมดูลแผนการเพาะปลูก เพื่อจัดกลุ่มตามรอบผลิต (ยังไม่มี field เชื่อมตรงกับ planting_plan ในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/crop/grade-prices</td><td>ดึงราคาทั้งหมดต่อเกรด/พันธุ์ — ดึงจาก grade_price</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -770,6 +771,7 @@ reject_rate_pct &gt; threshold (เช่น 15%)
           <li class="func-item"><span class="txt">ช่องกรอกค่าที่วัด: measured_size, measured_brix, measured_moisture_pct, defect_pct</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกและคำนวณเกรด" เรียก POST /crop/quality-inspections คำนวณ assigned_grade ตามสูตร Auto Grade Assignment</span></li>
           <li class="func-item"><span class="txt">แสดง assigned_grade ที่ระบบตัดสินให้ทันทีหลังบันทึกสำเร็จ</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ผลแล็บ/รูปถ่ายการตรวจสอบ</span></li>
         </ul>
       </article>
       <article class="card func-card">

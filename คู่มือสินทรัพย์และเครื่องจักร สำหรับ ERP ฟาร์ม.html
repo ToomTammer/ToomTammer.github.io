@@ -592,6 +592,7 @@
               <tr><td class="mono">description</td><td class="type">ข้อความ (text)</td><td>อาการที่พบและงานที่ทำ</td></tr>
               <tr><td class="mono">cost</td><td class="type">ตัวเลข (decimal)</td><td>ค่าใช้จ่ายรวมของการซ่อมครั้งนี้ (ค่าแรง + อะไหล่)</td></tr>
               <tr><td class="mono">performed_by</td><td class="type">เลขอ้างอิง (FK → user/ผู้รับเหมา)</td><td>ใครเป็นคนซ่อม</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบเสร็จ/บิลค่าซ่อมที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -656,7 +657,7 @@
           <tr><td class="method get">GET</td><td class="mono">/assets/maintenance-schedules</td><td>ดึงแผนซ่อมบำรุงทั้งหมด — ดึงจาก maintenance_schedule</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/assets/maintenance-schedules</td><td>ตั้งแผนซ่อมบำรุงใหม่ — บันทึกลง maintenance_schedule (อ้างอิง asset_id จาก asset)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/assets/maintenance-schedules/due-soon</td><td>รายการที่ใกล้ถึงกำหนด PM — ดึงจาก maintenance_schedule (filter next_due_date, next_due_usage_hours)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/assets/maintenance-logs</td><td>บันทึกการซ่อมบำรุงจริง — บันทึกลง maintenance_log (อ้างอิง asset_id จาก asset, maintenance_schedule_id จาก maintenance_schedule ถ้าเป็นไปตามแผน, performed_by อ้างอิงพนักงานช่างจาก employee ของโมดูลบุคลากรและแรงงาน หรือผู้รับเหมาภายนอกที่ไม่มี entity เก็บในสเปกนี้; การเบิกอะไหล่/น้ำมันเครื่องมาซ่อมที่ต้องตัดสต็อกจากโมดูลคลังสินค้า/สต็อกยังไม่มี field อ้างอิงในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/assets/maintenance-logs</td><td>บันทึกการซ่อมบำรุงจริง — บันทึกลง maintenance_log (อ้างอิง asset_id จาก asset, maintenance_schedule_id จาก maintenance_schedule ถ้าเป็นไปตามแผน, performed_by อ้างอิงพนักงานช่างจาก employee ของโมดูลบุคลากรและแรงงาน หรือผู้รับเหมาภายนอกที่ไม่มี entity เก็บในสเปกนี้; การเบิกอะไหล่/น้ำมันเครื่องมาซ่อมที่ต้องตัดสต็อกจากโมดูลคลังสินค้า/สต็อกยังไม่มี field อ้างอิงในสเปกนี้ ต้องเพิ่ม) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/assets/{id}/maintenance-history</td><td>ประวัติการซ่อมบำรุงของสินทรัพย์ตัวหนึ่ง — ดึงจาก maintenance_log (filter asset_id)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/assets/depreciation-runs</td><td>คำนวณค่าเสื่อมราคาประจำงวดให้ทุกสินทรัพย์ — บันทึกลง depreciation_entry โดยคำนวณจาก asset.purchase_cost, asset.salvage_value, asset.useful_life_years และ snapshot asset.default_cost_center_id ลงเป็น depreciation_entry.cost_center_id</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/assets/depreciation-entries/post</td><td>ส่งค่าเสื่อมราคาเข้าบัญชี — ยิงไปโพสต์ journal entry ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = asset) โดยส่ง depreciation_amount และ cost_center_id ไปด้วย</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -841,6 +842,7 @@ ratio &gt; threshold (เช่น 50%)
         <ul class="func-list">
           <li class="func-item"><span class="txt">ฟอร์ม: asset_id, maintenance_schedule_id (ว่างได้ถ้าเป็น corrective), maintenance_type, maintenance_date, description, cost, performed_by</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึก" (POST /assets/maintenance-logs) อัปเดต last_done_date/last_done_usage_hours ของแผนที่ผูกไว้อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบเสร็จ/บิลค่าซ่อม</span></li>
         </ul>
       </article>
       <article class="card func-card">

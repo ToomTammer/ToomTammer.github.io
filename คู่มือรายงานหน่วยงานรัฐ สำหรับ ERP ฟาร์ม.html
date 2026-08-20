@@ -567,6 +567,7 @@
               <tr><td class="mono">reference_number</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่รับเรื่องจากหน่วยงาน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: draft, submitted, acknowledged, rejected</td></tr>
               <tr><td class="mono">submitted_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนยื่นรายงานนี้</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น แบบฟอร์มที่ยื่นจริง/ใบตอบรับจากหน่วยงานที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -629,7 +630,7 @@
           <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions</td><td>สร้างร่างรายงานโดยดึงข้อมูลจากโมดูลอื่นตามงวด — บันทึกลง report_submission, report_data_snapshot (อ้างอิง template_id จาก report_template แล้วดึงข้อมูลตาม applicable_scope จาก animal_movement/animal_group ของโมดูลทะเบียนสัตว์, dispatch_record ของโมดูลคัดแยกและส่งขาย, harvest_record ของโมดูลการเก็บเกี่ยว, sales_order ของโมดูลขายและลูกค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions</td><td>ดึงรายการรายงานทั้งหมดพร้อมสถานะ — ดึงจาก report_submission (อ้างอิง template_id จาก report_template)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}</td><td>แก้ไขร่างรายงานก่อนยื่นจริง — บันทึกลง report_submission</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions/{id}/submit</td><td>บันทึกว่ายื่นรายงานแล้วพร้อมเลขอ้างอิง — บันทึกลง report_submission (อัปเดต submitted_date, reference_number, status เป็น submitted, submitted_by อ้างอิง user)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/gov-reports/report-submissions/{id}/submit</td><td>บันทึกว่ายื่นรายงานแล้วพร้อมเลขอ้างอิง — บันทึกลง report_submission (อัปเดต submitted_date, reference_number, status เป็น submitted, submitted_by อ้างอิง user) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/gov-reports/report-submissions/{id}/status</td><td>อัปเดตผลตอบรับจากหน่วยงาน (acknowledged/rejected) — บันทึกลง report_submission (อัปเดตฟิลด์ status)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/gov-reports/report-submissions/{id}/data-snapshot</td><td>ดูข้อมูลอ้างอิงที่ใช้ประกอบรายงานฉบับนี้ — ดึงจาก report_data_snapshot (ผูกกับ report_submission)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/gov-reports/export-documents</td><td>ออกเอกสารประกอบการส่งออกต่อ shipment — บันทึกลง export_document (อ้างอิง shipment_ref จาก sales_order ของโมดูลขายและลูกค้า, ตรวจสิทธิ์ผ่าน certificate.status จากโมดูลมาตรฐานฟาร์ม และ trace_code จากโมดูลตรวจสอบย้อนกลับ, issued_by อ้างอิง user)</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -788,6 +789,7 @@
           <li class="func-item"><span class="txt">หัวข้อสรุป: reference_number, status, period_start–period_end, generated_date</span></li>
           <li class="func-item"><span class="txt">ตาราง report_data_snapshot ประกอบร่าง: source_module, source_entity, source_ref_id, value_summary</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "แก้ไขร่าง" (เฉพาะ status = draft) และปุ่ม "บันทึกว่ายื่นแล้ว" เปิดฟอร์มกรอก submitted_date + reference_number</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น แบบฟอร์มที่ยื่นจริง/ใบตอบรับจากหน่วยงาน</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกผลตอบรับ" อัปเดต status เป็น acknowledged/rejected</span></li>
           <li class="func-item"><span class="txt">ถ้า status = rejected แสดงลิงก์ไปยังฉบับที่ยื่นใหม่ (resubmission chain) และล็อกฉบับเดิมห้ามแก้ไข</span></li>
         </ul>

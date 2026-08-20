@@ -684,6 +684,7 @@
               <tr><td class="mono">paid_date</td><td class="type">วันที่ (date)</td><td>วันที่รับ/จ่ายเงินจริง</td></tr>
               <tr><td class="mono">method</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>วิธีชำระ เลือกได้เฉพาะ: cash, bank_transfer, cheque</td></tr>
               <tr><td class="mono">bank_txn_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขอ้างอิงธุรกรรมธนาคาร ใช้ตอนกระทบยอดกับ statement</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น สลิปโอนเงิน/หลักฐานการรับ-จ่ายเงินที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -770,10 +771,10 @@
           <tr><td class="method post">POST</td><td class="mono">/accounting/journal-entries/from-source</td><td>Internal endpoint ให้โมดูลอื่นยิงเข้ามาโพสต์อัตโนมัติ — บันทึกลง journal_entry, journal_entry_line โดยรับข้อมูลจากโมดูลขาย/จัดซื้อ/คลังสินค้า/บุคลากรและแรงงาน/สินทรัพย์และเครื่องจักร/ทะเบียนสัตว์-แผนการเพาะปลูก ตามค่า source_module</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/ar-invoices</td><td>ดึงใบแจ้งหนี้ลูกหนี้ — ดึงจาก ar_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices</td><td>ออกใบแจ้งหนี้ลูกหนี้ — บันทึกลง ar_invoice (อ้างอิง sales_order_ref จากโมดูลขายและลูกค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices/{id}/payments</td><td>บันทึกรับชำระ — บันทึกลง payment ผูกกับ ar_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices/{id}/payments</td><td>บันทึกรับชำระ — บันทึกลง payment ผูกกับ ar_invoice (รับ attachment_url ได้ถ้ามีไฟล์แนบ เช่น สลิปโอนเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/ap-invoices</td><td>ดึงใบแจ้งหนี้เจ้าหนี้ — ดึงจาก ap_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices</td><td>บันทึกใบแจ้งหนี้เจ้าหนี้ — บันทึกลง ap_invoice (อ้างอิง purchase_order_ref และ vendor_invoice_no/date จากโมดูลจัดซื้อ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices/{id}/payments</td><td>บันทึกจ่ายชำระ — บันทึกลง payment ผูกกับ ap_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices/{id}/payments</td><td>บันทึกจ่ายชำระ — บันทึกลง payment ผูกกับ ap_invoice (รับ attachment_url ได้ถ้ามีไฟล์แนบ เช่น สลิปโอนเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/profit-loss</td><td>งบกำไรขาดทุน (filter: cost_center_id, period) — ดึงจาก journal_entry, journal_entry_line, chart_of_accounts, cost_center</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/trial-balance</td><td>งบทดลอง — ยอดคงเหลือทุกบัญชี ณ วันที่ (filter: as_of_date) — ดึงจาก journal_entry_line, chart_of_accounts ผ่านสูตร balance() (หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/reports/balance-sheet</td><td>งบแสดงฐานะการเงิน (filter: cost_center_id, as_of_date) — ดึงจาก journal_entry_line, chart_of_accounts, cost_center</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -983,7 +984,7 @@ flag เตือนถ้า |cost_variance_pct| &gt; threshold (เช่น 1
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: invoice_no, ลูกค้า, total_amount, due_date, status พร้อม badge สีตามสถานะ</span></li>
           <li class="func-item"><span class="txt">ตัวกรองตามสถานะ (draft/issued/overdue/paid) และลูกค้า</span></li>
-          <li class="func-item"><span class="txt">หน้ารายละเอียดใบแจ้งหนี้ + ปุ่ม "บันทึกรับชำระ" เปิดฟอร์ม payment</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียดใบแจ้งหนี้ + ปุ่ม "บันทึกรับชำระ" เปิดฟอร์ม payment (มีช่องอัปโหลดไฟล์แนบ attachment_url ไม่บังคับ เช่น สลิปโอนเงิน)</span></li>
         </ul>
       </article>
       <article class="card func-card">
@@ -992,7 +993,7 @@ flag เตือนถ้า |cost_variance_pct| &gt; threshold (เช่น 1
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: invoice_no, ผู้ขาย, total_amount, due_date, status</span></li>
           <li class="func-item"><span class="txt">ฟอร์มบันทึกใบแจ้งหนี้ใหม่ผูกกับ purchase_order_ref</span></li>
-          <li class="func-item"><span class="txt">หน้ารายละเอียด + ปุ่ม "บันทึกจ่ายชำระ" เปิดฟอร์ม payment</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียด + ปุ่ม "บันทึกจ่ายชำระ" เปิดฟอร์ม payment (มีช่องอัปโหลดไฟล์แนบ attachment_url ไม่บังคับ เช่น สลิปโอนเงิน)</span></li>
         </ul>
       </article>
       <article class="card func-card">
