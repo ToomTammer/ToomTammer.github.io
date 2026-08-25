@@ -573,6 +573,11 @@
               <tr><td class="mono">cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>ขอซื้อให้พื้นที่/รอบผลิตไหน</td></tr>
               <tr><td class="mono">needed_by_date</td><td class="type">วันที่ (date)</td><td>วันที่ต้องการใช้ของ</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: draft, pending_approval, approved, rejected, converted_to_po</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
+              <tr><td class="mono">(line) purchase_requisition_id</td><td class="type">เลขอ้างอิง (FK → purchase_requisition)</td><td>บรรทัดนี้เป็นของใบขอซื้อไหน</td></tr>
+              <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>ขอซื้อสินค้าอะไร</td></tr>
+              <tr><td class="mono">(line) quantity_requested</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่ต้องการ — ยังไม่มีราคา เพราะยังไม่รู้ผู้ขาย ราคาจะถูกกรอกทีหลังตอนแปลงเป็น PO</td></tr>
+              <tr><td class="mono">(line) note</td><td class="type">ข้อความ (text, ว่างได้)</td><td>หมายเหตุเพิ่มเติม เช่น ยี่ห้อที่ต้องการ/ข้อกำหนดพิเศษ</td></tr>
             </tbody>
           </table>
         </div>
@@ -588,7 +593,7 @@
             <tbody>
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">po_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้อ</td></tr>
-              <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>สั่งซื้อจากผู้ขายรายไหน</td></tr>
+              <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor, ว่างได้ชั่วคราว)</td><td>สั่งซื้อจากผู้ขายรายไหน — ว่างได้เฉพาะตอนที่ PO ถูกสร้างอัตโนมัติจาก PR ที่เพิ่งอนุมัติ (ยังไม่รู้ผู้ขาย) ต้องกรอกให้ครบก่อนเปลี่ยนสถานะจาก draft เป็น pending_approval</td></tr>
               <tr><td class="mono">pr_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบขอซื้อต้นทาง ถ้ามาจาก PR</td></tr>
               <tr><td class="mono">order_date / expected_delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่สั่งซื้อ และวันที่คาดว่าจะได้รับของ</td></tr>
               <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมของ PO = SUM(po_line.line_total) (ดูสูตรหัวข้อ 6) — คำนวณแล้วบันทึกเป็นค่านิ่งตอน approve เพื่อให้โมดูลบัญชีดึงไปสร้าง ap_invoice.total_amount ได้โดยไม่ต้องคำนวณซ้ำ</td></tr>
@@ -597,10 +602,11 @@
               <tr><td class="mono">(line) purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>บรรทัดนี้เป็นของใบสั่งซื้อไหน</td></tr>
               <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>สั่งซื้อสินค้าอะไร</td></tr>
               <tr><td class="mono">(line) quantity_ordered / quantity_received</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่สั่ง และจำนวนที่ได้รับแล้วสะสม</td></tr>
-              <tr><td class="mono">(line) unit_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ตกลงซื้อ</td></tr>
+              <tr><td class="mono">(line) unit_price</td><td class="type">ตัวเลข (decimal, ว่างได้ชั่วคราว)</td><td>ราคาต่อหน่วยที่ตกลงซื้อ — ว่างได้เฉพาะบรรทัดที่ยกมาจาก purchase_requisition_line ตอนสร้างอัตโนมัติจาก PR (ยังไม่รู้ราคา) เจ้าหน้าที่จัดซื้อต้องกรอกให้ครบทุกบรรทัดก่อนเปลี่ยนสถานะ PO จาก draft เป็น pending_approval</td></tr>
             </tbody>
           </table>
         </div>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> PO ที่สร้างอัตโนมัติจาก PR ที่อนุมัติแล้วจะได้ status=draft เสมอ (ไม่ใช่ pending_approval ทันที) เพราะยังขาด vendor_id และ unit_price — ต้องให้เจ้าหน้าที่จัดซื้อเข้ามาเลือกผู้ขาย+กรอกราคาให้ครบก่อน ระบบจึงอนุญาตให้ส่งเข้า workflow อนุมัติ PO ตามปกติ (validation: ปฏิเสธการเปลี่ยนสถานะ draft → pending_approval ถ้ายังมี vendor_id ว่างหรือมีบรรทัดไหน unit_price ว่าง/เป็น 0)</p>
       </article>
 
       <article class="card entity-card">
@@ -617,6 +623,8 @@
               <tr><td class="mono">received_date</td><td class="type">วันที่ (date)</td><td>วันที่รับสินค้าจริง</td></tr>
               <tr><td class="mono">received_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนตรวจรับ</td></tr>
               <tr><td class="mono">vendor_invoice_no / vendor_invoice_date</td><td class="type">ข้อความ/วันที่ (ว่างได้)</td><td>เลขที่และวันที่ใบกำกับภาษีซื้อจากผู้ขาย ถ้ามาพร้อมของ — ใช้เป็น ap_invoice.invoice_no ตอนสร้างอัตโนมัติ ถ้ายังไม่มี (ใบกำกับมาทีหลัง) ให้สร้าง ap_invoice เป็น draft ก่อนแล้วอัปเดตทีหลัง</td></tr>
+              <tr><td class="mono">adjustment_of_id</td><td class="type">เลขอ้างอิง (FK → goods_receipt, ว่างได้)</td><td>ถ้าแถวนี้เป็นใบปรับแก้ ให้ชี้กลับไปใบรับสินค้าเดิมที่ต้องแก้ — ใบรับสินค้าปกติปล่อยว่าง (ห้ามแก้ไข quantity_received ของใบเดิมตรง ๆ ต้องสร้างใบปรับแก้แทนเสมอ เพื่อรักษา audit trail และไม่กระทบสต็อก/AP invoice ที่อ้างอิงไปแล้ว)</td></tr>
+              <tr><td class="mono">adjustment_reason</td><td class="type">ข้อความ (ว่างได้ ยกเว้นเป็นใบปรับแก้ต้องบังคับกรอก)</td><td>เหตุผลที่ต้องปรับแก้ เช่น "กรอกจำนวนรับผิด ที่ถูกคือ 90 ไม่ใช่ 100"</td></tr>
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) goods_receipt_id</td><td class="type">เลขอ้างอิง (FK → goods_receipt)</td><td>บรรทัดนี้เป็นของใบรับสินค้าไหน</td></tr>
               <tr><td class="mono">(line) po_line_id</td><td class="type">เลขอ้างอิง (FK → purchase_order_line)</td><td>รับสินค้าบรรทัดไหนของ PO</td></tr>
@@ -684,14 +692,16 @@
           <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders</td><td>ดึงใบสั่งซื้อ (filter: status, vendor_id, date_from, date_to) — ดึงจาก purchase_order, purchase_order_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders</td><td>สร้างใบสั่งซื้อใหม่ — บันทึกลง purchase_order, purchase_order_line (อ้างอิง vendor, purchase_requisition ถ้าแปลงมาจาก PR, และ item_id จากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/purchase-orders/{id}</td><td>ดูรายละเอียด PO ใบเดียว — ดึงจาก purchase_order, purchase_order_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/approve</td><td>อนุมัติ PO — บันทึกลง purchase_order (status → approved, คำนวณ total_amount ตามสูตรหัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/approve</td><td>อนุมัติ PO — บันทึกลง purchase_order (status → approved, คำนวณ total_amount ตามสูตรหัวข้อ 6) — ปฏิเสธคำขอ (400) ถ้า vendor_id ยังว่างหรือมีบรรทัดไหน unit_price ว่าง/เป็น 0 (กรณี PO ที่ยกมาจาก PR ยังกรอกไม่ครบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/cancel</td><td>ยกเลิก PO ที่ยังไม่ได้รับสินค้า — บันทึกลง purchase_order (status → cancelled)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/{id}/goods-receipts</td><td>บันทึกรับสินค้าเข้ากับ PO นี้ — บันทึกลง goods_receipt, goods_receipt_line (อ้างอิง purchase_order_line ผ่าน po_line_id) — ถ้า received_ratio ครบ (status = received) จะยิงไปสร้าง ap_invoice + journal entry ที่โมดูลบัญชีอัตโนมัติผ่าน POST /accounting/journal-entries/from-source (source_module = procurement) โดยส่ง vendor_invoice_no/date และ purchase_order_ref ไปให้ ap_invoice ที่โมดูลบัญชีและการเงิน (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/procurement/goods-receipts</td><td>ดึงประวัติการรับสินค้าทั้งหมด — ดึงจาก goods_receipt, goods_receipt_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/procurement/goods-receipts</td><td>ดึงประวัติการรับสินค้าทั้งหมด — ดึงจาก goods_receipt, goods_receipt_line (ใบปรับแก้จะมี adjustment_of_id ชี้กลับไปใบต้นฉบับ ให้แสดงเชื่อมโยงกันในตาราง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/goods-receipts/{id}/adjust</td><td>สร้างใบรับสินค้าปรับแก้ — บันทึกเป็น goods_receipt แถวใหม่ (adjustment_of_id ชี้กลับไป {id}, บังคับกรอก adjustment_reason) ห้ามแก้ไข quantity_received ของใบเดิมตรง ๆ — received_ratio ของ PO คำนวณใหม่จาก SUM(quantity_received) รวมใบปรับแก้ด้วย และปรับ stock_lot ที่โมดูลคลังสินค้าตามผลต่างที่เกิดขึ้นจริง</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/reports/pending-deliveries</td><td>รายงาน PO ที่ยังไม่ได้รับสินค้าหรือเลยกำหนดส่งมอบ — ดึงจาก purchase_order, purchase_order_line, goods_receipt_line (เทียบ quantity_ordered กับ quantity_received และ expected_delivery_date)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/requisitions</td><td>ดึงใบขอซื้อทั้งหมด — ดึงจาก purchase_requisition</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions</td><td>สร้างใบขอซื้อ — บันทึกลง purchase_requisition (อ้างอิง cost_center_id จากโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-2">2</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions/{id}/approve</td><td>อนุมัติใบขอซื้อ แล้วแปลงเป็น PO — บันทึกลง purchase_requisition (status → approved) และสร้าง purchase_order ใหม่ (pr_ref = purchase_requisition.pr_no)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions</td><td>สร้างใบขอซื้อ — บันทึกลง purchase_requisition, purchase_requisition_line (อ้างอิง cost_center_id จากโมดูลบัญชีและการเงิน, item_id จากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/procurement/requisitions/{id}/approve</td><td>อนุมัติใบขอซื้อ แล้วแปลงเป็น PO — บันทึกลง purchase_requisition (status → approved → converted_to_po) และสร้าง purchase_order ใหม่สถานะ draft (pr_ref = purchase_requisition.pr_no, ยก purchase_requisition_line มาเป็น purchase_order_line โดย vendor_id และ unit_price ปล่อยว่างไว้ก่อน รอเจ้าหน้าที่จัดซื้อกรอกต่อ)</td><td><span class="phase-tag phase-2">2</span></td></tr>
+          <tr><td class="method patch">PATCH</td><td class="mono">/procurement/purchase-orders/{id}</td><td>เจ้าหน้าที่จัดซื้อกรอก vendor_id และ unit_price ของแต่ละบรรทัดให้ครบ สำหรับ PO ที่สร้างมาจาก PR — บันทึกลง purchase_order, purchase_order_line (ยังคง status = draft จนกว่าจะกรอกครบ)</td><td><span class="phase-tag phase-2">2</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/purchase-orders/from-reorder-point</td><td>Internal endpoint ให้โมดูลคลังสินค้าเรียกเสนอสร้าง PO อัตโนมัติ — สร้าง purchase_order (status = draft) โดยรับ item_id, reorder_point, max_stock_level จากโมดูลคลังสินค้า (entity item) มาคำนวณจำนวนที่ควรสั่งซื้อ</td><td><span class="phase-tag phase-2">2</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/procurement/price-quotations</td><td>บันทึกใบเสนอราคาจากผู้ขาย — บันทึกลง price_quotation (อ้างอิง vendor และ item_id จากโมดูลคลังสินค้า)</td><td><span class="phase-tag phase-2">2</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/procurement/reports/vendor-price-comparison</td><td>เปรียบเทียบราคาผู้ขายต่อสินค้า — ดึงจาก price_quotation</td><td><span class="phase-tag phase-2">2</span></td></tr>
@@ -856,7 +866,8 @@ po.total_amount &gt; available_budget
         <p>ดู สร้าง หรือแก้ไข PO พร้อมรายการสินค้าแต่ละบรรทัด</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">ฟอร์มหัว PO: เลือก vendor_id, pr_ref (ถ้ามาจาก PR), order_date, expected_delivery_date</span></li>
-          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (purchase_order_line): item, quantity_ordered, unit_price, line_total คำนวณอัตโนมัติ พร้อมปุ่มเพิ่ม/ลบบรรทัด</span></li>
+          <li class="func-item"><span class="txt">ถ้า PO นี้ถูกสร้างมาจาก PR (มี pr_ref) และยังไม่มี vendor_id/unit_price ครบ ให้แสดงแบนเนอร์เตือนด้านบน "สร้างจากใบขอซื้อ {pr_ref} — กรุณาเลือกผู้ขายและกรอกราคาให้ครบก่อนส่งขออนุมัติ"</span></li>
+          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (purchase_order_line): item, quantity_ordered, unit_price, line_total คำนวณอัตโนมัติ พร้อมปุ่มเพิ่ม/ลบบรรทัด — บรรทัดที่ยกมาจาก PR จะ prefill item/quantity ให้ เหลือแค่กรอก unit_price</span></li>
           <li class="func-item"><span class="txt">ยอดรวม total_amount แสดงแบบ real-time = SUM(line_total) ตามสูตรหัวข้อ 6</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ยกเลิก PO" (เฉพาะสถานะยังไม่ได้รับสินค้า) เรียก POST /procurement/purchase-orders/{id}/cancel</span></li>
         </ul>
@@ -879,6 +890,8 @@ po.total_amount &gt; available_budget
           <li class="func-item"><span class="txt">ช่อง vendor_invoice_no / vendor_invoice_date ถ้าใบกำกับภาษีซื้อมาพร้อมของ</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกรับสินค้า" เรียก POST /procurement/purchase-orders/{id}/goods-receipts แสดง received_ratio ที่อัปเดตสถานะ PO ทันที และตารางประวัติการรับสินค้าทั้งหมด (GET /procurement/goods-receipts)</span></li>
           <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบกำกับภาษี/ใบส่งของจากผู้ขาย</span></li>
+          <li class="func-item"><span class="txt">ใบรับสินค้าที่บันทึกแล้ว <b>แก้ไข quantity_received/quantity_rejected ตรง ๆ ไม่ได้</b> — หน้ารายละเอียดใบรับสินค้ามีปุ่ม "สร้างใบปรับแก้" แทน เปิดฟอร์มกรอกจำนวนที่ถูกต้องใหม่ + บังคับกรอกเหตุผล แล้วเรียก POST /procurement/goods-receipts/{id}/adjust สร้างใบปรับแก้แยกออกมา ไม่เขียนทับใบเดิม</span></li>
+          <li class="func-item"><span class="txt">ตารางประวัติการรับสินค้าแสดงใบปรับแก้เยื้องต่อจากใบต้นฉบับ (เชื่อมด้วย adjustment_of_id) พร้อม badge "ใบปรับแก้" ให้แยกจากใบรับสินค้าปกติเห็นชัด</span></li>
         </ul>
       </article>
       <article class="card func-card">
@@ -895,8 +908,8 @@ po.total_amount &gt; available_budget
         <p>ผู้จัดการฟาร์ม/แปลงขอซื้อภายในก่อนออกเป็น PO จริง</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: pr_no, requested_by, cost_center_id, needed_by_date, status (GET /procurement/requisitions)</span></li>
-          <li class="func-item"><span class="txt">ฟอร์มสร้างใบขอซื้อใหม่ (POST /procurement/requisitions)</span></li>
-          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ" แปลงเป็น PO อัตโนมัติ เรียก POST /procurement/requisitions/{id}/approve</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มสร้างใบขอซื้อใหม่ (POST /procurement/requisitions) — เลือก cost_center_id, needed_by_date แล้วเพิ่มบรรทัดสินค้าที่ต้องการทีละรายการ (item_id, quantity_requested, note) ยังไม่ต้องกรอกราคาหรือเลือกผู้ขาย</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ" แปลงเป็น PO อัตโนมัติ เรียก POST /procurement/requisitions/{id}/approve — PO ที่ได้จะมีสถานะ draft และยังไม่มีผู้ขาย/ราคา ต้องส่งต่อให้เจ้าหน้าที่จัดซื้อกรอกให้ครบที่หน้า "รายละเอียด/สร้างใบสั่งซื้อ" ก่อนจึงจะอนุมัติ PO ได้จริง</span></li>
         </ul>
       </article>
       <article class="card func-card">
