@@ -586,6 +586,7 @@
               <tr><td class="mono">buyer_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>ผู้ซื้อ/โรงชำแหละที่รับซื้อ</td></tr>
               <tr><td class="mono">quantity</td><td class="type">ตัวเลข (integer)</td><td>จำนวนตัวที่ส่งออกครั้งนี้</td></tr>
               <tr><td class="mono">total_weight</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักรวมที่ส่งออกครั้งนี้</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบชั่งน้ำหนัก/ใบรับซื้อจากผู้ซื้อที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -628,7 +629,7 @@
           <tr><td class="method get">GET</td><td class="mono">/livestock/sorting-records</td><td>ดึงประวัติการคัดเกรด — ดึงจาก sorting_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/livestock/sorting-records</td><td>บันทึกการคัดเกรด พร้อมคำนวณ assigned_grade อัตโนมัติ — บันทึกลง sorting_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์, weight_at_sorting จากโมดูลการเจริญเติบโตและผลผลิต) โดยเทียบกับ grading_standard_livestock เพื่อตัดสิน assigned_grade</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/dispatch-eligibility</td><td>ตรวจสอบสิทธิ์ส่งออก (เรียก withdrawal check จากโมดูลสุขภาพ) — ดึงจาก animal ในโมดูลทะเบียนสัตว์ (สถานะปัจจุบัน) และผลตรวจระยะหยุดยาจากโมดูลสุขภาพและวัคซีน</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/dispatch-records</td><td>บันทึกการส่งขาย/ชำแหละ อัปเดตสถานะสัตว์อัตโนมัติ — บันทึกลง dispatch_record (อ้างอิง sorting_record_id จาก sorting_record) พร้อมอัปเดตสถานะสัตว์เป็น sold/culled ส่งต่อให้โมดูลทะเบียนสัตว์ และแจ้งตัดสต็อกสัตว์มีชีวิต/สร้างสต็อกซาก ส่งต่อให้โมดูลคลังสินค้า/สต็อก</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/dispatch-records</td><td>บันทึกการส่งขาย/ชำแหละ อัปเดตสถานะสัตว์อัตโนมัติ — บันทึกลง dispatch_record (อ้างอิง sorting_record_id จาก sorting_record) พร้อมอัปเดตสถานะสัตว์เป็น sold/culled ส่งต่อให้โมดูลทะเบียนสัตว์ และแจ้งตัดสต็อกสัตว์มีชีวิต/สร้างสต็อกซาก ส่งต่อให้โมดูลคลังสินค้า/สต็อก (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/dispatch-records</td><td>ดึงประวัติการส่งขาย/ชำแหละ — ดึงจาก dispatch_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/reports/production-closeout</td><td>สรุปผลผลิตปิดรอบ (ขาย+ตาย+คัดออก เทียบจำนวนเริ่มต้น) — ดึงจาก dispatch_record (ยอดขาย/คัดออก) และข้อมูลจำนวนตาย/คงเหลือจาก animal ในโมดูลทะเบียนสัตว์ (โมดูลนี้ไม่ได้เก็บข้อมูลการตายเอง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/reports/grade-price-summary</td><td>สรุปมูลค่าตามเกรดที่ส่งออก — ดึงจาก sorting_record (เกรดที่คัด), dispatch_record (ปริมาณ/น้ำหนักที่ส่งออกจริง) และ buyer_price_quote (ราคาต่อกิโลกรัมตามเกรด)</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -789,6 +790,7 @@
           <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่ dispatch_date, destination_type</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกส่งออกใหม่" — เลือก sorting_record_id ที่ยังไม่ถูก dispatch, คีย์ destination_type/buyer_ref/quantity/total_weight โดยระบบเรียกตรวจ dispatch-eligibility ก่อนอนุญาต submit และอัปเดตสถานะสัตว์เป็น sold/culled อัตโนมัติ (POST /livestock/dispatch-records)</span></li>
           <li class="func-item"><span class="txt">หน้ารายละเอียด 1 รายการ แสดงมูลค่ารวมจาก total_weight × price_per_kg ของเกรดนั้น</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบชั่งน้ำหนัก/ใบรับซื้อ</span></li>
         </ul>
       </article>
       <article class="card func-card">

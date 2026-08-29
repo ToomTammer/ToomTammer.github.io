@@ -629,6 +629,7 @@
               <tr><td class="mono">start_date / end_date</td><td class="type">วันที่ (date)</td><td>ช่วงวันที่ลา</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะ เลือกได้เฉพาะ: pending, approved, rejected</td></tr>
               <tr><td class="mono">approved_by</td><td class="type">เลขอ้างอิง (FK → user, ว่างได้)</td><td>ใครเป็นคนอนุมัติ</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบรับรองแพทย์สำหรับการลาป่วยที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -676,12 +677,13 @@
           <tr><td class="method get">GET</td><td class="mono">/hr/employees</td><td>ดึงรายชื่อพนักงานทั้งหมด (filter: position_id) — ดึงจาก employee, position</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/employees</td><td>สร้างพนักงานใหม่ — บันทึกลง employee (อ้างอิง position_id จาก position, default_cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method patch">PATCH</td><td class="mono">/hr/employees/{id}</td><td>แก้ไข/ปิดใช้งานพนักงาน — บันทึกลง employee</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน — บันทึกลง attendance (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to) — ดึงจาก attendance</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/attendance</td><td>บันทึกเวลาเข้า-ออกงาน — บันทึกลง attendance (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน) — ถ้าผู้เรียกเป็นหัวหน้างาน ระบบต้องปฏิเสธถ้า employee_id ที่ระบุไม่ได้อยู่ในทีมที่ตนดูแล (บังคับที่ backend ไม่ใช่แค่ซ่อนปุ่มใน UI)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/attendance</td><td>ดึงประวัติเวลาเข้า-ออกงาน (filter: employee_id, date_from, date_to, scope=my_team) — ดึงจาก attendance — scope=my_team บังคับกรองเฉพาะพนักงานในทีมของผู้เรียก ใช้โดยหน้า "ทีมของฉัน"</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/piece-work-records</td><td>บันทึกผลงานตามชิ้น/หน่วย — บันทึกลง piece_work_record (อ้างอิง employee_id จาก employee, cost_center_id จาก cost_center ของโมดูลบัญชีและการเงิน, รับ quantity_completed จากโมดูลทะเบียนสัตว์หรือการเก็บเกี่ยว)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/hr/piece-work-records</td><td>ดึงประวัติผลงานตามชิ้น/หน่วย — ดึงจาก piece_work_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา — บันทึกลง leave_request (อ้างอิง employee_id จาก employee)</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา — บันทึกลง leave_request (อ้างอิง approved_by จาก user ของโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests</td><td>ยื่นใบลา — บันทึกลง leave_request (อ้างอิง employee_id จาก employee) (รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/hr/leave-requests/{id}/approve</td><td>อนุมัติ/ปฏิเสธใบลา — บันทึกลง leave_request (อ้างอิง approved_by จาก user ของโมดูลผู้ใช้งานและสิทธิ์การเข้าถึง) — ถ้าผู้เรียกเป็นหัวหน้างาน ระบบต้องปฏิเสธถ้าใบลานั้นไม่ใช่ของพนักงานในทีมที่ตนดูแล</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/hr/leave-requests?scope=my_team</td><td>ดึงใบลาที่รออนุมัติเฉพาะของทีมตนเอง — ดึงจาก leave_request กรองเฉพาะพนักงานที่มี employee.default_cost_center_id อยู่ในความดูแลของผู้เรียก ใช้โดยหน้า "ทีมของฉัน"</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/hr/reports/leave-balance</td><td>วันลาคงเหลือต่อพนักงาน — ดึงจาก leave_request เพื่อคำนวณวันลาที่ใช้ไป (ยังไม่มี entity เก็บสิทธิ์วันลา/โควตาต่อปีต่อพนักงานในสเปกนี้ ต้องเพิ่ม)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs</td><td>เริ่มรอบเงินเดือนใหม่ — บันทึกลง payroll_run</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/hr/payroll-runs/{id}/calculate</td><td>คำนวณเงินเดือนทุกคนในรอบนี้ — บันทึกลง payroll_run_line โดยดึงจาก employee (base_wage, wage_type), attendance (overtime_hours), piece_work_record (quantity_completed, rate_per_unit), leave_request (unpaid leave) — cost_center_id เป็น snapshot จาก employee.default_cost_center_id (อ้างอิง cost_center จากโมดูลบัญชีและการเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -711,7 +713,7 @@
       </div>
       <div class="role-card">
         <div class="role-name">หัวหน้างาน/ผู้จัดการฟาร์ม-แปลง</div>
-        <div class="role-scope">บันทึกเวลาเข้า-ออกงานและผลงานของลูกทีมตนเอง อนุมัติใบลาเบื้องต้น</div>
+        <div class="role-scope">บันทึกเวลาเข้า-ออกงานและผลงานของลูกทีมตนเอง อนุมัติใบลาเบื้องต้น — ใช้งานผ่านเมนู "ทีมของฉัน" (คนละหน้ากับเมนู HR ที่สงวนไว้สำหรับเจ้าหน้าที่ HR/ธุรการ)</div>
       </div>
       <div class="role-card">
         <div class="role-name">พนักงานทั่วไป</div>
@@ -835,7 +837,7 @@ tax_deduction = tax_annual / pay_periods_per_year</pre>
       </article>
       <article class="card func-card">
         <h3>บันทึกเวลาเข้า-ออกงาน (Attendance) <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>คีย์เวลาเข้า-ออกงานรายวันของพนักงาน ให้หัวหน้างาน/HR ใช้ประจำวัน</p>
+        <p>คีย์เวลาเข้า-ออกงานรายวันของพนักงานทั้งฟาร์ม — อยู่ในเมนู HR สำหรับเจ้าหน้าที่ HR/ธุรการเท่านั้น หัวหน้างานที่ต้องการบันทึกเฉพาะทีมตนเองให้ใช้เมนู "ทีมของฉัน" แทน</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: work_date, employee_id, cost_center_id, clock_in, clock_out, hours_worked, overtime_hours</span></li>
           <li class="func-item"><span class="txt">ตัวกรอง: employee_id, date_from, date_to, cost_center_id</span></li>
@@ -853,11 +855,12 @@ tax_deduction = tax_annual / pay_periods_per_year</pre>
       </article>
       <article class="card func-card">
         <h3>ใบลาและอนุมัติ (Leave Requests) <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>พนักงานยื่นใบลา หัวหน้างาน/HR อนุมัติหรือปฏิเสธ</p>
+        <p>ภาพรวมใบลาทั้งฟาร์ม — อยู่ในเมนู HR สำหรับเจ้าหน้าที่ HR/ธุรการตรวจสอบ/อนุมัติซ้ำได้ทุกใบ หัวหน้างานที่ต้องการอนุมัติเฉพาะทีมตนเองให้ใช้เมนู "ทีมของฉัน" แทน</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: employee_id, leave_type, start_date, end_date, status พร้อม badge สีตามสถานะ</span></li>
           <li class="func-item"><span class="txt">ตัวกรอง: employee_id, leave_type, status</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ยื่นใบลาใหม่" — ฟอร์มเลือก leave_type, start_date/end_date</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบรับรองแพทย์</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ/ปฏิเสธ" ในหน้ารายละเอียด (บันทึก approved_by, เปลี่ยน status)</span></li>
         </ul>
       </article>
@@ -868,6 +871,34 @@ tax_deduction = tax_annual / pay_periods_per_year</pre>
           <li class="func-item"><span class="txt">ตารางรายการ: employee_id, name, leave_type, วันลาที่ใช้ไป, วันลาคงเหลือ</span></li>
           <li class="func-item"><span class="txt">ตัวกรอง: employee_id, position_id, leave_type</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ส่งออกรายงาน" (CSV/Excel) สำหรับ HR ใช้ตรวจสอบทั้งฟาร์ม</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทีมของฉัน — ภาพรวมทีมวันนี้ (My Team Overview) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>หน้าแรกของเมนู "ทีมของฉัน" สำหรับหัวหน้างาน/ผู้จัดการฟาร์ม-แปลง เห็นเฉพาะพนักงานในทีมที่ตนดูแล — คนละหน้ากับเมนู HR ที่สงวนไว้สำหรับเจ้าหน้าที่ HR/ธุรการ</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">การ์ดสรุป: จำนวนใบลารอฉันอนุมัติ, จำนวนคนในทีมที่ลาวันนี้, จำนวนคนที่ยังไม่คีย์เวลาเข้างานวันนี้</span></li>
+          <li class="func-item"><span class="txt">รายชื่อลูกทีมวันนี้พร้อมสถานะ: เข้างานแล้ว/ยังไม่เข้างาน/ลาวันนี้ — คลิกชื่อไปหน้ารายละเอียดพนักงาน (อ่านอย่างเดียว ไม่แก้ทะเบียนพนักงานได้ ต้องผ่าน HR)</span></li>
+          <li class="func-item"><span class="txt">ทีมที่แสดงมาจาก employee ที่มี default_cost_center_id อยู่ในความดูแลของผู้เรียก (backend กรอง ไม่ใช่ query parameter ที่ผู้ใช้เลือกเองได้)</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทีมของฉัน — คิวอนุมัติใบลา (My Team Leave Approval) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>อนุมัติ/ปฏิเสธใบลาเฉพาะของลูกทีมตนเอง แยกจากหน้า "ใบลาและอนุมัติ" ของ HR ที่เห็นทั้งฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางกรองอัตโนมัติเฉพาะ status=pending ของทีมตนเอง (GET /hr/leave-requests?scope=my_team) — ไม่ต้องเลือก employee_id เอง</span></li>
+          <li class="func-item"><span class="txt">คอลัมน์: employee_id, leave_type, start_date, end_date, จำนวนวัน, ไฟล์แนบ (ถ้ามี)</span></li>
+          <li class="func-item"><span class="txt">ปุ่ม "อนุมัติ"/"ปฏิเสธ" ต่อแถวโดยตรง ไม่ต้องเข้าหน้ารายละเอียด (POST /hr/leave-requests/{id}/approve)</span></li>
+          <li class="func-item"><span class="txt">แท็บ "ประวัติ" ดูใบลาของทีมที่อนุมัติ/ปฏิเสธไปแล้วย้อนหลังได้</span></li>
+        </ul>
+      </article>
+      <article class="card func-card">
+        <h3>ทีมของฉัน — บันทึกเวลาเข้า-ออกงาน (My Team Attendance) <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>คีย์เวลาเข้า-ออกงานเฉพาะลูกทีมตนเองประจำวัน แยกจากหน้า Attendance ของ HR ที่เห็นทั้งฟาร์ม</p>
+        <ul class="func-list">
+          <li class="func-item"><span class="txt">ตารางรายชื่อลูกทีมของวันนี้ (หรือวันที่เลือก) พร้อมช่องคีย์ clock_in/clock_out แก้ได้ในตารางเลยไม่ต้องเปิดฟอร์มแยก</span></li>
+          <li class="func-item"><span class="txt">hours_worked/overtime_hours คำนวณอัตโนมัติทันทีที่คีย์ครบ</span></li>
+          <li class="func-item"><span class="txt">ตัวกรองย้อนหลัง: date_from, date_to (ยังคง scope เฉพาะทีมตนเองเสมอ)</span></li>
         </ul>
       </article>
       <article class="card func-card">

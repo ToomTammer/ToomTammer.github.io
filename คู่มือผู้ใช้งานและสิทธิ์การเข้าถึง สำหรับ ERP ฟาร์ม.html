@@ -832,7 +832,9 @@ refresh_token: อายุ 7-30 วัน
         <h3>โปรไฟล์ของฉัน (My Profile) <span class="phase-tag phase-1">Phase 1</span></h3>
         <p>ผู้ใช้ทุกคนแก้ไขข้อมูลส่วนตัวและเปลี่ยนรหัสผ่านของตัวเอง</p>
         <ul class="func-list">
-          <li class="func-item"><span class="txt">ฟอร์มแก้ไข full_name_th, phone_number, profile_image_url (อัปโหลดรูปเก็บใน Azure Blob Storage)</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มแก้ไข full_name_th, phone_number (ไม่มีช่องรูปโปรไฟล์ในฟอร์มนี้ — แก้รูปทำผ่านการคลิกที่รูปโปรไฟล์แทน)</span></li>
+          <li class="func-item"><span class="txt">คลิก/แตะที่รูปโปรไฟล์ (avatar) ด้านบนหน้าเพื่อเปิด dialog อัปโหลดรูปใหม่ทันที — ไม่ต้องกดปุ่มแก้ไขฟอร์มก่อน</span></li>
+          <li class="func-item"><span class="txt">หลังเลือกไฟล์ เปิดหน้าต่าง crop รูปเป็นสี่เหลี่ยมจัตุรัส (ปรับ zoom/ลากตำแหน่งได้) ก่อนบันทึก แล้วอัปโหลดผลลัพธ์ที่ครอปแล้วไปเก็บใน Azure Blob Storage อัปเดต profile_image_url</span></li>
           <li class="func-item"><span class="txt">ฟอร์มเปลี่ยนรหัสผ่าน (รหัสเดิม + รหัสใหม่) — เปลี่ยนแล้ว security_stamp ต้องเปลี่ยนตามทันที</span></li>
         </ul>
       </article>

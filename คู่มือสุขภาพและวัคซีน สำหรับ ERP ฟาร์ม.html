@@ -585,6 +585,7 @@
               <tr><td class="mono">dosage</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณยาที่ใช้</td></tr>
               <tr><td class="mono">withdrawal_days</td><td class="type">ตัวเลข (integer)</td><td>จำนวนวันที่ต้องเว้นก่อนขาย/ชำแหละได้ ดึงจากมาตรฐานของยานั้น</td></tr>
               <tr><td class="mono">safe_sale_date</td><td class="type">วันที่ (date)</td><td>วันที่ขายได้อย่างปลอดภัย คำนวณจาก treatment_date + withdrawal_days</td></tr>
+              <tr><td class="mono">attachment_url</td><td class="type">ข้อความ (text, nullable)</td><td>ลิงก์ไฟล์แนบ (เช่น ใบสั่งยา/ใบเสร็จจากสัตวแพทย์ที่สแกน) อัปโหลดไปยัง cloud storage ไม่บังคับกรอก</td></tr>
             </tbody>
           </table>
         </div>
@@ -629,7 +630,7 @@
           <tr><td class="method get">GET</td><td class="mono">/livestock/vaccination-records</td><td>ดึงประวัติการฉีดวัคซีน — ดึงจาก vaccination_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/livestock/vaccination-records</td><td>บันทึกการฉีดวัคซีนจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง vaccination_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ vaccine_item_id จากโมดูลคลังสินค้าเพื่อตัดสต็อก)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/treatment-records</td><td>ดึงประวัติการรักษา/ใช้ยา — ดึงจาก treatment_record</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/livestock/treatment-records</td><td>บันทึกการรักษาจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง treatment_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ medication_item_id จากโมดูลคลังสินค้าเพื่อตัดสต็อกและดึง withdrawal_days มาตรฐาน; คำนวณ safe_sale_date อัตโนมัติ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/livestock/treatment-records</td><td>บันทึกการรักษาจริง (ตัดสต็อกอัตโนมัติ) — บันทึกลง treatment_record (อ้างอิง animal_id/animal_group_id จากโมดูลทะเบียนสัตว์ และ medication_item_id จากโมดูลคลังสินค้าเพื่อตัดสต็อกและดึง withdrawal_days มาตรฐาน; คำนวณ safe_sale_date อัตโนมัติ; รับ attachment_url ได้ถ้ามีไฟล์แนบ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/withdrawal-status</td><td>ตรวจสอบสถานะระยะหยุดยาและวันที่ขายได้ปลอดภัย — ดึงจาก treatment_record ผ่านสูตร is_safe_to_sell/safe_sale_date (หัวข้อ 6)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/animals/{id}/health-history</td><td>ประวัติสุขภาพรวมของสัตว์ตัวหนึ่ง — ดึงจาก vaccination_record, treatment_record, health_symptom_log</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/livestock/health-symptom-logs</td><td>ดึงบันทึกอาการเบื้องต้น — ดึงจาก health_symptom_log</td><td><span class="phase-tag phase-2">2</span></td></tr>
@@ -786,6 +787,7 @@ due_vaccines =
           <li class="func-item"><span class="txt">ตารางรายการ: treatment_date, animal_id/animal_group_id, medication_item_id, diagnosis, dosage, withdrawal_days, safe_sale_date พร้อม badge ถ้ายังอยู่ในระยะหยุดยา</span></li>
           <li class="func-item"><span class="txt">ตัวกรอง: ช่วงวันที่, สัตว์/ฝูง, diagnosis</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกการรักษาใหม่" — ฟอร์มเลือก medication_item_id, กรอก diagnosis/dosage/treatment_date แล้วระบบคำนวณ safe_sale_date = treatment_date + withdrawal_days ให้อัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ฟอร์มมีช่องอัปโหลดไฟล์แนบ (attachment_url) ไม่บังคับ เช่น ใบสั่งยา/ใบเสร็จจากสัตวแพทย์</span></li>
         </ul>
       </article>
       <article class="card func-card">
