@@ -629,9 +629,9 @@
       </article>
 
       <article class="card entity-card">
-        <h3>ar_invoice <span class="phase-tag phase-1">Phase 1</span></h3>
-        <p>ใบแจ้งหนี้ลูกหนี้ — ใบเรียกเก็บเงินที่ฟาร์มออกให้ลูกค้า เช่น พ่อค้าคนกลาง โมเดิร์นเทรด หรือผู้ส่งออก หลังขายผลผลิต</p>
-        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับลูกค้าและคำสั่งขายที่มาจากโมดูลขาย</p>
+        <h3>ar_invoice + ar_invoice_line <span class="phase-tag phase-1">Phase 1</span></h3>
+        <p>ใบแจ้งหนี้ลูกหนี้ — ใบเรียกเก็บเงินที่ฟาร์มออกให้ลูกค้า เช่น พ่อค้าคนกลาง โมเดิร์นเทรด หรือผู้ส่งออก หลังขายผลผลิต ar_invoice_line คือแต่ละรายการสินค้าภายในใบนั้น รองรับกรณีขายหลายเกรด/หลายรายการในใบแจ้งหนี้เดียวกัน</p>
+        <p class="rel-line"><b>ความสัมพันธ์:</b> ผูกกับลูกค้าและคำสั่งขายที่มาจากโมดูลขาย — ar_invoice_line คัดลอกค่า grade, weight (จริง), moisture, unit_price, is_vat_exempt, vat_rate มาจาก delivery_note_line (ไม่ใช่ sales_order_line โดยตรง เพราะ delivery_note_line มีน้ำหนักจริงที่ชั่งตอนส่งของแล้ว ไม่ใช่แค่ประมาณการ) ณ วันที่ออกใบแจ้งหนี้ เป็น snapshot ไม่ใช่ live join เพื่อไม่ให้ใบแจ้งหนี้ที่ส่งลูกค้าไปแล้วเปลี่ยนค่าไปตามข้อมูลต้นทางที่อาจถูกแก้ไขภายหลัง</p>
         <div class="field-table-wrap">
           <table class="data">
             <thead><tr><th>ฟิลด์</th><th>ชนิดข้อมูล</th><th>เก็บอะไร</th></tr></thead>
@@ -641,12 +641,19 @@
               <tr><td class="mono">invoice_date</td><td class="type">วันที่ (date)</td><td>วันที่ออกใบแจ้งหนี้ ใช้กำหนดว่าอยู่งวดภาษี/งวดบัญชีไหน</td></tr>
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → ลูกค้า)</td><td>ลูกค้ารายไหนเป็นหนี้</td></tr>
               <tr><td class="mono">sales_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่คำสั่งขายอ้างอิงจากโมดูลขาย</td></tr>
-              <tr><td class="mono">grade / weight / moisture</td><td class="type">ข้อความ/ตัวเลข</td><td>เกรด น้ำหนัก ความชื้นของสินค้า ที่ใช้คำนวณราคาขาย ณ วันนั้น</td></tr>
-              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินก่อนภาษี รับค่ามาจาก delivery_note.subtotal_amount ของโมดูลขาย</td></tr>
-              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ภาษีมูลค่าเพิ่มที่เรียกเก็บจากลูกค้า (ภาษีขาย) รับค่ามาจาก delivery_note.vat_amount — เป็น 0 ถ้าสินค้ายกเว้นภาษีทั้งใบ</td></tr>
+              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินก่อนภาษี = SUM(ar_invoice_line.line_total ทุกบรรทัด)</td></tr>
+              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ภาษีมูลค่าเพิ่มที่เรียกเก็บจากลูกค้า (ภาษีขาย) = SUM(บรรทัดที่ is_vat_exempt=false ของ line_total &#215; vat_rate/100) — เป็น 0 ถ้าทุกบรรทัดยกเว้นภาษี</td></tr>
               <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องเรียกเก็บ = subtotal_amount + vat_amount</td></tr>
               <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดชำระเงิน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะใบแจ้งหนี้ เลือกได้เฉพาะ: draft, issued, partially_paid, paid, overdue</td></tr>
+              <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
+              <tr><td class="mono">(line) ar_invoice_id</td><td class="type">เลขอ้างอิง (FK → ar_invoice)</td><td>บรรทัดนี้เป็นของใบแจ้งหนี้ไหน</td></tr>
+              <tr><td class="mono">(line) delivery_note_line_id</td><td class="type">เลขอ้างอิง (FK → delivery_note_line, ว่างได้)</td><td>อ้างอิงบรรทัดต้นทางที่คัดลอกค่ามา ใช้ตรวจสอบย้อนกลับไปดูน้ำหนักจริงตอนส่งของ</td></tr>
+              <tr><td class="mono">(line) grade / weight / moisture</td><td class="type">ข้อความ/ตัวเลข</td><td>เกรด น้ำหนักจริง ความชื้นของสินค้าบรรทัดนี้ ที่ใช้คำนวณราคาขาย ณ วันนั้น (คัดลอกมาจาก delivery_note_line)</td></tr>
+              <tr><td class="mono">(line) quantity / unit_price</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณและราคาต่อหน่วยของบรรทัดนี้ ณ วันที่ออกใบแจ้งหนี้</td></tr>
+              <tr><td class="mono">(line) is_vat_exempt</td><td class="type">จริง/เท็จ (boolean)</td><td>สินค้าบรรทัดนี้ได้รับยกเว้น VAT หรือไม่ คัดลอกมาจาก sales_order_line.is_vat_exempt</td></tr>
+              <tr><td class="mono">(line) vat_rate</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>อัตราภาษีมูลค่าเพิ่มของบรรทัดนี้ ใช้เมื่อ is_vat_exempt = false เท่านั้น</td></tr>
+              <tr><td class="mono">(line) line_total</td><td class="type">ตัวเลข (decimal)</td><td>ยอดก่อนภาษีของบรรทัดนี้ = quantity &#215; unit_price</td></tr>
             </tbody>
           </table>
         </div>
@@ -776,8 +783,8 @@
           <tr><td class="method get">GET</td><td class="mono">/accounting/journal-entries</td><td>ดึงรายการบัญชี (filter: date_from, date_to, cost_center_id, source_module) — ดึงจาก journal_entry, journal_entry_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/journal-entries</td><td>บันทึกรายการบัญชีแบบ manual — บันทึกลง journal_entry, journal_entry_line (อ้างอิง chart_of_accounts, cost_center)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/journal-entries/from-source</td><td>Internal endpoint ให้โมดูลอื่นยิงเข้ามาโพสต์อัตโนมัติ — บันทึกลง journal_entry, journal_entry_line โดยรับข้อมูลจากโมดูลขาย/จัดซื้อ/คลังสินค้า/บุคลากรและแรงงาน/สินทรัพย์และเครื่องจักร/ทะเบียนสัตว์-แผนการเพาะปลูก ตามค่า source_module</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method get">GET</td><td class="mono">/accounting/ar-invoices</td><td>ดึงใบแจ้งหนี้ลูกหนี้ — ดึงจาก ar_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
-          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices</td><td>ออกใบแจ้งหนี้ลูกหนี้ — บันทึกลง ar_invoice (อ้างอิง sales_order_ref จากโมดูลขายและลูกค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method get">GET</td><td class="mono">/accounting/ar-invoices</td><td>ดึงใบแจ้งหนี้ลูกหนี้ — ดึงจาก ar_invoice, ar_invoice_line</td><td><span class="phase-tag phase-1">1</span></td></tr>
+          <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices</td><td>ออกใบแจ้งหนี้ลูกหนี้ — บันทึกลง ar_invoice, ar_invoice_line (คัดลอกค่าจาก delivery_note + delivery_note_line ของโมดูลขายและลูกค้า)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/ar-invoices/{id}/payments</td><td>บันทึกรับชำระ — บันทึกลง payment ผูกกับ ar_invoice (รับ attachment_url ได้ถ้ามีไฟล์แนบ เช่น สลิปโอนเงิน)</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method get">GET</td><td class="mono">/accounting/ap-invoices</td><td>ดึงใบแจ้งหนี้เจ้าหนี้ — ดึงจาก ap_invoice</td><td><span class="phase-tag phase-1">1</span></td></tr>
           <tr><td class="method post">POST</td><td class="mono">/accounting/ap-invoices</td><td>บันทึกใบแจ้งหนี้เจ้าหนี้ — บันทึกลง ap_invoice (อ้างอิง purchase_order_ref และ vendor_invoice_no/date จากโมดูลจัดซื้อ)</td><td><span class="phase-tag phase-1">1</span></td></tr>
@@ -1007,7 +1014,7 @@ flag เตือนถ้า |cost_variance_pct| &gt; threshold (เช่น 1
         <ul class="func-list">
           <li class="func-item"><span class="txt">ตารางรายการ: invoice_no, ลูกค้า, total_amount, due_date, status พร้อม badge สีตามสถานะ</span></li>
           <li class="func-item"><span class="txt">ตัวกรองตามสถานะ (draft/issued/overdue/paid) และลูกค้า</span></li>
-          <li class="func-item"><span class="txt">หน้ารายละเอียดใบแจ้งหนี้ + ปุ่ม "บันทึกรับชำระ" เปิดฟอร์ม payment (มีช่องอัปโหลดไฟล์แนบ attachment_url ไม่บังคับ เช่น สลิปโอนเงิน)</span></li>
+          <li class="func-item"><span class="txt">หน้ารายละเอียดใบแจ้งหนี้: ตารางบรรทัดสินค้า (ar_invoice_line) grade, weight, moisture, quantity, unit_price, line_total ต่อบรรทัด พร้อมสรุป subtotal_amount, vat_amount, total_amount + ปุ่ม "บันทึกรับชำระ" เปิดฟอร์ม payment (มีช่องอัปโหลดไฟล์แนบ attachment_url ไม่บังคับ เช่น สลิปโอนเงิน)</span></li>
         </ul>
       </article>
       <article class="card func-card">
