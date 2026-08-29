@@ -547,7 +547,7 @@
               <tr><td class="mono">asset_code</td><td class="type">ข้อความ (text)</td><td>รหัสสินทรัพย์ที่ใช้อ้างอิงภายในระบบ</td></tr>
               <tr><td class="mono">name</td><td class="type">ข้อความ (text)</td><td>ชื่อสินทรัพย์ เช่น "รถไถคูโบต้า M6040"</td></tr>
               <tr><td class="mono">category</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>ประเภทสินทรัพย์ เลือกได้เฉพาะ: vehicle, machinery, building, equipment, other</td></tr>
-              <tr><td class="mono">purchase_date / purchase_cost</td><td class="type">วันที่ / ตัวเลข (decimal)</td><td>วันที่ซื้อ และราคาซื้อตั้งต้น</td></tr>
+              <tr><td class="mono">purchase_date / purchase_cost</td><td class="type">วันที่ / ตัวเลข (decimal)</td><td>วันที่ซื้อ และราคาซื้อตั้งต้น — เป็นยอด<b>ไม่รวม VAT</b> เสมอ (ใช้ purchase_order.subtotal_amount ของโมดูลจัดซื้อ ไม่ใช่ total_amount) ถ้า purchase_order.vat_reclaimable = false (VAT เอาคืนไม่ได้) ให้บวก vat_amount รวมเข้าไปใน purchase_cost ด้วย เพราะกลายเป็นต้นทุนจริงของสินทรัพย์ตามหลักบัญชี</td></tr>
               <tr><td class="mono">useful_life_years</td><td class="type">ตัวเลข (integer)</td><td>อายุการใช้งานประมาณการเป็นปี ใช้คำนวณค่าเสื่อม</td></tr>
               <tr><td class="mono">salvage_value</td><td class="type">ตัวเลข (decimal)</td><td>มูลค่าซากโดยประมาณ ณ สิ้นอายุการใช้งาน</td></tr>
               <tr><td class="mono">default_cost_center_id</td><td class="type">เลขอ้างอิง (FK → cost_center)</td><td>พื้นที่/หน่วยงานที่ใช้งานประจำ</td></tr>
@@ -729,6 +729,7 @@ accumulated_depreciation += monthly_depreciation
 
 book_value = purchase_cost - accumulated_depreciation
   (ค่าต่ำสุดไม่ต่ำกว่า salvage_value)</pre>
+        <p class="note" style="margin-top:10px;"><b>หมายเหตุ</b> purchase_cost ที่ใช้เป็นฐานคำนวณต้องไม่รวม VAT ที่เอาคืนได้ (ดูฟิลด์ purchase_cost ด้านบน) ไม่งั้นค่าเสื่อมราคาจะคำนวณสูงเกินจริง</p>
       </article>
 
       <article class="card">

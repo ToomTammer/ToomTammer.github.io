@@ -638,10 +638,13 @@
             <tbody>
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้</td></tr>
+              <tr><td class="mono">invoice_date</td><td class="type">วันที่ (date)</td><td>วันที่ออกใบแจ้งหนี้ ใช้กำหนดว่าอยู่งวดภาษี/งวดบัญชีไหน</td></tr>
               <tr><td class="mono">customer_id</td><td class="type">เลขอ้างอิง (FK → ลูกค้า)</td><td>ลูกค้ารายไหนเป็นหนี้</td></tr>
               <tr><td class="mono">sales_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่คำสั่งขายอ้างอิงจากโมดูลขาย</td></tr>
               <tr><td class="mono">grade / weight / moisture</td><td class="type">ข้อความ/ตัวเลข</td><td>เกรด น้ำหนัก ความชื้นของสินค้า ที่ใช้คำนวณราคาขาย ณ วันนั้น</td></tr>
-              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องเรียกเก็บ</td></tr>
+              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินก่อนภาษี รับค่ามาจาก delivery_note.subtotal_amount ของโมดูลขาย</td></tr>
+              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ภาษีมูลค่าเพิ่มที่เรียกเก็บจากลูกค้า (ภาษีขาย) รับค่ามาจาก delivery_note.vat_amount — เป็น 0 ถ้าสินค้ายกเว้นภาษีทั้งใบ</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องเรียกเก็บ = subtotal_amount + vat_amount</td></tr>
               <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดชำระเงิน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะใบแจ้งหนี้ เลือกได้เฉพาะ: draft, issued, partially_paid, paid, overdue</td></tr>
             </tbody>
@@ -659,9 +662,13 @@
             <tbody>
               <tr><td class="mono">id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำแถวนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">invoice_no</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบแจ้งหนี้จากผู้ขาย</td></tr>
+              <tr><td class="mono">invoice_date</td><td class="type">วันที่ (date)</td><td>วันที่บนใบแจ้งหนี้ของผู้ขาย ใช้กำหนดว่าอยู่งวดภาษี/งวดบัญชีไหน</td></tr>
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → ผู้ขาย)</td><td>เป็นหนี้ผู้ขายรายไหน</td></tr>
               <tr><td class="mono">purchase_order_ref</td><td class="type">ข้อความ (text)</td><td>เลขที่ใบสั่งซื้ออ้างอิงจากโมดูลจัดซื้อ</td></tr>
-              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องจ่าย</td></tr>
+              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินก่อนภาษี รับค่ามาจาก purchase_order.subtotal_amount ของโมดูลจัดซื้อ</td></tr>
+              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ภาษีมูลค่าเพิ่มที่ผู้ขายเรียกเก็บ (ภาษีซื้อ) รับค่ามาจาก purchase_order.vat_amount</td></tr>
+              <tr><td class="mono">vat_reclaimable</td><td class="type">จริง/เท็จ (boolean)</td><td>ภาษีซื้อนี้นำไปหักภาษีขายตอนยื่น ภ.พ.30 ได้ไหม รับค่ามาจาก purchase_order.vat_reclaimable</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมที่ต้องจ่าย = subtotal_amount + vat_amount</td></tr>
               <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดจ่ายเงิน</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>สถานะเดียวกับ ar_invoice (draft, issued, partially_paid, paid, overdue)</td></tr>
             </tbody>
@@ -884,6 +891,22 @@ balance(account_id) =
 cost_per_unit(X) = ( direct_cost(X) + allocated_cost(X) )
     / output_quantity(X)</pre>
         <p class="formula-example"><b>ตัวอย่าง:</b> ค่าน้ำ-ไฟส่วนกลาง 10,000 บาท จัดสรรตามจำนวนตัวสัตว์ โรงเรือน A มี 500 ตัว จากทั้งหมด 2,000 ตัว → ได้รับจัดสรร 10,000 × (500/2000) = 2,500 บาท</p>
+      </article>
+
+      <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ภาษีมูลค่าเพิ่มสุทธิ (Net VAT Payable)</h3><span class="phase-tag phase-2">Phase 2</span></div>
+        <p>สรุปภาษีขายหักภาษีซื้อของงวดนั้น เพื่อใช้ยื่นแบบ ภ.พ.30 ให้กรมสรรพากร</p>
+        <pre class="formula">output_vat(period) = SUM(ar_invoice.vat_amount)
+    WHERE ar_invoice.invoice_date อยู่ในงวดนั้น (status != draft)
+
+input_vat(period)  = SUM(ap_invoice.vat_amount)
+    WHERE ap_invoice.invoice_date อยู่ในงวดนั้น
+      AND ap_invoice.vat_reclaimable = true
+
+net_vat_payable(period) = output_vat(period) - input_vat(period)
+    ค่าเป็นบวก -&gt; ต้องนำส่งกรมสรรพากร
+    ค่าเป็นลบ  -&gt; มีเครดิตภาษียกไปงวดถัดไป/ขอคืนได้</pre>
+        <p class="note" style="margin-top:10px;"><b>หมายเหตุ</b> ผลลัพธ์นี้ควรบันทึกอ้างอิงไว้ใน tax_document (doc_type = ภ.พ.30) และให้นักบัญชียืนยันก่อนยื่นจริงทุกครั้ง โดยเฉพาะกรณีฟาร์มมีทั้งรายได้ที่ยกเว้นภาษี (ผลผลิตดิบ) และรายได้ที่ต้องเสียภาษี (สินค้าแปรรูป) ปะปนกัน ซึ่งอาจต้องเฉลี่ยภาษีซื้อตามสัดส่วนรายได้ตามหลักเกณฑ์ของกรมสรรพากร ไม่ใช่หักเต็มจำนวนเสมอไป</p>
       </article>
 
       <article class="card">

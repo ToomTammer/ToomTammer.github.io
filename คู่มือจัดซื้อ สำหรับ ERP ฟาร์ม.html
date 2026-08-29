@@ -591,13 +591,17 @@
               <tr><td class="mono">vendor_id</td><td class="type">เลขอ้างอิง (FK → vendor)</td><td>สั่งซื้อจากผู้ขายรายไหน</td></tr>
               <tr><td class="mono">pr_ref</td><td class="type">ข้อความ (text, ว่างได้)</td><td>เลขที่ใบขอซื้อต้นทาง ถ้ามาจาก PR</td></tr>
               <tr><td class="mono">order_date / expected_delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่สั่งซื้อ และวันที่คาดว่าจะได้รับของ</td></tr>
-              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมของ PO = SUM(po_line.line_total) (ดูสูตรหัวข้อ 6) — คำนวณแล้วบันทึกเป็นค่านิ่งตอน approve เพื่อให้โมดูลบัญชีดึงไปสร้าง ap_invoice.total_amount ได้โดยไม่ต้องคำนวณซ้ำ</td></tr>
+              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมก่อนภาษี = SUM(po_line.line_total) (ดูสูตรหัวข้อ 6)</td></tr>
+              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดภาษีมูลค่าเพิ่มรวมของ PO = SUM(po_line.line_total &#215; po_line.vat_rate/100) เป็น 0 ถ้าไม่มีบรรทัดไหนเสียภาษี</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมสุทธิ = subtotal_amount + vat_amount — คำนวณแล้วบันทึกเป็นค่านิ่งตอน approve เพื่อให้โมดูลบัญชีดึงไปสร้าง ap_invoice.total_amount ได้โดยไม่ต้องคำนวณซ้ำ</td></tr>
+              <tr><td class="mono">vat_reclaimable</td><td class="type">จริง/เท็จ (boolean)</td><td>ภาษีซื้อของ PO นี้นำไปหักภาษีขายตอนยื่น ภ.พ.30 ได้หรือไม่ ขึ้นกับสถานะจดทะเบียน VAT ของฟาร์มเอง (ไม่ใช่ของผู้ขาย) — ถ้า false ให้ vat_amount ถูกรวมเป็นต้นทุนจริงแทนการหักภาษี ต้องยืนยันกับนักบัญชีก่อนใช้งานจริง</td></tr>
               <tr><td class="mono">status</td><td class="type">ตัวเลือกคงที่ (enum)</td><td>เลือกได้เฉพาะ: draft, pending_approval, approved, partially_received, received, closed, cancelled</td></tr>
               <tr><td class="mono">(line) id</td><td class="type">เลขอ้างอิง/UUID (PK)</td><td>รหัสประจำบรรทัดนี้ ไม่ซ้ำกัน สร้างอัตโนมัติ</td></tr>
               <tr><td class="mono">(line) purchase_order_id</td><td class="type">เลขอ้างอิง (FK → purchase_order)</td><td>บรรทัดนี้เป็นของใบสั่งซื้อไหน</td></tr>
               <tr><td class="mono">(line) item_id</td><td class="type">เลขอ้างอิง (FK → รายการสินค้าในคลัง)</td><td>สั่งซื้อสินค้าอะไร</td></tr>
               <tr><td class="mono">(line) quantity_ordered / quantity_received</td><td class="type">ตัวเลข (decimal)</td><td>จำนวนที่สั่ง และจำนวนที่ได้รับแล้วสะสม</td></tr>
               <tr><td class="mono">(line) unit_price</td><td class="type">ตัวเลข (decimal)</td><td>ราคาต่อหน่วยที่ตกลงซื้อ</td></tr>
+              <tr><td class="mono">(line) vat_rate</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>อัตราภาษีมูลค่าเพิ่มของสินค้าบรรทัดนี้ เช่น 7 (%) ปล่อยว่างหรือ 0 ถ้าสินค้านี้ไม่มี VAT</td></tr>
             </tbody>
           </table>
         </div>
@@ -752,9 +756,14 @@
     <div class="card-grid">
       <article class="card">
         <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ยอดรวมใบสั่งซื้อ (PO Total)</h3><span class="phase-tag phase-1">Phase 1</span></div>
-        <p>คำนวณยอดรวมทุกครั้งที่มีการเพิ่ม/แก้ไขรายการสินค้าใน PO</p>
-        <pre class="formula">po_line.line_total = quantity_ordered &#215; unit_price
-po.total_amount    = SUM(po_line.line_total)</pre>
+        <p>คำนวณยอดรวมทุกครั้งที่มีการเพิ่ม/แก้ไขรายการสินค้าใน PO แยกภาษีมูลค่าเพิ่มออกจากยอดสินค้าเพื่อบันทึกบัญชีและยื่นภาษีได้ถูกต้อง</p>
+        <pre class="formula">po_line.line_total      = quantity_ordered &#215; unit_price
+po_line.line_vat_amount = line_total &#215; vat_rate / 100
+
+po.subtotal_amount = SUM(po_line.line_total)
+po.vat_amount       = SUM(po_line.line_vat_amount)
+po.total_amount     = subtotal_amount + vat_amount</pre>
+        <p class="note" style="margin-top:10px;"><b>หมายเหตุ</b> ถ้า po.vat_reclaimable = false (ฟาร์มไม่ได้จดทะเบียน VAT) ให้ vat_amount ถูกนับรวมเป็นต้นทุนจริงของสินค้าตอนคำนวณ cost_per_unit ในโมดูลบัญชี ไม่ใช่แยกไว้เป็นภาษีซื้อที่ขอคืนได้</p>
       </article>
 
       <article class="card">
@@ -855,8 +864,8 @@ po.total_amount &gt; available_budget
         <p>ดู สร้าง หรือแก้ไข PO พร้อมรายการสินค้าแต่ละบรรทัด</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">ฟอร์มหัว PO: เลือก vendor_id, pr_ref (ถ้ามาจาก PR), order_date, expected_delivery_date</span></li>
-          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (purchase_order_line): item, quantity_ordered, unit_price, line_total คำนวณอัตโนมัติ พร้อมปุ่มเพิ่ม/ลบบรรทัด</span></li>
-          <li class="func-item"><span class="txt">ยอดรวม total_amount แสดงแบบ real-time = SUM(line_total) ตามสูตรหัวข้อ 6</span></li>
+          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (purchase_order_line): item, quantity_ordered, unit_price, vat_rate, line_total คำนวณอัตโนมัติ พร้อมปุ่มเพิ่ม/ลบบรรทัด</span></li>
+          <li class="func-item"><span class="txt">ช่อง vat_reclaimable (นำภาษีซื้อไปหักภาษีขายได้ไหม) และสรุปยอด subtotal_amount, vat_amount, total_amount แบบ real-time ตามสูตรหัวข้อ 6</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ยกเลิก PO" (เฉพาะสถานะยังไม่ได้รับสินค้า) เรียก POST /procurement/purchase-orders/{id}/cancel</span></li>
         </ul>
       </article>

@@ -578,6 +578,8 @@
               <tr><td class="mono">(line) grade</td><td class="type">ข้อความ/ตัวเลือกคงที่ (enum)</td><td>เกรดที่ตกลงซื้อขาย เช่น A, B, C</td></tr>
               <tr><td class="mono">(line) weight / moisture</td><td class="type">ตัวเลข (decimal)</td><td>น้ำหนักและความชื้นโดยประมาณที่ใช้ตั้งราคาตอนสั่งขาย</td></tr>
               <tr><td class="mono">(line) quantity / unit_price</td><td class="type">ตัวเลข (decimal)</td><td>ปริมาณและราคาต่อหน่วยที่ตกลง</td></tr>
+              <tr><td class="mono">(line) is_vat_exempt</td><td class="type">จริง/เท็จ (boolean)</td><td>สินค้าบรรทัดนี้ได้รับยกเว้น VAT หรือไม่ ค่าเริ่มต้น true สำหรับผลผลิตเกษตรดิบตามมาตรา 81 — ต้องให้นักบัญชียืนยันก่อนใช้งานจริง โดยเฉพาะถ้าฟาร์มขายสินค้าแปรรูปด้วย</td></tr>
+              <tr><td class="mono">(line) vat_rate</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>อัตราภาษีมูลค่าเพิ่ม ณ วันขาย เช่น 7 (%) ใช้เมื่อ is_vat_exempt = false เท่านั้น ปล่อยว่างหรือ 0 ถ้ายกเว้นภาษี</td></tr>
             </tbody>
           </table>
         </div>
@@ -597,12 +599,14 @@
               <tr><td class="mono">delivery_date</td><td class="type">วันที่ (date)</td><td>วันที่ส่งของจริง</td></tr>
               <tr><td class="mono">delivered_by</td><td class="type">เลขอ้างอิง (FK → user)</td><td>ใครเป็นคนส่ง/ชั่งของ</td></tr>
               <tr><td class="mono">actual_weight</td><td class="type">ตัวเลข (decimal, ว่างได้)</td><td>น้ำหนักจริงตอนชั่งส่งของ อาจต่างจากที่ประเมินไว้ตอนสั่งขาย</td></tr>
-              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมของใบส่งของนี้ คำนวณจาก final_amount ของทุกบรรทัด (ดูสูตรในหัวข้อ 6) แล้วบันทึกเป็นค่านิ่งตอนปิดใบส่งของ เพื่อให้ ar_invoice.total_amount ที่โมดูลบัญชีดึงไปใช้มีค่าคงที่ ไม่ต้องคำนวณซ้ำ</td></tr>
+              <tr><td class="mono">subtotal_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมก่อนภาษี คำนวณจาก final_amount ของทุกบรรทัด (ดูสูตรในหัวข้อ 6)</td></tr>
+              <tr><td class="mono">vat_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดภาษีมูลค่าเพิ่มรวมของใบส่งของนี้ = SUM(บรรทัดที่ is_vat_exempt=false ของ final_amount &#215; vat_rate/100) เป็น 0 ทั้งใบถ้าทุกบรรทัดยกเว้นภาษี</td></tr>
+              <tr><td class="mono">total_amount</td><td class="type">ตัวเลข (decimal)</td><td>ยอดเงินรวมสุทธิ = subtotal_amount + vat_amount แล้วบันทึกเป็นค่านิ่งตอนปิดใบส่งของ เพื่อให้ ar_invoice.total_amount ที่โมดูลบัญชีดึงไปใช้มีค่าคงที่ ไม่ต้องคำนวณซ้ำ</td></tr>
               <tr><td class="mono">due_date</td><td class="type">วันที่ (date)</td><td>กำหนดชำระเงิน = delivery_date + customer.payment_terms_days คำนวณตอนปิดใบส่งของ ส่งต่อให้ ar_invoice.due_date</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> ปิดใบส่งของ (status ของ sales_order เปลี่ยนเป็น invoiced) จะยิง event ให้โมดูลบัญชีสร้าง ar_invoice + journal entry อัตโนมัติผ่าน <span class="mono">POST /accounting/journal-entries/from-source</span> (source_module = sales) โดยส่ง total_amount, due_date, customer_id, sales_order_ref ไปด้วย — ดู endpoint ด้านล่าง</p>
+        <p class="note" style="margin-top:12px;"><b>หมายเหตุ</b> ปิดใบส่งของ (status ของ sales_order เปลี่ยนเป็น invoiced) จะยิง event ให้โมดูลบัญชีสร้าง ar_invoice + journal entry อัตโนมัติผ่าน <span class="mono">POST /accounting/journal-entries/from-source</span> (source_module = sales) โดยส่ง subtotal_amount, vat_amount, total_amount, due_date, customer_id, sales_order_ref ไปด้วย — ดู endpoint ด้านล่าง</p>
       </article>
 
       <article class="card entity-card">
@@ -745,6 +749,17 @@ final_amount = delivery_note.actual_weight &#215; unit_price</pre>
       </article>
 
       <article class="card">
+        <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>คำนวณภาษีมูลค่าเพิ่ม (VAT Calculation)</h3><span class="phase-tag phase-1">Phase 1</span></div>
+        <p>แยกยอดก่อนภาษีกับภาษีมูลค่าเพิ่มออกจากกันตอนปิดใบส่งของ เพื่อออกใบกำกับภาษีและยื่น ภ.พ.30 ได้ถูกต้อง</p>
+        <pre class="formula">line_vat_amount = (is_vat_exempt ? 0 : final_amount &#215; vat_rate / 100)
+
+delivery_note.subtotal_amount = SUM(final_amount ทุกบรรทัด)
+delivery_note.vat_amount      = SUM(line_vat_amount ทุกบรรทัด)
+delivery_note.total_amount    = subtotal_amount + vat_amount</pre>
+        <p class="note" style="margin-top:10px;"><b>หมายเหตุ</b> ผลผลิตเกษตรดิบ (พืชผล/สัตว์มีชีวิต/ไข่/นม ที่ยังไม่แปรรูป) โดยหลักได้รับยกเว้น VAT ตามมาตรา 81 แห่งประมวลรัษฎากร — ค่าเริ่มต้นของ is_vat_exempt ควรเป็น true แต่ต้องให้นักบัญชี/ผู้สอบบัญชียืนยันสถานะการจดทะเบียนภาษีของฟาร์มและประเภทสินค้าจริงก่อนใช้เป็นค่ามาตรฐานในระบบ</p>
+      </article>
+
+      <article class="card">
         <div class="card-top" style="display:flex;justify-content:space-between;align-items:center;"><h3>ตรวจสอบวงเงินเครดิต (Credit Limit Check)</h3><span class="phase-tag phase-2">Phase 2</span></div>
         <p>ป้องกันไม่ให้ลูกค้าซื้อค้างจ่ายเกินวงเงินที่อนุมัติไว้</p>
         <pre class="formula">outstanding_balance(customer) =
@@ -829,7 +844,7 @@ final_unit_price = unit_price &#215; (1 - discount_pct)</pre>
         <p>คีย์ใบสั่งขายใหม่พร้อมรายการสินค้าและคัดเกรด/ตั้งราคา</p>
         <ul class="func-list">
           <li class="func-item"><span class="txt">เลือกลูกค้า (customer_id) และวันที่สั่งขาย (order_date)</span></li>
-          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (sales_order_line): item_id, grade, weight, moisture, quantity, unit_price พร้อม line_total คำนวณอัตโนมัติ</span></li>
+          <li class="func-item"><span class="txt">ตารางบรรทัดสินค้า (sales_order_line): item_id, grade, weight, moisture, quantity, unit_price, is_vat_exempt, vat_rate พร้อม line_total คำนวณอัตโนมัติ</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "เพิ่มบรรทัดสินค้า" / ลบบรรทัด</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "บันทึกร่าง" และ "ยืนยันใบสั่งขาย" (confirm)</span></li>
         </ul>
@@ -850,7 +865,7 @@ final_unit_price = unit_price &#215; (1 - discount_pct)</pre>
         <ul class="func-list">
           <li class="func-item"><span class="txt">แสดงใบสั่งขายที่ผูกอยู่ (sales_order_id), delivery_date, delivered_by</span></li>
           <li class="func-item"><span class="txt">ช่องกรอก actual_weight พร้อมเทียบกับ weight ที่ประมาณการไว้ (variance_qty)</span></li>
-          <li class="func-item"><span class="txt">แสดง total_amount ที่คำนวณจาก final_amount ทุกบรรทัด และ due_date = delivery_date + customer.payment_terms_days</span></li>
+          <li class="func-item"><span class="txt">แสดงสรุปยอด subtotal_amount, vat_amount, total_amount ที่คำนวณจาก final_amount ทุกบรรทัด (ดูสูตรหัวข้อ 6) และ due_date = delivery_date + customer.payment_terms_days</span></li>
           <li class="func-item"><span class="txt">ปุ่ม "ปิดใบส่งของ" — เปลี่ยน sales_order.status เป็น invoiced และยิงสร้าง ar_invoice ที่โมดูลบัญชี</span></li>
         </ul>
       </article>
